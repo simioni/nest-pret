@@ -1,5 +1,6 @@
-# nest-mongoose-passport-casl
-A production-ready NestJS project that solves much of the basic auth functionality common for most projects.
+# NestJS + Mongoose + Passport + Casl + Swagger + Docker
+
+A fully tested, fully documented, production-ready NestJS project that solves much of the basic functionality common in many projects.
 
 It allows:
 
@@ -10,8 +11,7 @@ It allows:
   - A PoliciesGuard to restrict access to routes only to users who can access them
   - A RolesSerializerInterceptor to serialize the response into an object containing only the fields that the user has access to
 - Versioned user consent for TOS / Cookies / Privacy and other policies
- 
-It's also fully documented using swagger.
+- Standardized and paginated responses
 
 ## Before starting
 Edit the ```/src/config.ts``` file and add your mailer service information.
