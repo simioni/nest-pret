@@ -33,7 +33,7 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 
 ## TODO Milestones
 
-- Add user concent forms with versioned policies
+- Add user consent forms with versioned policies
 - Add option for log-in using social media accounts
 - Add option for delayed email verification (right now it is either required or OFF)
 - Add test coverage
