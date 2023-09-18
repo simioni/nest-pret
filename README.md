@@ -9,6 +9,7 @@ It allows:
 - Claims-based access control, including:
   - A PoliciesGuard to restrict access to routes only to users who can access them
   - A RolesSerializerInterceptor to serialize the response into an object containing only the fields that the user has access to
+- Versioned user consent for TOS / Cookies / Privacy and other policies
  
 It's also fully documented using swagger.
 
