@@ -66,9 +66,13 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 ## User Module <a name="UserModule"></a>
 
 ## Standard Response Module <a name="StandardResponseModule"></a>
-### ✅ @StandardResponse() decorator <a name="StandardResponseDecorator"></a>
+### ✅ @StandardResponse(Class, _options?:_ [_StandardResponseOptions_](#StandardResponseOptions)) <a name="StandardResponseDecorator"></a>
+
 The ```@StandardResponse()``` decorator wraps the returned document (or array of documents) from a route handler into a standardized API response object containing metadata about the request.
-It also applies the swagger documentation ```@ApiResponse``` decorator, providing the correct combined schema for the DTO and the standard reponse object, as well as building example responses for each user role, containing the reponse document as it would be serialized for their role access control policies.
+
+It also applies the swagger documentation ```@ApiResponse``` decorator, providing the correct combined schema for the DTO and the standard reponse object, as well as building example responses for each user role, containing the reponse document properly serialized for their role according to access control policies.
+
+To use this decorator, you must pass in as its first argument the class that represents the type of the object(s) that will be returned from the route (for example, a Model or a DTO).
 
 ``` ts
 import { UserDto } from './dto/user.dto';
@@ -99,6 +103,14 @@ export class UsersController {
 ```
 
 (TODO image of swagger UI with the response examples dropdown open. Comparing a response for User and Admin, with arrows showcasing the extra fields returned only to admin)
+
+<br />
+
+### StandardResponseOptions <a name="StandardResponseOptions"></a>
+
+The ```@StandardResponse()``` decorator can also accept an optional configuration object as its second parameter.
+
+The configuration object ```description``` field is used as the desciption of this response in the OpenAPI docs.
 
 <br />
 
@@ -150,7 +162,7 @@ export class UsersController {
 
 <br />
 
-### PaginatedResponseOptions <a name="PaginatedResponseOptions"></a>
+### - PaginatedResponseOptions <a name="PaginatedResponseOptions"></a>
 
 The ```@PaginatedResponse()``` decorator can accept an optional configuration object as its second parameter.
 
