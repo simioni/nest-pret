@@ -37,12 +37,16 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 ---------------------------------------------------------------------------
 # Reference
 
-[StandardResponse](#StandardResponse)
-## Auth Module
+* [AuthModule](#AuthModule)
+  * [StandardResponse](#StandardResponse)
+* [PoliciesModule](#PoliciesModule)
+* [UserModule](#UserModule)
 
-## Policies Module
+## Auth Module <a name="AuthModule"></a>
 
-## User Module
+## Policies Module <a name="PoliciesModule"></a>
+
+## User Module <a name="UserModule"></a>
 
 ## Standard Response Module
 ### <a name="StandardResponse"></a> ✅ StandardResponse decorator
