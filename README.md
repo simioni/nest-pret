@@ -110,7 +110,13 @@ export class UsersController {
 
 The ```@StandardResponse()``` decorator can also accept an optional configuration object as its second parameter.
 
-The configuration object ```description``` field is used as the desciption of this response in the OpenAPI docs.
+The configuration object currently has a single field: ```description```. It is used as the desciption of this response in the OpenAPI docs.
+
+``` ts
+type StandardResponseOptions = {
+  description?: string
+}
+```
 
 <br />
 
