@@ -38,9 +38,12 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 # Reference
 
 * [AuthModule](#AuthModule)
-  * [StandardResponse](#StandardResponse)
 * [PoliciesModule](#PoliciesModule)
 * [UserModule](#UserModule)
+* [StandardResponseModule](#StandardResponseModule)
+  * [StandardResponseDecorator](#StandardResponse)
+  * [PaginatedResponseDecorator](#PaginatedResponse)
+  * [RawResponseDecorator](#RawResponse)
 
 ## Auth Module <a name="AuthModule"></a>
 
@@ -48,8 +51,8 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 
 ## User Module <a name="UserModule"></a>
 
-## Standard Response Module
-### <a name="StandardResponse"></a> ✅ StandardResponse decorator
+## Standard Response Module <a name="StandardResponseModule"></a>
+### ✅ StandardResponse decorator <a name="StandardResponseDecorator"></a>
 The ```@StandardResponse()``` decorator wraps the returned document (or array of documents) from a route handler into a standardized API response object containing metadata about the request.
 It also applies the swagger documentation ```@ApiResponse``` decorator, providing the correct combined schema for the DTO and the standard reponse object, as well as building example responses for each user role, containing the reponse document as it would be serialized for their role access control policies.
 
@@ -85,7 +88,7 @@ export class UsersController {
 
 <br />
 
-### ✅ PaginatedResponse decorator
+### ✅ PaginatedResponse decorator <a name="PaginatedResponseDecorator"></a>
 The ```@PaginatedResponse()``` is an extension of the StandardResponse that supports pagination. It also properly configures swagger schemas and examples, but allows the use of the ```@PaginationParam()``` parameter decorator to inject the pagination object into the handler. The pagination object contains information about the query params received from the client, as well as methods to set the pagination information, such as total count of results, before returning the results normally.
 
 ``` ts
@@ -133,7 +136,7 @@ export class UsersController {
 
 <br />
 
-### ✅ RawResponse decorator
+### ✅ RawResponse decorator <a name="RawResponseDecorator"></a>
 
 The ```@RawResponse()``` decorator skips wrapping the response and sends the data returned by the handler directly as the route response. This is useful if you set the @StandarResponse() on the controller or even the application level, but wants to override that behavior in a particular route. (For example, to provide a response formatted to other API that you do not control).
 
