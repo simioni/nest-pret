@@ -167,7 +167,7 @@ export class UsersController {
 
 <br />
 
-### - PaginatedResponseOptions <a name="PaginatedResponseOptions"></a>
+### PaginatedResponseOptions <a name="PaginatedResponseOptions"></a>
 
 The ```@PaginatedResponse()``` decorator can accept an optional configuration object as its second parameter.
 
@@ -181,16 +181,12 @@ The other options (```minPageSize```, ```maxPageSize```, ```defaultPageSize```) 
 * Are fully documented in the OpenAPI docs, with descriptions, examples and client side param validation
 
 ``` ts
-@Get('/')
-@PaginatedResponse(UserDto, {
+type PaginatedResponseOptions = {
   description?: string,
   minPageSize?: number,
   maxPageSize?: number,
   defaultPageSize?: number
-})
-async findAll(
-  @PaginationParam() pagination: Pagination,
-): Promise<UserDto[]> {...}
+}
 ```
 
 <br />
