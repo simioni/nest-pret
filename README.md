@@ -41,9 +41,9 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 * [PoliciesModule](#PoliciesModule)
 * [UserModule](#UserModule)
 * [StandardResponseModule](#StandardResponseModule)
-  * [StandardResponseDecorator](#StandardResponse)
-  * [PaginatedResponseDecorator](#PaginatedResponse)
-  * [RawResponseDecorator](#RawResponse)
+  * [StandardResponseDecorator](#StandardResponseDecorator)
+  * [PaginatedResponseDecorator](#PaginatedResponseDecorator)
+  * [RawResponseDecorator](#RawResponseDecorator)
 
 ## Auth Module <a name="AuthModule"></a>
 
