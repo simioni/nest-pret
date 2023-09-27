@@ -14,6 +14,10 @@ A fully tested, fully documented, production-ready NestJS project that solves mu
   - Automatic wrapping of the route handlers return object into a StandardResponse
   - Generation of OpenAPI documentation for routes with proper response schema
   - Generation of OpenAPI response examples with proper serialization for each user role
+- Secure defaults:
+  - Sets secure HTTP response headers (using helmet)
+  - Global IP request rate limiting
+  - Account creation rate limiting
 
 <br />
 
