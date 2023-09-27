@@ -36,6 +36,8 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 
 ---------------------------------------------------------------------------
 # Reference
+
+[StandardResponse](#StandardResponse)
 ## Auth Module
 
 ## Policies Module
@@ -43,7 +45,7 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 ## User Module
 
 ## Standard Response Module
-### ✅ StandardResponse decorator
+### <a name="StandardResponse"></a> ✅ StandardResponse decorator
 The ```@StandardResponse()``` decorator wraps the returned document (or array of documents) from a route handler into a standardized API response object containing metadata about the request.
 It also applies the swagger documentation ```@ApiResponse``` decorator, providing the correct combined schema for the DTO and the standard reponse object, as well as building example responses for each user role, containing the reponse document as it would be serialized for their role access control policies.
 
