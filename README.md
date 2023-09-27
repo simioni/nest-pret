@@ -55,7 +55,6 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 * [StandardResponse Module](#StandardResponseModule)
   * [@StandardResponse() Decorator](#StandardResponseDecorator)
   * [@PaginatedResponse() Decorator](#PaginatedResponseDecorator)
-    * [PaginatedResponseOptions](#PaginatedResponseOptions)
     * [@PaginationParam() Decorator](#PaginationParamDecorator)
   * [@RawResponse() Decorator](#RawResponseDecorator)
 
@@ -120,7 +119,7 @@ type StandardResponseOptions = {
 
 <br />
 
-### ✅ @PaginatedResponse() decorator <a name="PaginatedResponseDecorator"></a>
+### ✅ @PaginatedResponse(Class, _options?:_ [_PaginatedResponseOptions_](#PaginatedResponseOptions)) <a name="PaginatedResponseDecorator"></a>
 The ```@PaginatedResponse()``` is an extension of the StandardResponse that supports pagination. It also properly configures swagger schemas and examples, but allows the use of the ```@PaginationParam()``` parameter decorator to inject the pagination object into the handler. The pagination object contains information about the query params received from the client, as well as methods to set the pagination information, such as total count of results, before returning the results normally.
 
 ``` ts
