@@ -153,13 +153,15 @@ export class UsersController {
 ### PaginatedResponseOptions <a name="PaginatedResponseOptions"></a>
 
 The ```@PaginatedResponse()``` decorator can accept an optional configuration object as its second parameter.
-Just like in ```@StandardResponse()```, the ```description``` option is used to describe this response in the OpenAPI docs.
-The other options (```minPageSize```, ```maxPageSize```, ```defaultPageSize```) are used across several places:
 
-* They provide the default value used if the route was called without query parameters
-* They are included in the response object to let the client know how many/few items it can ask at a time
-* They are used for validation of the query parameters input
-* They are fully documented in the OpenAPI docs, with descriptions, examples and client side param validation
+Just like in ```@StandardResponse()```, the ```description``` option is used to describe this response in the OpenAPI docs.
+
+The other options (```minPageSize```, ```maxPageSize```, ```defaultPageSize```) are used across several places. They:
+
+* Provide the default value used if the route was called without query parameters
+* Are included in the response object to let the client know how many/few items it can ask at a time
+* Are used for validation of the query parameters input
+* Are fully documented in the OpenAPI docs, with descriptions, examples and client side param validation
 
 ``` ts
 @Get('/')
