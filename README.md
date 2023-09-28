@@ -124,7 +124,7 @@ type StandardResponseOptions = {
 ### ✅ @PaginatedResponse(Class, _options?:_ [_PaginatedResponseOptions_](#PaginatedResponseOptions)) <a name="PaginatedResponseDecorator"></a>
 The ```@PaginatedResponse()``` is an extension of the StandardResponse that supports pagination. It also properly configures swagger schemas and examples, but allows the use of the ```@PaginationParam()``` parameter decorator to inject the pagination object into the handler. The pagination object contains information about the query params received from the client, as well as methods to set the pagination information, such as total count of results, before returning the results normally.
 
-> Your route handler must return an instance of a concrete class, or an array of them. Plain JS objcts will not work! [See why](#HandlersMustReturnClassInstances)
+> Your route handler must return an array of instances of a concrete class. Plain JS objcts will not work! [See why](#HandlersMustReturnClassInstances)
 
 ``` ts
 import { UserDto } from './dto/user.dto';
