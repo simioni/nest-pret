@@ -73,6 +73,8 @@ It also applies the swagger documentation ```@ApiResponse``` decorator, providin
 
 To use this decorator, you must pass in as its first argument the class that represents the type of the object(s) that will be returned from the route (for example, a Model or a DTO).
 
+> Your route handler must return an instance of a concrete class, or an array of them. Plain JS objcts will not work! [See why](#HandlersMustReturnClassInstances)
+
 ``` ts
 import { UserDto } from './dto/user.dto';
 
@@ -224,12 +226,14 @@ The ```@RawResponse()``` decorator skips wrapping the response and sends the dat
 
 <br />
 
-### ✅ You should return class instances from route handlers, not plain objects or DB documents
+### ✅ You should return class instances from route handlers, not plain objects or DB documents <a name="HandlersMustReturnClassInstances"></a>
 NestJS' request pipeline greatly benefits from receiving DTOs or Model class instances as responses from request handlers. This allows interceptors to perform serialization, caching, and other data transformations to the document before sending it to the client.
 
-StandardResponse also rely on an interceptor that uses reflection to read the metadata set by its decorators in order to write documentation and properly wrap the response.
+StandardResponse also rely on an interceptor that uses reflection to read the metadata set by its decorators. Since the typing information and other metadata for Models or DTOs is set on the class that represents them, you need to return instances of these classes from route handlers.
 
-Since the typing information and other metadata for Models or DTOs is set on the class that represents them, you need to return instances of these classes from route handlers.
+### ✅ Use concrete JS classes as types, not typescript interfaces
+
+Typescript interfaces are a developer utility feature, and are completely removed from compiled code. Since we want to perform data validation and transformation on deployed code, we need the typing information to be available at runtime. NestJS (as well as this library) achieve this by storing type, validation constrainsts and other metadata as properties in the classes that data objects are constructed from. These can be Models, Entities, Schemas, DTOs or any other class that was anotated with the proper decorators.
 
 <br />
 
