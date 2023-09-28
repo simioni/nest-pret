@@ -233,7 +233,7 @@ StandardResponse also rely on an interceptor that uses reflection to read the me
 
 ### ✅ Use concrete JS classes as types, not typescript interfaces
 
-Typescript interfaces are a developer utility feature, and are completely removed from compiled code. Since we want to perform data validation and transformation on deployed code, we need the typing information to be available at runtime. NestJS (as well as this library) achieve this by storing type, validation constrainsts and other metadata as properties in the classes that data objects are constructed from. These can be Models, Entities, Schemas, DTOs or any other class that was anotated with the proper decorators.
+Typescript interfaces are a developer utility feature, and are completely removed from compiled code. Since we want to perform data validation and transformation on deployed code, we need the typing information to be available at runtime. NestJS (as well as this library) achieve this by storing type, validation constrainsts and other metadata as properties in the classes that describe the data objects. These can be Models, Entities, Schemas, DTOs or any other class that was anotated with the proper decorators.
 
 <br />
 
