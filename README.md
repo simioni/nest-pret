@@ -169,9 +169,9 @@ export class UsersController {
 
 ### PaginatedResponseOptions <a name="PaginatedResponseOptions"></a>
 
-The ```@PaginatedResponse()``` decorator can accept an optional configuration object as its second parameter.
+The ```@PaginatedResponse()``` decorator can accept an optional second parameter containing a configuration object.
 
-Just like in ```@StandardResponse()```, the ```description``` option is used to describe this response in the OpenAPI docs.
+Just like in ```@StandardResponse()```, the ```description``` field of the configuration is used to describe the response in the OpenAPI docs.
 
 The other options (```minPageSize```, ```maxPageSize```, ```defaultPageSize```) are used across several places. They:
 
@@ -220,7 +220,7 @@ async findAll(
 
 ### ✅ @RawResponse() decorator <a name="RawResponseDecorator"></a>
 
-The ```@RawResponse()``` decorator skips wrapping the response and sends the data returned by the handler directly as the route response. This is useful if you set the @StandarResponse() on the controller or even the application level, but wants to override that behavior in a particular route. (For example, to provide a response formatted to other API that you do not control).
+The ```@RawResponse()``` decorator skips wrapping the response and sends the data returned by the handler directly as the route response. This is useful if you set the @StandardResponse() on the controller or even the application level, but wants to override that behavior in a particular route. (For example, to provide a response formatted to other API that you do not control).
 
 <br />
 
