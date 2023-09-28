@@ -35,7 +35,7 @@ To start using Docker, run:
 
 It will use docker-compose to lift a Mongo DB, a Mongo-Express visual DB admin page on port 8081, and the NestJS app in watch mode.
 
-> If running in Docker, you're not required to run ```npm install``` locally, but you still might want to do so in order to get auto-complete in your code editor.
+> If running in Docker, you're not required to run ```npm install``` locally, but you still might want to do so in order to get features such as auto-import and auto-complete in your code editor.
 
 ## Start without docker
 
