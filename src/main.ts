@@ -48,8 +48,10 @@ async function bootstrap() {
     .build();
 
   const swaggerUiOptions = {
-    explorer: true,
+    // explorer: true,
     swaggerOptions: {
+      filter: true,
+      // deepLinking: true,
       persistAuthorization: true,
       defaultModelsExpandDepth: 0, // set to -1 to hide the 'Schemas' section from docs
     },

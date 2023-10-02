@@ -25,6 +25,8 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.1.12",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
     "express-rate-limit": "^7.0.2",
     "helmet": "^7.0.0",
     "reflect-metadata": "^0.1.13",
