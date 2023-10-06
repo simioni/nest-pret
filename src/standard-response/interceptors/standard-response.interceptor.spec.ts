@@ -26,24 +26,30 @@ describe('StandardResponseInterceptor', () => {
   beforeEach(async () => {
     reflector = new Reflector();
     interceptor = new StandardResponseInterceptor(reflector);
-    const moduleRef = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [AppService],
-    }).compile();
-
-    appService = moduleRef.get<AppService>(AppService);
-    appController = moduleRef.get<AppController>(AppController);
+    // const moduleRef = await Test.createTestingModule({
+    //   controllers: [AppController],
+    //   providers: [AppService],
+    // }).compile();
+    // appService = moduleRef.get<AppService>(AppService);
+    // appController = moduleRef.get<AppController>(AppController);
   });
 
   it('should be defined', async () => {
-    // (
-    //   executionContext.switchToHttp().getRequest as jest.Mock<any, any>
-    // ).mockReturnValueOnce({
-    //   body: { data: 'mocked data' },
-    // });
-    // callHandler.handle.mockResolvedValueOnce('next handle');
-    // const context = createMock<ExecutionContext>();
-    const testUser = { name: 'mark' };
+    const testPayload = {
+      id: '1234',
+      name: 'mark',
+    };
+    const context = createMock<ExecutionContext>();
+    const handler = createMock<CallHandler>({
+      handle: () => of(testPayload),
+    });
+    const userObservable = interceptor.intercept(context, handler);
+    const response = await lastValueFrom(userObservable);
+    console.log(JSON.stringify(response));
+    expect(response.data.name).toEqual(testPayload.name);
+  });
+
+  it('should wrap basic responses', () => {
     // const context = createMock<ExecutionContext>({
     //   switchToHttp: () => ({
     //     getRequest: () => ({
@@ -51,15 +57,6 @@ describe('StandardResponseInterceptor', () => {
     //     }),
     //   }),
     // });
-    const context = createMock<ExecutionContext>();
-    const handler = createMock<CallHandler>({
-      handle: () => of(testUser),
-    });
-    const userObservable = interceptor.intercept(context, handler);
-    const response = await lastValueFrom(userObservable);
-    console.log(response);
-    expect(response.data.name).toEqual(testUser.name);
-
     // const actualValue = await interceptor.intercept(context, callHandler);
     // expect(actualValue).toBe('next handle');
     // expect(executionContext.switchToHttp().getRequest().user).toEqual({
@@ -69,19 +66,21 @@ describe('StandardResponseInterceptor', () => {
     // expect(callHandler.handle).toBeCalledTimes(1);
   });
 
-  it('should wrap basic responses', () => {
-    expect(interceptor).toBeDefined();
-  });
-
   it('should wrap paginated responses', () => {
-    expect(interceptor).toBeDefined();
+    // (
+    //   executionContext.switchToHttp().getRequest as jest.Mock<any, any>
+    // ).mockReturnValueOnce({
+    //   body: { data: 'mocked data' },
+    // });
+    // callHandler.handle.mockResolvedValueOnce('next handle');
+    // const context = createMock<ExecutionContext>();
   });
 
   it('should wrap sorted responses', () => {
-    expect(interceptor).toBeDefined();
+    // expect(interceptor).toBeDefined();
   });
 
   it('should wrap filtered responses', () => {
-    expect(interceptor).toBeDefined();
+    // expect(interceptor).toBeDefined();
   });
 });

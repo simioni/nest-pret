@@ -5,6 +5,7 @@ import {
   ExecutionContext,
   CallHandler,
   HttpException,
+  Optional,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
@@ -25,22 +26,45 @@ import {
 import { SortingInfoDto } from '../dto/sorting-info.dto';
 import { FilteringInfoDto } from '../dto/filtering-info.dto';
 
+export interface StandardResponseInterceptorOptions {
+  interceptAll?: boolean;
+}
+
+const defaultOptions: StandardResponseInterceptorOptions = {
+  interceptAll: true,
+};
+
 @Injectable()
 export class StandardResponseInterceptor implements NestInterceptor {
   private responseType: RESPONSE_TYPE;
   private responseFeatures: RESPONSE_FEATURES[];
-  private handler: Function;
+  private routeController: new (...args) => {};
+  private routeHandler: Function;
 
-  constructor(private reflector: Reflector) {}
+  constructor(
+    private reflector: Reflector,
+    @Optional()
+    protected readonly options: StandardResponseInterceptorOptions = defaultOptions,
+  ) {}
+
+  // TODO should accept a initialization object with options: (forFeature?)
+  // should intercept every route? (even unannotated ones)
+  // should prevent sending ORM documents directly to client?
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    this.handler = context.getHandler();
-    this.responseType = this.reflector.get(
+    console.log(this.options);
+
+    this.routeController = context.getClass();
+    this.routeHandler = context.getHandler();
+    this.responseType = this.reflector.getAllAndOverride(
       STANDARD_RESPONSE_TYPE_KEY,
-      this.handler,
+      [this.routeHandler, this.routeController],
     );
     this.responseFeatures =
-      this.reflector.get(STANDARD_RESPONSE_FEATURES_KEY, this.handler) ?? [];
+      this.reflector.getAllAndMerge(STANDARD_RESPONSE_FEATURES_KEY, [
+        this.routeHandler,
+        this.routeController,
+      ]) ?? [];
 
     return next.handle().pipe(
       map((data) => {
@@ -65,7 +89,7 @@ export class StandardResponseInterceptor implements NestInterceptor {
     if (this.responseFeatures.includes(RESPONSE_FEATURES.PAGINATION)) {
       const paginationInfo = this.reflector.get<PaginationInfoDto>(
         RESPONSE_PAGINATION_INFO_KEY,
-        this.handler,
+        this.routeHandler,
       );
       responseFields.pagination = paginationInfo;
     }
@@ -73,7 +97,7 @@ export class StandardResponseInterceptor implements NestInterceptor {
     if (this.responseFeatures.includes(RESPONSE_FEATURES.SORTING)) {
       const sortingInfo = this.reflector.get<SortingInfoDto>(
         RESPONSE_SORTING_INFO_KEY,
-        this.handler,
+        this.routeHandler,
       );
       responseFields.sorting = sortingInfo;
     }
@@ -81,7 +105,7 @@ export class StandardResponseInterceptor implements NestInterceptor {
     if (this.responseFeatures.includes(RESPONSE_FEATURES.FILTERING)) {
       const filteringInfo = this.reflector.get<FilteringInfoDto>(
         RESPONSE_FILTERING_INFO_KEY,
-        this.handler,
+        this.routeHandler,
       );
       responseFields.filtering = filteringInfo;
     }
