@@ -39,10 +39,8 @@ export class StandardResponseInterceptor implements NestInterceptor {
       STANDARD_RESPONSE_TYPE_KEY,
       this.handler,
     );
-    this.responseFeatures = this.reflector.get(
-      STANDARD_RESPONSE_FEATURES_KEY,
-      this.handler,
-    );
+    this.responseFeatures =
+      this.reflector.get(STANDARD_RESPONSE_FEATURES_KEY, this.handler) ?? [];
 
     return next.handle().pipe(
       map((data) => {
