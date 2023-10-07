@@ -52,14 +52,18 @@ export class StandardResponseInterceptor implements NestInterceptor {
   // should prevent sending ORM documents directly to client?
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    console.log(this.options);
-
     this.routeController = context.getClass();
     this.routeHandler = context.getHandler();
+
     this.responseType = this.reflector.getAllAndOverride(
       STANDARD_RESPONSE_TYPE_KEY,
       [this.routeHandler, this.routeController],
     );
+
+    if (!this.responseType && !this.options.interceptAll) {
+      return next.handle();
+    }
+
     this.responseFeatures =
       this.reflector.getAllAndMerge(STANDARD_RESPONSE_FEATURES_KEY, [
         this.routeHandler,
@@ -69,7 +73,6 @@ export class StandardResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data) => {
         if (data instanceof HttpException) {
-          // throw data
           return data;
         }
         return this.transformResponse(data);
@@ -114,19 +117,6 @@ export class StandardResponseInterceptor implements NestInterceptor {
 
     transformFunction = (data) =>
       new StandardResponseDto({ ...responseFields, data });
-
-    // if (this.responseType === RESPONSE_TYPE.STANDARD) {
-    //   transformFunction = (data) => new StandardResponseDto({ data });
-    // }
-
-    // if (this.responseType === RESPONSE_TYPE.PAGINATED) {
-    //   const pagination = this.reflector.get<PaginationInfoDto>(
-    //     PAGINATION_INFO_KEY,
-    //     this.handler,
-    //   );
-    //   transformFunction = (data) =>
-    //     new PaginatedResponseDto({ data, pagination });
-    // }
 
     return transformFunction(data);
   }

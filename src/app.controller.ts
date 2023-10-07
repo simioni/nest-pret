@@ -16,35 +16,36 @@ class SomeResponseDto {
 
 @Controller()
 @ApiExtraModels(SomeResponseDto)
-@UseInterceptors(StandardResponseInterceptor)
+// @UseInterceptors(StandardResponseInterceptor)
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @StandardResponse([SomeResponseDto], {
-    isPaginated: true,
-    maxPageSize: 20,
-    minPageSize: 5,
-    isSorted: true,
-    sortingFields: ['popularity', 'title', 'year'],
-    isFiltered: true,
-    filteringFields: [
-      'year',
-      'points',
-      'previousPoints',
-      'email',
-      'medals',
-      'titles',
-      'cars',
-      'name',
-      'surname',
-      'address',
-    ],
-  })
-  getHello(@StandardParam() params: StandardParams): SomeResponseDto[] {
+  // @StandardResponse([SomeResponseDto], {
+  //   isPaginated: true,
+  //   maxPageSize: 20,
+  //   minPageSize: 5,
+  //   isSorted: true,
+  //   sortingFields: ['popularity', 'title', 'year'],
+  //   isFiltered: true,
+  //   filteringFields: [
+  //     'year',
+  //     'points',
+  //     'previousPoints',
+  //     'email',
+  //     'medals',
+  //     'titles',
+  //     'cars',
+  //     'name',
+  //     'surname',
+  //     'address',
+  //   ],
+  // })
+  // getHello(@StandardParam() params: StandardParams): SomeResponseDto[] {
+  getHello(): SomeResponseDto[] {
     // return this.appService.getHello();
-    console.log(params);
-    params.setPaginationInfo({ count: 36 });
+    // console.log(params);
+    // params.setPaginationInfo({ count: 36 });
     const rv = new SomeResponseDto();
     rv.value = 'hello';
     return [rv];
