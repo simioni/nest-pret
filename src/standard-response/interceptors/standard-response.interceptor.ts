@@ -6,11 +6,11 @@ import {
   CallHandler,
   HttpException,
   Optional,
+  Type,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 import { StandardResponseDto } from '../dto/standard-response.dto';
-// import { PaginatedResponseDto } from '../dto/paginated-response.dto';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { PaginationInfoDto } from '../dto/pagination-info.dto';
@@ -25,12 +25,9 @@ import {
 } from '../standard-response.constants';
 import { SortingInfoDto } from '../dto/sorting-info.dto';
 import { FilteringInfoDto } from '../dto/filtering-info.dto';
+import { StandardResponseModuleOptions } from '../interfaces/standard-response-module-options.interface';
 
-export interface StandardResponseInterceptorOptions {
-  interceptAll?: boolean;
-}
-
-const defaultOptions: StandardResponseInterceptorOptions = {
+const defaultOptions: StandardResponseModuleOptions = {
   interceptAll: true,
 };
 
@@ -38,17 +35,16 @@ const defaultOptions: StandardResponseInterceptorOptions = {
 export class StandardResponseInterceptor implements NestInterceptor {
   private responseType: RESPONSE_TYPE;
   private responseFeatures: RESPONSE_FEATURES[];
-  private routeController: new (...args) => {};
+  private routeController: Type<any>;
   private routeHandler: Function;
 
   constructor(
     private reflector: Reflector,
     @Optional()
-    protected readonly options: StandardResponseInterceptorOptions = defaultOptions,
+    protected readonly options: StandardResponseModuleOptions = defaultOptions,
   ) {}
 
-  // TODO should accept a initialization object with options: (forFeature?)
-  // should intercept every route? (even unannotated ones)
+  // TODO should accept a initialization object with options: (forRoot?)
   // should prevent sending ORM documents directly to client?
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
