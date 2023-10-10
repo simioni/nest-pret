@@ -17,6 +17,7 @@ export class StandardResponseModule {
           inject: [Reflector],
         },
       ],
+      imports: [],
       exports: [],
     };
   }
