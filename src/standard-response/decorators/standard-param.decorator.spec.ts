@@ -19,7 +19,7 @@ describe('StandardParamDecorator', () => {
 
   function getContext(payload, decoratorOptions?) {
     class Test {
-      @StandardResponse(undefined, decoratorOptions)
+      @StandardResponse(decoratorOptions)
       public handler(): any {
         return payload;
       }

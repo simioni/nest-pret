@@ -53,7 +53,7 @@ export class AppController {
   }
 
   @Get('/2')
-  @StandardResponse(SomeResponseDto)
+  @StandardResponse({ type: SomeResponseDto })
   getHello2(): SomeResponseDto {
     const rv = new SomeResponseDto();
     rv.value = 'hello2';
@@ -61,7 +61,7 @@ export class AppController {
   }
 
   @Get('/3')
-  @StandardResponse([SomeResponseDto])
+  @StandardResponse({ type: [SomeResponseDto] })
   getHello3(): SomeResponseDto[] {
     const rv = new SomeResponseDto();
     rv.value = 'hello3';

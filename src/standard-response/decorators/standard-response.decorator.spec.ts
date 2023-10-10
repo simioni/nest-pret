@@ -13,10 +13,14 @@ describe('StandardResponseDecorator', () => {
   let handler: CallHandler;
   let testPayload;
 
+  class TestReturnClass {
+    prop1: string;
+    prop2: number;
+  }
   function getContext(payload, decoratorOptions?) {
     class Test {
-      @StandardResponse(undefined, decoratorOptions)
-      public handler(): any {
+      @StandardResponse(decoratorOptions)
+      public handler(): TestReturnClass {
         return payload;
       }
     }
@@ -56,15 +60,21 @@ describe('StandardResponseDecorator', () => {
   it('should support returning arrays of objects', async () => {
     testPayload = [{ name: 'mark' }, { name: 'charlie' }, { name: 'carol' }];
     context = getContext(testPayload, { isPaginated: true });
-    console.log(context.getClass(), context.getHandler());
+    // console.log(context.getClass(), context.getHandler());
+    // console.log(
+    //   reflector.get(STANDARD_RESPONSE_TYPE_KEY, context.getClass()),
+    //   reflector.get(STANDARD_RESPONSE_TYPE_KEY, context.getHandler()),
+    // );
     console.log(
-      reflector.get(STANDARD_RESPONSE_TYPE_KEY, context.getClass()),
-      reflector.get(STANDARD_RESPONSE_TYPE_KEY, context.getHandler()),
-      // Reflect.getMetadataKeys(test, 'routeHandler'),
-      // Reflect.getOwnMetadataKeys(test, 'routeHandler'),
-      // Reflect.getMetadata(STANDARD_RESPONSE_TYPE_KEY, test.routeHandler),
+      Reflect.getMetadataKeys(context.getClass().prototype, 'handler'),
     );
-    // console.log(Reflect.getMetadataKeys(Test.prototype, 'routeHandler'));
+    // [ 'design:returntype', 'design:paramtypes', 'design:type' ]
+    // console.log(
+    //   reflector.get('design:returntype', context.getHandler()),
+    // );
+    // const someType = ReturnType<context.getClass>
+    console.log(reflector.get('design:paramtypes', context.getHandler()));
+    console.log(reflector.get('design:type', context.getHandler()));
     // console.log(Reflect.getMetadataKeys(Test));
     // const decorate = StandardResponse([String], { isPaginated: true });
     // handler = createMock<CallHandler>({
@@ -74,7 +84,7 @@ describe('StandardResponseDecorator', () => {
     interceptor = new StandardResponseInterceptor(reflector);
     const userObservable = interceptor.intercept(context, handler);
     const response = await lastValueFrom(userObservable);
-    console.log(response);
+    // console.log(response);
     expect(response.success).toEqual(true);
     expect(response.isArray).toEqual(true);
     expect(response.data.length).toEqual(3);
