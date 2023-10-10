@@ -7,6 +7,8 @@ import {
   HttpException,
   Optional,
   Type,
+  BadGatewayException,
+  Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
@@ -22,6 +24,7 @@ import {
   RESPONSE_FEATURES,
   RESPONSE_SORTING_INFO_KEY,
   RESPONSE_FILTERING_INFO_KEY,
+  DEFAULT_VALIDATION_ERROR_MESSAGE,
 } from '../standard-response.constants';
 import { SortingInfoDto } from '../dto/sorting-info.dto';
 import { FilteringInfoDto } from '../dto/filtering-info.dto';
@@ -29,10 +32,12 @@ import { StandardResponseModuleOptions } from '../interfaces/standard-response-m
 
 const defaultOptions: StandardResponseModuleOptions = {
   interceptAll: true,
+  validationErrorMessage: DEFAULT_VALIDATION_ERROR_MESSAGE,
 };
 
 @Injectable()
 export class StandardResponseInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(StandardResponseInterceptor.name);
   private responseType: RESPONSE_TYPE;
   private responseFeatures: RESPONSE_FEATURES[];
   private routeController: Type<any>;
@@ -41,11 +46,10 @@ export class StandardResponseInterceptor implements NestInterceptor {
   constructor(
     private reflector: Reflector,
     @Optional()
-    protected readonly options: StandardResponseModuleOptions = defaultOptions,
-  ) {}
-
-  // TODO should accept a initialization object with options: (forRoot?)
-  // should prevent sending ORM documents directly to client?
+    protected readonly options: StandardResponseModuleOptions = {},
+  ) {
+    this.options = { ...defaultOptions, ...options };
+  }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     this.routeController = context.getClass();
@@ -71,9 +75,30 @@ export class StandardResponseInterceptor implements NestInterceptor {
         if (data instanceof HttpException) {
           return data;
         }
+        if (!this.isValidResponse(data)) {
+          return new BadGatewayException();
+        }
         return this.transformResponse(data);
       }),
     );
+  }
+
+  isValidResponse(data) {
+    if (typeof data === 'undefined') return false;
+    if (typeof this.options.validateResponse === 'undefined') return true;
+    if (typeof this.options.validateResponse !== 'function') return false;
+    const isArray = Array.isArray(data);
+    if (isArray) {
+      if (data.some((value) => !this.options.validateResponse(value))) {
+        this.logger.error(this.options.validationErrorMessage);
+        return false;
+      }
+    }
+    if (!isArray && !this.options.validateResponse(data)) {
+      this.logger.error(this.options.validationErrorMessage);
+      return false;
+    }
+    return true;
   }
 
   transformResponse(data) {

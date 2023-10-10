@@ -1,31 +1,33 @@
 import { createMock } from '@golevelup/ts-jest';
 import { CallHandler, ExecutionContext } from '@nestjs/common';
-import { StandardResponseInterceptor } from './standard-response.interceptor';
 import { Reflector } from '@nestjs/core';
-import { Test } from '@nestjs/testing';
-import { AppController } from 'src/app.controller';
-import { AppService } from 'src/app.service';
 import { lastValueFrom, of } from 'rxjs';
+import { StandardResponseInterceptor } from './standard-response.interceptor';
 
 describe('StandardResponseInterceptor', () => {
   let interceptor: StandardResponseInterceptor;
   let reflector: Reflector;
-
-  let appController: AppController;
-  let appService: AppService;
-
-  const executionContext = {
-    switchToHttp: jest.fn().mockReturnThis(),
-    getRequest: jest.fn().mockReturnThis(),
+  let context: ExecutionContext;
+  let handler: CallHandler;
+  const testPayload = {
+    id: '1234',
+    name: 'mark',
   };
 
-  const callHandler = {
-    handle: jest.fn(),
-  };
+  // let appController: AppController;
+  // let appService: AppService;
+
+  // const executionContext = {
+  //   switchToHttp: jest.fn().mockReturnThis(),
+  //   getRequest: jest.fn().mockReturnThis(),
+  // };
 
   beforeEach(async () => {
     reflector = new Reflector();
-    interceptor = new StandardResponseInterceptor(reflector);
+    context = createMock<ExecutionContext>();
+    handler = createMock<CallHandler>({
+      handle: () => of(testPayload),
+    });
     // const moduleRef = await Test.createTestingModule({
     //   controllers: [AppController],
     //   providers: [AppService],
@@ -34,53 +36,61 @@ describe('StandardResponseInterceptor', () => {
     // appController = moduleRef.get<AppController>(AppController);
   });
 
-  it('should be defined', async () => {
-    const testPayload = {
-      id: '1234',
-      name: 'mark',
-    };
-    const context = createMock<ExecutionContext>();
-    const handler = createMock<CallHandler>({
-      handle: () => of(testPayload),
-    });
+  it('should be defined', () => {
+    expect(reflector).toBeDefined();
+    expect(context).toBeDefined();
+    expect(handler.handle).toBeDefined();
+  });
+
+  it('should wrap ALL responses (including unannotated routes) by default', async () => {
+    interceptor = new StandardResponseInterceptor(reflector);
     const userObservable = interceptor.intercept(context, handler);
     const response = await lastValueFrom(userObservable);
-    console.log(JSON.stringify(response));
+    expect(response.success).toEqual(true);
     expect(response.data.name).toEqual(testPayload.name);
   });
 
-  it('should wrap basic responses', () => {
-    // const context = createMock<ExecutionContext>({
-    //   switchToHttp: () => ({
-    //     getRequest: () => ({
-    //       user: 'mocked data',
-    //     }),
-    //   }),
-    // });
-    // const actualValue = await interceptor.intercept(context, callHandler);
-    // expect(actualValue).toBe('next handle');
-    // expect(executionContext.switchToHttp().getRequest().user).toEqual({
-    //   user: 'mocked data',
-    //   addedAttribute: 'example',
-    // });
-    // expect(callHandler.handle).toBeCalledTimes(1);
+  it('should SKIP wrapping responses for unannotated routes when options.interceptAll = false', async () => {
+    interceptor = new StandardResponseInterceptor(reflector, {
+      interceptAll: false,
+    });
+    const userObservable = interceptor.intercept(context, handler);
+    const response = await lastValueFrom(userObservable);
+    expect(response.success).toBeUndefined();
+    expect(response.data).toBeUndefined();
+    expect(response.name).toEqual(testPayload.name);
   });
 
-  it('should wrap paginated responses', () => {
-    // (
-    //   executionContext.switchToHttp().getRequest as jest.Mock<any, any>
-    // ).mockReturnValueOnce({
-    //   body: { data: 'mocked data' },
-    // });
-    // callHandler.handle.mockResolvedValueOnce('next handle');
-    // const context = createMock<ExecutionContext>();
+  it('should SKIP wrapping responses for routes annotated with @RawResponse()', () => {
+    //
   });
 
-  it('should wrap sorted responses', () => {
-    // expect(interceptor).toBeDefined();
+  it('should PREVENT responses that fail to pass options.validateResponse', async () => {
+    interceptor = new StandardResponseInterceptor(reflector, {
+      validateResponse: function shouldNotHaveId(data) {
+        if (typeof data.id !== 'undefined') return false;
+        return true;
+      },
+      validationErrorMessage:
+        'This request will ERROR on purpose to test the validator.',
+    });
+    const userObservable = interceptor.intercept(context, handler);
+    const response = await lastValueFrom(userObservable);
+    expect(response.status).toEqual(502);
+    expect(response.data).toBeUndefined();
   });
 
-  it('should wrap filtered responses', () => {
-    // expect(interceptor).toBeDefined();
+  it('should ALLOW responses that pass options.validateResponse', async () => {
+    interceptor = new StandardResponseInterceptor(reflector, {
+      validateResponse: function shouldHaveIdButNotAge(data) {
+        if (typeof data.id === 'undefined') return false;
+        if (typeof data.age !== 'undefined') return false;
+        return true;
+      },
+    });
+    const userObservable = interceptor.intercept(context, handler);
+    const response = await lastValueFrom(userObservable);
+    expect(response.success).toEqual(true);
+    expect(response.data.id).toEqual(testPayload.id);
   });
 });
