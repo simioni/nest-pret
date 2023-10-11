@@ -43,7 +43,7 @@ describe('StandardParamDecorator', () => {
       public handler(@paramDecorator() value) {}
     }
     const args = Reflect.getMetadata(ROUTE_ARGS_METADATA, Test, 'handler');
-    console.log(args[Object.keys(args)[0]].factory);
+    // console.log(args[Object.keys(args)[0]].factory);
     return args[Object.keys(args)[0]].factory;
   }
 
@@ -70,7 +70,7 @@ describe('StandardParamDecorator', () => {
     param.setPaginationInfo({ count: 330 });
     const userObservable = interceptor.intercept(context, handler);
     const response = await lastValueFrom(userObservable);
-    console.log(response);
+    // console.log(response);
     expect(response.success).toEqual(true);
     expect(response.isArray).toEqual(true);
     expect(response.pagination).toBeDefined();

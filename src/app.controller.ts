@@ -53,7 +53,7 @@ export class AppController {
   }
 
   @Get('/2')
-  @StandardResponse({ type: SomeResponseDto })
+  @StandardResponse({ type: 'string' })
   getHello2(): SomeResponseDto {
     const rv = new SomeResponseDto();
     rv.value = 'hello2';
@@ -61,10 +61,18 @@ export class AppController {
   }
 
   @Get('/3')
-  @StandardResponse({ type: [SomeResponseDto] })
+  @StandardResponse({ type: ['string'] })
   getHello3(): SomeResponseDto[] {
     const rv = new SomeResponseDto();
     rv.value = 'hello3';
+    return [rv, rv];
+  }
+
+  @Get('/4')
+  @StandardResponse({ type: [SomeResponseDto] })
+  getHello4(): SomeResponseDto[] {
+    const rv = new SomeResponseDto();
+    rv.value = 'hello4';
     return [rv, rv];
   }
 }

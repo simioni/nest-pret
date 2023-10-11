@@ -45,16 +45,6 @@ export function StandardResponse<TModel extends ResponseModelType>({
     isArray = true;
   }
 
-  const dataArraySchema = {
-    type: 'array',
-    items: {
-      $ref: getSchemaPath(returnType),
-    },
-  };
-  const dataObjSchema = {
-    $ref: getSchemaPath(returnType),
-  };
-
   const helpText = [];
   if (typeof minPageSize !== 'undefined') helpText.push(`min: ${minPageSize}`);
   if (typeof maxPageSize !== 'undefined') helpText.push(`max: ${maxPageSize}`);
@@ -140,6 +130,22 @@ export function StandardResponse<TModel extends ResponseModelType>({
       }),
     );
   }
+
+  const dataArraySchema = {
+    type: 'array',
+    items: {
+      ...(typeof returnType === 'string'
+        ? { type: 'string' }
+        : { $ref: getSchemaPath(returnType) }),
+      // $ref: getSchemaPath(returnType),
+    },
+  };
+  const dataObjSchema = {
+    ...(typeof returnType === 'string'
+      ? { type: 'string' }
+      : { $ref: getSchemaPath(returnType) }),
+    // $ref: getSchemaPath(returnType),
+  };
 
   decoratorsToApply.push(
     ApiOkResponse({
