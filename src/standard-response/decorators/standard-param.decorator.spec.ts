@@ -2,12 +2,11 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-types */
 import { createMock, PartialFuncReturn } from '@golevelup/ts-jest';
-import { ExecutionContext, CallHandler } from '@nestjs/common';
+import { CallHandler, ExecutionContext } from '@nestjs/common';
 import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants';
 import { Reflector } from '@nestjs/core';
 import { lastValueFrom, of } from 'rxjs';
-import { PaginationInfoDto } from '../dto/pagination-info.dto';
-import { SortingInfoDto, SortingOrder } from '../dto/sorting-info.dto';
+import { SortingOrder } from '../dto/sorting-info.dto';
 import { StandardResponseInterceptor } from '../interceptors/standard-response.interceptor';
 import { StandardResponseOptions } from '../interfaces/standard-response-options.interface';
 import { StandardParam, StandardParams } from './standard-param.decorator';
@@ -131,17 +130,17 @@ describe('StandardParamDecorator', () => {
     console.log(response);
     expect(response.success).toEqual(true);
     expect(response.isArray).toEqual(true);
+    expect(response.data.length).toEqual(4);
+    expect(response.data[3].name).toEqual(testPayload[3].name);
 
     // PAGINATION - from decorator options
     expect(response.isPaginated).toEqual(true);
     expect(response.pagination).toBeDefined();
-    expect(response.pagination).toBeInstanceOf(PaginationInfoDto);
     expect(response.pagination.minPageSize).toEqual(4);
     expect(response.pagination.maxPageSize).toEqual(22);
     expect(response.pagination.defaultPageSize).toEqual(12);
 
     // PAGINATION - from user query
-    expect(response.pagination.query).toBeDefined();
     expect(response.pagination.query).toEqual('limit=8&offset=16');
     expect(response.pagination.limit).toEqual(8);
     expect(response.pagination.offset).toEqual(16);
@@ -152,31 +151,45 @@ describe('StandardParamDecorator', () => {
     // SORTING - from decorator options
     expect(response.isSorted).toEqual(true);
     expect(response.sorting).toBeDefined();
-    expect(response.sorting).toBeInstanceOf(SortingInfoDto);
     expect(response.sorting.sortingFields).toBeDefined();
     expect(response.sorting.sortingFields.length).toEqual(4);
     expect(response.sorting.sortingFields[1]).toEqual('author');
 
     // SORTING - from user query
-    expect(response.sorting.query).toBeDefined();
-    expect(response.sorting.query).toEqual('');
+    expect(response.sorting.query).toEqual('title,-year');
     expect(Array.isArray(response.sorting.sort)).toEqual(true);
     expect(response.sorting.sort.length).toEqual(2);
     expect(response.sorting.sort[0].field).toEqual('title');
     expect(response.sorting.sort[0].order).toEqual(SortingOrder.ASC);
     expect(response.sorting.sort[1].field).toEqual('year');
-    expect(response.sorting.sort[1].order).toEqual(SortingOrder.ASC);
+    expect(response.sorting.sort[1].order).toEqual(SortingOrder.DES);
 
     // FILTERING - from decorator options
     expect(response.isFiltered).toEqual(true);
-    expect(response.filtering).toBeDefined();
+    expect(response.isFiltered).toBeDefined();
     expect(response.filtering.filteringFields).toBeDefined();
     expect(response.filtering.filteringFields.length).toEqual(2);
     expect(response.filtering.filteringFields[1]).toEqual('year');
 
     // FILTERING - from user query
-
-    expect(response.data.length).toEqual(4);
-    expect(response.data[3].name).toEqual(testPayload[3].name);
+    expect(response.filtering.query).toEqual(
+      'author==John,author==Jake;year>=1890,year<=2000',
+    );
+    expect(Array.isArray(response.filtering.filter.allOf)).toEqual(true);
+    expect(response.filtering.filter.allOf.length).toEqual(2);
+    // filter 1
+    expect(response.filtering.filter.allOf[0].anyOf[0].field).toEqual('author');
+    expect(response.filtering.filter.allOf[0].anyOf[0].operation).toEqual('==');
+    expect(response.filtering.filter.allOf[0].anyOf[0].value).toEqual('John');
+    expect(response.filtering.filter.allOf[0].anyOf[1].field).toEqual('author');
+    expect(response.filtering.filter.allOf[0].anyOf[1].operation).toEqual('==');
+    expect(response.filtering.filter.allOf[0].anyOf[1].value).toEqual('Jake');
+    // filter 2
+    expect(response.filtering.filter.allOf[1].anyOf[0].field).toEqual('year');
+    expect(response.filtering.filter.allOf[1].anyOf[0].operation).toEqual('>=');
+    expect(response.filtering.filter.allOf[1].anyOf[0].value).toEqual('1890');
+    expect(response.filtering.filter.allOf[1].anyOf[1].field).toEqual('year');
+    expect(response.filtering.filter.allOf[1].anyOf[1].operation).toEqual('<=');
+    expect(response.filtering.filter.allOf[1].anyOf[1].value).toEqual('2000');
   });
 });
