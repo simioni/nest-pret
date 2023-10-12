@@ -274,30 +274,74 @@ export class UsersController {
 
 <br />
 
----------------------------------------------------
+The params object injected with @StandardParam() contains three properties:
+
+```ts
+{
+  pagination: PaginationInfo,
+  sorting: SortingInfo,
+  filtering: FilteringInfo,
+}
+
+```
+It also contain three methods, so you can update the data inside the handler when needed (like defining the pagination total count, which is only known after a DB query)
+
+```ts
+{
+  setPaginationInfo: (info: {}) => void,
+  setSortingInfo: (info: {}) => void,
+  setFilteringInfo: (info: {}) => void,
+}
+```
+
+<br />
 
 ## ✅ PaginationInfo
 
 <br />
 
-The ```@StandardParam()``` is a parameter
+```ts
+class PaginationInfoDto {
+  query?: string;
+  count?: number;
+  limit: number;
+  offset: number;
+  maxPageSize?: number;
+  minPageSize?: number;
+  defaultPageSize?: number;
+}
+```
 
 <br />
 
----------------------------------------------------
+## ✅ SortingInfo
 
 <br />
 
-
-The other options (```minPageSize```, ```maxPageSize```, ```defaultPageSize```) are used across several places. They:
-
-* Provide the default value used if the route was called without query parameters
-* Are included in the response object to let the client know how many/few items it can ask at a time
-* Are used for validation of the query parameters input
-* Are fully documented in the OpenAPI docs, with descriptions, examples and client side param validation
+```ts
+class PaginationInfoDto {
+  query?: string;
+  sort?: SortingOperation[];
+  sortableFields?: string[];
+}
+```
 
 <br />
 
+## ✅ FilteringInfo
+
+<br />
+
+```ts
+class PaginationInfoDto {
+  query?: string;
+  filter?: FilteringQueryGroup;
+  filterableFields?: string[];
+}
+```
+
+<br />
+<br />
 <br />
 
 ---------------------------------------------------
@@ -347,9 +391,7 @@ NestJS' request pipeline greatly benefits from receiving DTOs or Model class ins
 StandardResponse also rely on an interceptor that uses reflection to read the metadata set by its decorators. Since the typing information and other metadata for Models or DTOs is set on the class that represents them, you need to return instances of these classes from route handlers.
 
 <br />
-
----------------------------------------------------
-
+<br />
 <br />
 
 ## ✅ Use concrete JS classes as types, not typescript interfaces
