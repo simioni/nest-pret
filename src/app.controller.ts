@@ -8,9 +8,14 @@ import {
 } from './standard-response/decorators/standard-param.decorator';
 // import { StandardResponse } from './standard-response/decorators/standard-response.decorator';
 import { StandardResponseInterceptor } from './standard-response/interceptors/standard-response.interceptor';
+import { RawResponse } from './standard-response/decorators/raw-response.decorator';
 // import { ValidatePaginationQueryPipe } from './standard-response/pipes/validate-pagination-query.pipe';
 
 class SomeResponseDto {
+  value: string;
+}
+
+class SomeRawObjectDefition {
   value: string;
 }
 
@@ -42,6 +47,10 @@ export class AppController {
   //   ],
   // })
   // getHello(@StandardParam() params: StandardParams): SomeResponseDto[] {
+  @RawResponse({
+    type: SomeRawObjectDefition,
+    description: 'This is a RAW response!',
+  })
   getHello(): SomeResponseDto[] {
     // return this.appService.getHello();
     // console.log(params);

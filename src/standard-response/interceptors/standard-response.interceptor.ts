@@ -106,6 +106,7 @@ export class StandardResponseInterceptor implements NestInterceptor {
 
     if (this.responseType === RESPONSE_TYPE.RAW) {
       transformFunction = (data) => data;
+      return transformFunction(data);
     }
 
     const responseFields: Partial<StandardResponseDto<typeof data>> = {};
@@ -133,8 +134,6 @@ export class StandardResponseInterceptor implements NestInterceptor {
       );
       responseFields.filtering = filteringInfo;
     }
-
-    // console.log(responseFields);
 
     transformFunction = (data) =>
       new StandardResponseDto({ ...responseFields, data });

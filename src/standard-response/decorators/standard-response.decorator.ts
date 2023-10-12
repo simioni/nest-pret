@@ -67,6 +67,10 @@ export function StandardResponse<TModel extends ResponseModelType>({
     ApiExtraModels(StandardResponseDto),
   ];
 
+  if (typeof returnType === 'function') {
+    decoratorsToApply.push(ApiExtraModels(returnType));
+  }
+
   if (isPaginated) {
     decoratorsToApply.push(
       SetStandardResponsePaginationInfo({

@@ -61,10 +61,6 @@ describe('StandardResponseInterceptor', () => {
     expect(response.name).toEqual(testPayload.name);
   });
 
-  it('should SKIP wrapping responses for routes annotated with @RawResponse()', () => {
-    //
-  });
-
   it('should PREVENT responses that fail to pass options.validateResponse', async () => {
     interceptor = new StandardResponseInterceptor(reflector, {
       validateResponse: function shouldNotHaveId(data) {

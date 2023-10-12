@@ -152,7 +152,6 @@ describe('StandardResponseDecorator', () => {
     interceptor = new StandardResponseInterceptor(reflector);
     const userObservable = interceptor.intercept(context, handlerArray);
     const response = await lastValueFrom(userObservable);
-    console.log(response);
     expect(response.success).toEqual(true);
     expect(response.isArray).toEqual(true);
 
