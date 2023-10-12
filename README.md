@@ -52,28 +52,59 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 * [Auth Module](#AuthModule)
 * [Policies Module](#PoliciesModule)
 * [User Module](#UserModule)
+* [Config Module](#ConfigModule)
 * [StandardResponse Module](#StandardResponseModule)
   * [@StandardResponse() Decorator](#StandardResponseDecorator)
-  * [@PaginatedResponse() Decorator](#PaginatedResponseDecorator)
-    * [@PaginationParam() Decorator](#PaginationParamDecorator)
+    * [StandardResponseOptions](#StandardResponseOptions)
+    * [@StandardParam() Param Decorator](#StandardParamDecorator)
   * [@RawResponse() Decorator](#RawResponseDecorator)
 
-## Auth Module <a name="AuthModule"></a>
+# Auth Module <a name="AuthModule"></a>
 
-## Policies Module <a name="PoliciesModule"></a>
+# Policies Module <a name="PoliciesModule"></a>
 
-## User Module <a name="UserModule"></a>
+# User Module <a name="UserModule"></a>
 
-## Standard Response Module <a name="StandardResponseModule"></a>
-### ✅ @StandardResponse(Class, _options?:_ [_StandardResponseOptions_](#StandardResponseOptions)) <a name="StandardResponseDecorator"></a>
+# Config Module <a name="ConfigModule"></a>
 
-The ```@StandardResponse()``` decorator wraps the returned document (or array of documents) from a route handler into a standardized API response object containing metadata about the request.
+# Standard Response Module <a name="StandardResponseModule"></a>
 
-It also applies the swagger documentation ```@ApiResponse``` decorator, providing the correct combined schema for the DTO and the standard reponse object, as well as building example responses for each user role, containing the reponse document properly serialized for their role according to access control policies.
+* Metadata-based wrapper to provide customizable standard API response objects, including pagination, sorting and filtering.
 
-To use this decorator, you must pass in as its first argument the class that represents the type of the object(s) that will be returned from the route (for example, a Model or a DTO).
+* Allows route handlers to keep returning DTOs instead of wrapper objects, so they remain fully compatible with interceptors.
+
+To set up, just import ```StandardResponseModule.forRoot()``` in the imports array of your application module.
+
+```ts
+@Module({
+  imports: [
+    StandardResponseModule.forRoot(),
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+```
+
+## ✅ @StandardResponse(_options?:_ [_StandardResponseOptions_](#StandardResponseOptions)) <a name="StandardResponseDecorator"></a>
+
+<br />
+
+The ```@StandardResponse()``` decorator causes the return of a route handler to be wrapped into a standardized API response object, while still allowing the handler to return true DTOs or other model class instances.
+
+This makes interceptors like caching, ```ClassSerializer```, or ```RoleSerializer``` work transparently.
+
+The wrapper allow custom messages to be set in the response, and has optional features to handle common tasks, like **pagination, sorting and filtering**.
+
+It can also optionally apply swagger's documentation ```@ApiResponse```, providing the correct combined schema for the DTO and the wrapper including any of its features.
+
+If given an array of Roles, it can also build Swagger route response examples for each user role, containing the reponse as it would be serialized for that user group.
+
+<br/>
 
 > Your route handler must return an instance of a concrete class (such as a DTO or Model), or an array of them. Plain JS objcts will not work! [See why](#HandlersMustReturnClassInstances)
+
+<br/>
 
 ``` ts
 import { UserDto } from './dto/user.dto';
@@ -85,10 +116,10 @@ export class UsersController {
   ) {}
 
   @Get('/')
-  @StandardResponse(UserDto)
+  @StandardResponse({ type: [UserDto] })
   async findAll(): Promise<UserDto[]> {
     const users = await this.usersService.findAll();
-    return users // <----- returns an array of UserDtos
+    return users // <--- returns an array of UserDtos
   }
 }
 
@@ -98,7 +129,7 @@ export class UsersController {
   "success": true,
   "isArray": true,
   "data": [
-    Users... // <----- The array of UserDtos is wrapped and delivered inside the data property
+    Users... // <--- The returned array is delivered inside the data property
   ]
 }
 ```
@@ -107,24 +138,92 @@ export class UsersController {
 
 <br />
 
-### StandardResponseOptions <a name="StandardResponseOptions"></a>
-
-The ```@StandardResponse()``` decorator can also accept an optional configuration object as its second parameter.
-
-The configuration object currently has a single field: ```description```. It is used as the desciption of this response in the OpenAPI docs.
-
-``` ts
-type StandardResponseOptions = {
-  description?: string
-}
-```
+-------------------------------------------
 
 <br />
 
-### ✅ @PaginatedResponse(Class, _options?:_ [_PaginatedResponseOptions_](#PaginatedResponseOptions)) <a name="PaginatedResponseDecorator"></a>
-The ```@PaginatedResponse()``` is an extension of the StandardResponse that supports pagination. It also properly configures swagger schemas and examples, but allows the use of the ```@PaginationParam()``` parameter decorator to inject the pagination object into the handler. The pagination object contains information about the query params received from the client, as well as methods to set the pagination information, such as total count of results, before returning the results normally.
+## ✅ StandardResponseOptions <a name="StandardResponseOptions"></a>
 
-> Your route handler must return an array of instances of a concrete class (such as DTOs or Models). Plain JS objcts will not work! [See why](#HandlersMustReturnClassInstances)
+<br />
+
+<table>
+  <tr>
+    <th>Option</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>type</td>
+    <td><i>Class</i></td>
+    <td>The class that represents the object(s) that will be returned from the route (for example, a Model or a DTO). This option is required to get auto-documentation.</td>
+  </tr>
+  <tr>
+    <td>description</td>
+    <td><i>string</i></td>
+    <td>Used as the desciption field of the response in the OpenAPI docs.</td>
+  </tr>
+  <tr>
+    <td>isPaginated</td>
+    <td><i>boolean</i></td>
+    <td>Mark the route to serve paginated responses, and allow the use of pagination options. This will capture and validate <code>limit</code> and <code>offset</code> query parameters, and make them available in the handler via <code>@StandardParam</code>. Also sets up pagination fields in the response object. </td>
+  </tr>
+  <tr>
+    <td>isSorted</td>
+    <td><i>boolean</i></td>
+    <td>Mark the route to serve sorted responses, and allow the use of sorting options. This will capture and validate the <code>sort</code> query parameter, and make it available in the handler via <code>@StandardParam</code>. Also sets up sorting fields in the response object. </td>
+  </tr>
+  <tr>
+    <td>isFiltered</td>
+    <td><i>boolean</i></td>
+    <td>Mark the route to serve filtered responses, and allow the use of filtering options. This will capture and validate the <code>filter</code> query parameter, parse it into a <code>FilteringQuery</code>, an and make it available in the handler via <code>@StandardParam</code>. Also sets up filtering fields in the response object. </td>
+  </tr>
+  <tr>
+    <th colspan="3"></th>
+  </tr>
+  <tr>
+    <td>defaultPageSize</td>
+    <td><i>number</i></td>
+    <td><i><b>(Pagination option) </b></i>The value to used for <code>limit</code> if the query param is missing. <i><b>(Defaults to 10)</b></i></td>
+  </tr>
+  <tr>
+    <td>maxPageSize</td>
+    <td><i>number</i></td>
+    <td><i><b>(Pagination option) </b></i>The maximum value accepted by the <code>limit</code> query param.</td>
+  </tr>
+  <tr>
+    <td>minPageSize</td>
+    <td><i>number</i></td>
+    <td><i><b>(Pagination option) </b></i>The minimum value accepted by the <code>limit</code> query param.</td>
+  </tr>
+  <tr>
+    <th colspan="3"></th>
+  </tr>
+  <tr>
+    <td>sortableFields</td>
+    <td><i>string[]</i></td>
+    <td><i><b>(Sorting option) </b></i>A list of fields that can used for sorting. If left undefined, all fields will be accepted.</td>
+  </tr>
+  <tr>
+    <th colspan="3"></th>
+  </tr>
+  <tr>
+    <td>filterableFields</td>
+    <td><i>string[]</i></td>
+    <td><i><b>(Filtering option) </b></i>A list of fields that can used for filtering. If left undefined, all fields will be accepted.</td>
+  </tr>
+</table>
+
+<br />
+
+---------------------------------------------------
+
+## ✅ @StandardParam() <a name="StandardParamDecorator"></a>
+
+<br />
+
+The ```@StandardParam()``` is a parameter decorator used to inject a ```StandardParams``` object in the route handler. This object allows access to all metadata set by ```@StandardResponse()```, as well as all the information captured from query parameters.
+
+<br />
 
 ``` ts
 import { UserDto } from './dto/user.dto';
@@ -136,46 +235,59 @@ export class UsersController {
   ) {}
 
   @Get('/')
-  @PaginatedResponse(UserDto)
+  @StandardResponse({
+    type: [UserDto],
+    isPaginated: true,
+    maxLimit: 24,
+    defaultLimit 12,
+  })
   async findAll(
-    @PaginationParam() pagination: Pagination, // <----- injects the pagination object into the handler
+    @StandardParam() params: StandardParams // <--- inject into handler
   ): Promise<UserDto[]> {
-    const { limit, offset } = pagination.query
-
-    const count = await this.usersService.countAll();
-    pagination.set({ count })
-
-    const users = await this.usersService.findAll(limit, offset);    
-    return users
+    const [users, count] = await this.usersService.findAll({
+      limit: params.pagination.limit,
+      offset: params.pagination.offset,
+    });
+    params.setPaginationInfo({ count: 348 }) // <--- set additional info
+    return users;
   }
 }
 
-// get /api/users?limit=10&offset=20
+// get /api/users?limit=15&offset=30
 // Response:
 {
   "success": true,
   "isArray": true,
   "isPaginated": true,
-  "pagination": {
-    "limit": 10,
-    "offset": 20,
-    "count": 192,
-    "minPageSize": 5,
-    "maxPageSize": 20,
-  },
+  "pagination: {
+    count: 348, // <--- added inside the handler
+    limit: 15, // <--- from query
+    offset: 30,
+    maxLimit: 24, // <--- from decorator options
+    defaultLimit: 12,
+  }
   "data": [
-    Users... // <----- The array of UserDtos is wrapped and delivered inside the data property
+    Users...
   ]
 }
 ```
 
 <br />
 
-### PaginatedResponseOptions <a name="PaginatedResponseOptions"></a>
+---------------------------------------------------
 
-The ```@PaginatedResponse()``` decorator can accept an optional second parameter containing a configuration object.
+## ✅ PaginationInfo
 
-Just like in ```@StandardResponse()```, the ```description``` field of the configuration is used to describe the response in the OpenAPI docs.
+<br />
+
+The ```@StandardParam()``` is a parameter
+
+<br />
+
+---------------------------------------------------
+
+<br />
+
 
 The other options (```minPageSize```, ```maxPageSize```, ```defaultPageSize```) are used across several places. They:
 
@@ -184,58 +296,71 @@ The other options (```minPageSize```, ```maxPageSize```, ```defaultPageSize```) 
 * Are used for validation of the query parameters input
 * Are fully documented in the OpenAPI docs, with descriptions, examples and client side param validation
 
-``` ts
-type PaginatedResponseOptions = {
-  description?: string,
-  minPageSize?: number,
-  maxPageSize?: number,
-  defaultPageSize?: number
+<br />
+
+<br />
+
+---------------------------------------------------
+
+<br />
+
+## ✅ @RawResponse() <a name="RawResponseDecorator"></a>
+
+The default behavior of StandardResponse is to wrap the response from all routes application wide. This keeps the API consistent and predictable. However, if you need to skip this behavior for a particular route, just set the ```@RawResponse()``` decorator:
+
+```ts
+@Controller('external-api-integration')
+export class ExternalApiIntegrationController {
+  @Get('/')
+  @RawResponse() // <--- will skip wrapping
+  async findAll(): Promise<SomeCustomObject> {
+    return customObject;
+  }
 }
+```
+
+
+If you're adding StandardResponse into an existing app, it might be useful to invert this behavior to create a gradual transition path. To do this, set the ```interceptAll``` option to ```false``` when importing the ```StandardResponseModule``` in your application. This way, routes will only be wrapped if they have explicitly set the ```@StandardResponse()``` decorator.
+
+```ts
+@Module({
+  imports: [
+    StandardResponseModule.forRoot({
+      interceptAll: false
+    }),
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
 ```
 
 <br />
 
-### ✅ @PaginationParam() decorator <a name="PaginationParamDecorator"></a>
-
-A param decorator to be injected into a route handler that was annotated with ```@PaginatedResponse()```. It provides one property, ```query```, containing the validated query data sent from the client in the following format: ```{ limit: number, offset: number }```. It also contains two methods, ```get()``` and ```set()```, allowing you to read the current pagination metadata (composed by default values plus the query from the client), or setting extra information in it, like the total ```count``` of items.
-
-``` ts
-@PaginatedResponse(UserDto)
-async findAll(
-  @PaginationParam() pagination: Pagination,
-): Promise<UserDto[]> {
-  const { limit, offset } = pagination.query
-  pagination.set({ count: 123 })
-  ...
-}
-
-// pagination object
-{
-  query: {
-    limit: number,
-    offset: number
-  },
-  get: () => PaginationInfoDto,
-  set: (metadata: Partial<PaginationInfoDto>) => void
-}
-```
+---------------------------------------------------
 
 <br />
 
-### ✅ @RawResponse() decorator <a name="RawResponseDecorator"></a>
-
-The ```@RawResponse()``` decorator skips wrapping the response and sends the data returned by the handler directly as the route response. This is useful if you set the @StandardResponse() on the controller or even the application level, but wants to override that behavior in a particular route. (For example, to provide a response formatted to other API that you do not control).
-
-<br />
-
-### ✅ You should return class instances from route handlers, not plain objects or DB documents <a name="HandlersMustReturnClassInstances"></a>
+## ✅ You should return class instances from route handlers, not plain objects or DB documents <a name="HandlersMustReturnClassInstances"></a>
 NestJS' request pipeline greatly benefits from receiving DTOs or Model class instances as responses from request handlers. This allows interceptors to perform serialization, caching, and other data transformations to the document before sending it to the client.
 
 StandardResponse also rely on an interceptor that uses reflection to read the metadata set by its decorators. Since the typing information and other metadata for Models or DTOs is set on the class that represents them, you need to return instances of these classes from route handlers.
 
-### ✅ Use concrete JS classes as types, not typescript interfaces
+<br />
 
-Typescript interfaces are a developer utility feature, and are completely removed from compiled code. Since we want to perform data validation and transformation on deployed code, we need the typing information to be available at runtime. NestJS (as well as this library) achieve this by storing type, validation constrainsts and other metadata as properties in the classes that describe the data objects. These can be Models, Entities, Schemas, DTOs or any other class that was anotated with the proper decorators.
+---------------------------------------------------
+
+<br />
+
+## ✅ Use concrete JS classes as types, not typescript interfaces
+
+Typescript interfaces are completely removed from compiled code. Since we want to perform data validation and transformation during execution, we need the typing information to be available at runtime. NestJS (as well as this library) achieve this by storing type, validation constrainsts and other metadata as properties in the classes that describe the data objects. These can be Models, Entities, Schemas, DTOs or any other class that was anotated with the proper decorators.
+
+<br />
+<br />
+<br />
+
+---------------------------------------------------
 
 <br />
 
