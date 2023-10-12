@@ -296,7 +296,7 @@ It also contain three methods, so you can update the data inside the handler whe
 
 <br />
 
-## ✅ PaginationInfo
+## PaginationInfo
 
 <br />
 
@@ -314,7 +314,7 @@ class PaginationInfoDto {
 
 <br />
 
-## ✅ SortingInfo
+## SortingInfo
 
 <br />
 
@@ -328,7 +328,7 @@ class PaginationInfoDto {
 
 <br />
 
-## ✅ FilteringInfo
+## FilteringInfo
 
 <br />
 
@@ -364,7 +364,45 @@ export class ExternalApiIntegrationController {
 ```
 
 
-If you're adding StandardResponse into an existing app, it might be useful to invert this behavior to create a gradual transition path. To do this, set the ```interceptAll``` option to ```false``` when importing the ```StandardResponseModule``` in your application. This way, routes will only be wrapped if they have explicitly set the ```@StandardResponse()``` decorator.
+If you're adding StandardResponse into an existing app, it might be useful to invert this behavior to create a gradual transition path. To do this, set the ```interceptAll``` option to ```false``` when importing the ```StandardResponseModule``` in your application. This way, routes will only be wrapped if they have explicitly set the ```@StandardResponse()``` decorator. See more information in the "Configuring" section bellow.
+
+<br />
+
+---------------------------------------------------
+
+<br />
+
+# Configuring
+
+## ✅ validateResponse
+
+Allows you to provide a validation function to stop the return of a route if certain conditions are met.
+
+For example: this can abort a request if a route tries to return — instead a DTO — a raw DB document or some other object that may leak information not intended to be exposed.
+
+This function should return ```false``` to abort the request.
+
+```ts
+@Module({
+  imports: [
+    StandardResponseModule.forRoot({
+      validateResponse: (data) => {
+        if (isMongooseObject(data)) return false;
+        return true;
+      },
+    }),
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+```
+
+<br/>
+
+## ✅ interceptAll
+
+Setting ```interceptAll``` to ```false``` will invert the default behavior of wrapping all routes by default, and will instead only wrap routes decorated with ```@StandardResponse()```.
 
 ```ts
 @Module({
@@ -381,16 +419,13 @@ export class AppModule {}
 
 <br />
 
----------------------------------------------------
-
-<br />
+# Tips
 
 ## ✅ You should return class instances from route handlers, not plain objects or DB documents <a name="HandlersMustReturnClassInstances"></a>
 NestJS' request pipeline greatly benefits from receiving DTOs or Model class instances as responses from request handlers. This allows interceptors to perform serialization, caching, and other data transformations to the document before sending it to the client.
 
 StandardResponse also rely on an interceptor that uses reflection to read the metadata set by its decorators. Since the typing information and other metadata for Models or DTOs is set on the class that represents them, you need to return instances of these classes from route handlers.
 
-<br />
 <br />
 <br />
 
