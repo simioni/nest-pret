@@ -1,4 +1,4 @@
-import { Controller, Get, UseInterceptors } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ApiExtraModels } from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { StandardResponse } from './standard-response/decorators/standard-response.decorator';
@@ -6,10 +6,7 @@ import {
   StandardParams,
   StandardParam,
 } from './standard-response/decorators/standard-param.decorator';
-// import { StandardResponse } from './standard-response/decorators/standard-response.decorator';
-import { StandardResponseInterceptor } from './standard-response/interceptors/standard-response.interceptor';
 import { RawResponse } from './standard-response/decorators/raw-response.decorator';
-// import { ValidatePaginationQueryPipe } from './standard-response/pipes/validate-pagination-query.pipe';
 
 class SomeResponseDto {
   value: string;
@@ -21,44 +18,39 @@ class SomeRawObjectDefition {
 
 @Controller()
 @ApiExtraModels(SomeResponseDto)
-// @UseInterceptors(StandardResponseInterceptor)
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  // @StandardResponse([SomeResponseDto], {
-  //   isPaginated: true,
-  //   maxPageSize: 20,
-  //   minPageSize: 5,
-  //   isSorted: true,
-  //   sortingFields: ['popularity', 'title', 'year'],
-  //   isFiltered: true,
-  //   filteringFields: [
-  //     'year',
-  //     'points',
-  //     'previousPoints',
-  //     'email',
-  //     'medals',
-  //     'titles',
-  //     'cars',
-  //     'name',
-  //     'surname',
-  //     'address',
-  //   ],
-  // })
-  // getHello(@StandardParam() params: StandardParams): SomeResponseDto[] {
-  @RawResponse({
-    type: SomeRawObjectDefition,
-    description: 'This is a RAW response!',
+  @StandardResponse({
+    type: [SomeResponseDto],
+    isPaginated: true,
+    maxPageSize: 20,
+    minPageSize: 5,
+    isSorted: true,
+    sortingFields: ['popularity', 'title', 'year'],
+    isFiltered: true,
+    filteringFields: [
+      'year',
+      'points',
+      'previousPoints',
+      'email',
+      'medals',
+      'titles',
+      'cars',
+      'name',
+      'surname',
+      'address',
+    ],
   })
-  getHello(): SomeResponseDto[] {
-    // return this.appService.getHello();
-    // console.log(params);
-    // params.setPaginationInfo({ count: 36 });
+  getHello(@StandardParam() params: StandardParams): SomeResponseDto[] {
+    console.log(params);
+    params.setPaginationInfo({ count: 326 });
+    // TODO allow setting a message
+    // params.setMessage('Some message');
     const rv = new SomeResponseDto();
-    rv.value = 'hello';
+    rv.value = this.appService.getHello();
     return [rv];
-    // return rv;
   }
 
   @Get('/2')
@@ -83,5 +75,16 @@ export class AppController {
     const rv = new SomeResponseDto();
     rv.value = 'hello4';
     return [rv, rv];
+  }
+
+  @Get('/5')
+  @RawResponse({
+    type: SomeRawObjectDefition,
+    description: 'This is a RAW response!',
+  })
+  getHello5(): SomeResponseDto[] {
+    const rv = new SomeResponseDto();
+    rv.value = 'raw hello';
+    return [rv];
   }
 }
