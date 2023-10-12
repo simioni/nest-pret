@@ -19,6 +19,8 @@ export async function getPaginationInfo(
 
   const paginationInfo = await validatePaginationQuery(ctx);
 
+  paginationInfo.count = undefined; // reset count metadata that might have been set on previous requests
+
   Reflect.defineMetadata(RESPONSE_PAGINATION_INFO_KEY, paginationInfo, handler);
 
   const pagination: PaginationParams = {

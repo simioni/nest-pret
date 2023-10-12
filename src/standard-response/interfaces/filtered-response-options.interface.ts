@@ -1,3 +1,3 @@
 export interface FilteredResponseOptions {
-  filteringFields?: string[];
+  filterableFields?: string[];
 }

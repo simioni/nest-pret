@@ -73,7 +73,6 @@ describe('StandardParamDecorator', () => {
   });
 
   it('should inject the params object in the request', async () => {
-    // testPayload = [{ name: 'mark' }, { name: 'charlie' }, { name: 'carol' }];
     context = getContext(testPayload, { isPaginated: true });
     const paramFactory = getParamDecoratorFactory(StandardParam);
     const param: StandardParams = await paramFactory(null, context);
@@ -89,14 +88,45 @@ describe('StandardParamDecorator', () => {
     expect(response.pagination.count).toEqual(330);
     expect(response.data.length).toEqual(4);
     expect(response.data[2].name).toEqual(testPayload[2].name);
-    // const result = factory(null, { user: mockUser });
-
-    // expect(result).toBe(mockUser);
   });
 
-  it('should support basic params without any options set', async () => {});
+  it('should support basic params without any options set', async () => {
+    context = getContext(testPayload, {
+      isPaginated: true,
+      isSorted: true,
+      isFiltered: true,
+    });
+    const paramFactory = getParamDecoratorFactory(StandardParam);
+    const param: StandardParams = await paramFactory(null, context);
+    expect(param).toBeDefined();
+    expect(param.setPaginationInfo).toBeDefined();
+    expect(param.setSortingInfo).toBeDefined();
+    expect(param.setFilteringInfo).toBeDefined();
 
-  it('should support params for all request features', async () => {
+    param.setPaginationInfo({ count: 40 });
+
+    const userObservable = interceptor.intercept(context, handler);
+    const response = await lastValueFrom(userObservable);
+    expect(response.success).toEqual(true);
+    expect(response.isArray).toEqual(true);
+    expect(response.data.length).toEqual(4);
+    expect(response.data[3].name).toEqual(testPayload[3].name);
+
+    // PAGINATION - from decorator options
+    expect(response.isPaginated).toEqual(true);
+    expect(response.pagination).toBeDefined();
+    expect(response.pagination.defaultPageSize).toBeDefined();
+    expect(response.pagination.limit).toEqual(
+      response.pagination.defaultPageSize,
+    );
+    expect(response.pagination.offset).toBeDefined();
+    expect(response.isSorted).toEqual(true);
+    expect(response.sorting).toBeDefined();
+    expect(response.isFiltered).toEqual(true);
+    expect(response.filtering).toBeDefined();
+  });
+
+  it('should support fully featured params with all options set', async () => {
     context = getContext(
       testPayload,
       {
@@ -105,9 +135,9 @@ describe('StandardParamDecorator', () => {
         maxPageSize: 22,
         defaultPageSize: 12,
         isSorted: true,
-        sortingFields: ['title', 'author', 'country', 'year'],
+        sortableFields: ['title', 'author', 'country', 'year'],
         isFiltered: true,
-        filteringFields: ['author', 'year'],
+        filterableFields: ['author', 'year'],
       },
       {
         limit: '8',
@@ -123,12 +153,14 @@ describe('StandardParamDecorator', () => {
     expect(param.setSortingInfo).toBeDefined();
     expect(param.setFilteringInfo).toBeDefined();
     param.setPaginationInfo({ count: 340 });
+    param.setMessage('This response includes all features');
 
     const userObservable = interceptor.intercept(context, handler);
     const response = await lastValueFrom(userObservable);
 
-    console.log(response);
+    // console.log(response);
     expect(response.success).toEqual(true);
+    expect(response.message).toEqual('This response includes all features');
     expect(response.isArray).toEqual(true);
     expect(response.data.length).toEqual(4);
     expect(response.data[3].name).toEqual(testPayload[3].name);
@@ -151,9 +183,9 @@ describe('StandardParamDecorator', () => {
     // SORTING - from decorator options
     expect(response.isSorted).toEqual(true);
     expect(response.sorting).toBeDefined();
-    expect(response.sorting.sortingFields).toBeDefined();
-    expect(response.sorting.sortingFields.length).toEqual(4);
-    expect(response.sorting.sortingFields[1]).toEqual('author');
+    expect(response.sorting.sortableFields).toBeDefined();
+    expect(response.sorting.sortableFields.length).toEqual(4);
+    expect(response.sorting.sortableFields[1]).toEqual('author');
 
     // SORTING - from user query
     expect(response.sorting.query).toEqual('title,-year');
@@ -167,9 +199,9 @@ describe('StandardParamDecorator', () => {
     // FILTERING - from decorator options
     expect(response.isFiltered).toEqual(true);
     expect(response.isFiltered).toBeDefined();
-    expect(response.filtering.filteringFields).toBeDefined();
-    expect(response.filtering.filteringFields.length).toEqual(2);
-    expect(response.filtering.filteringFields[1]).toEqual('year');
+    expect(response.filtering.filterableFields).toBeDefined();
+    expect(response.filtering.filterableFields.length).toEqual(2);
+    expect(response.filtering.filterableFields[1]).toEqual('year');
 
     // FILTERING - from user query
     expect(response.filtering.query).toEqual(

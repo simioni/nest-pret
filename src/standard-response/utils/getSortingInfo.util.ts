@@ -91,9 +91,9 @@ export async function validateSortingQuery(
 
   const queryFields = sortingInfo.sort.map((op: SortingOperation) => op.field);
 
-  if (sortingOptions?.sortingFields) {
+  if (sortingOptions?.sortableFields) {
     const invalidFields = queryFields.filter(
-      (field) => !sortingOptions.sortingFields.includes(field),
+      (field) => !sortingOptions.sortableFields.includes(field),
     );
     if (invalidFields.length > 0) {
       throw new BadRequestException({

@@ -25,6 +25,7 @@ import {
   RESPONSE_SORTING_INFO_KEY,
   RESPONSE_FILTERING_INFO_KEY,
   DEFAULT_VALIDATION_ERROR_MESSAGE,
+  STANDARD_RESPONSE_MESSAGE_KEY,
 } from '../standard-response.constants';
 import { SortingInfoDto } from '../dto/sorting-info.dto';
 import { FilteringInfoDto } from '../dto/filtering-info.dto';
@@ -110,6 +111,11 @@ export class StandardResponseInterceptor implements NestInterceptor {
     }
 
     const responseFields: Partial<StandardResponseDto<typeof data>> = {};
+
+    responseFields.message = this.reflector.get<string>(
+      STANDARD_RESPONSE_MESSAGE_KEY,
+      this.routeHandler,
+    );
 
     if (this.responseFeatures.includes(RESPONSE_FEATURES.PAGINATION)) {
       const paginationInfo = this.reflector.get<PaginationInfoDto>(

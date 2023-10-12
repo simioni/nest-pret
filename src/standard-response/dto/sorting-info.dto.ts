@@ -23,7 +23,7 @@ export class SortingInfoDto implements SortedResponseOptions {
 
   @ApiPropertyOptional()
   @IsArray()
-  sortingFields?: string[];
+  sortableFields?: string[];
 
   constructor(init?: Partial<SortingInfoDto>) {
     Object.assign(this, init);

@@ -1,3 +1,3 @@
 export interface SortedResponseOptions {
-  sortingFields?: string[];
+  sortableFields?: string[];
 }

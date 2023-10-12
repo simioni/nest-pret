@@ -106,9 +106,9 @@ export async function validateFilteringQuery(
     (value, index, array) => array.indexOf(value) === index,
   );
 
-  if (filteringOptions?.filteringFields) {
+  if (filteringOptions?.filterableFields) {
     const invalidFields = uniqueFilterFields.filter(
-      (filter) => !filteringOptions.filteringFields.includes(filter),
+      (filter) => !filteringOptions.filterableFields.includes(filter),
     );
     if (invalidFields.length > 0) {
       throw new BadRequestException({

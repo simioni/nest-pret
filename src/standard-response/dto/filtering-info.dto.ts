@@ -24,7 +24,7 @@ export class FilteringInfoDto implements FilteredResponseOptions {
 
   @ApiPropertyOptional()
   @IsArray()
-  filteringFields?: string[];
+  filterableFields?: string[];
 
   constructor(init?: Partial<FilteringInfoDto>) {
     Object.assign(this, init);

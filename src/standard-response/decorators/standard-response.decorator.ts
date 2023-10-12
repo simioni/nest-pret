@@ -30,8 +30,8 @@ export function StandardResponse<TModel extends ResponseModelType>({
   maxPageSize,
   minPageSize = 1,
   defaultPageSize = 10,
-  sortingFields,
-  filteringFields,
+  sortableFields: sortingFields,
+  filterableFields: filteringFields,
 }: StandardResponseOptions<TModel> = {}) {
   let isArray = false;
   let returnType: AnyClass | string;
@@ -98,7 +98,7 @@ export function StandardResponse<TModel extends ResponseModelType>({
   if (isSorted) {
     decoratorsToApply.push(
       SetStandardResponseSortingInfo({
-        sortingFields,
+        sortableFields: sortingFields,
       }),
       ApiQuery({
         name: 'sort',
@@ -113,7 +113,7 @@ export function StandardResponse<TModel extends ResponseModelType>({
   if (isFiltered) {
     decoratorsToApply.push(
       SetStandardResponseFilteringInfo({
-        filteringFields,
+        filterableFields: filteringFields,
       }),
       ApiQuery({
         name: 'filter',
@@ -129,7 +129,7 @@ export function StandardResponse<TModel extends ResponseModelType>({
         =^	Starts with
         =$	Ends with.
         These rules are similar to APIs like Google Analytics or Matomo Analytics. For more info, see: https://developers.google.com/analytics/devguides/reporting/core/v3/reference#filters and https://developer.matomo.org/api-reference/reporting-api-segmentation`,
-        // example: ['-popularity,name'],
+        // example: 'country==Italy,country==Germany;year>=2010',
         // schema: { type: 'string' },
       }),
     );

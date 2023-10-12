@@ -28,9 +28,9 @@ export class AppController {
     maxPageSize: 20,
     minPageSize: 5,
     isSorted: true,
-    sortingFields: ['popularity', 'title', 'year'],
+    sortableFields: ['popularity', 'title', 'year'],
     isFiltered: true,
-    filteringFields: [
+    filterableFields: [
       'year',
       'points',
       'previousPoints',
@@ -45,9 +45,10 @@ export class AppController {
   })
   getHello(@StandardParam() params: StandardParams): SomeResponseDto[] {
     console.log(params);
-    params.setPaginationInfo({ count: 326 });
-    // TODO allow setting a message
-    // params.setMessage('Some message');
+    if (params.paginationInfo.limit === 8) {
+      params.setPaginationInfo({ count: 326 });
+      params.setMessage('you choose 8!');
+    }
     const rv = new SomeResponseDto();
     rv.value = this.appService.getHello();
     return [rv];

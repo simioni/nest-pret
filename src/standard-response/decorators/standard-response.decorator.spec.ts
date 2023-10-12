@@ -103,7 +103,7 @@ describe('StandardResponseDecorator', () => {
   it("should support sorted responses and it's options", async () => {
     context = getContext(testPayloadArray, {
       isSorted: true,
-      sortingFields: ['title', 'author', 'country'],
+      sortableFields: ['title', 'author', 'country'],
     });
     interceptor = new StandardResponseInterceptor(reflector);
     const userObservable = interceptor.intercept(context, handlerArray);
@@ -112,9 +112,9 @@ describe('StandardResponseDecorator', () => {
     expect(response.isArray).toEqual(true);
     expect(response.isSorted).toEqual(true);
     expect(response.sorting).toBeDefined();
-    expect(response.sorting.sortingFields).toBeDefined();
-    expect(response.sorting.sortingFields.length).toEqual(3);
-    expect(response.sorting.sortingFields[1]).toEqual('author');
+    expect(response.sorting.sortableFields).toBeDefined();
+    expect(response.sorting.sortableFields.length).toEqual(3);
+    expect(response.sorting.sortableFields[1]).toEqual('author');
     expect(response.data.length).toEqual(4);
     expect(response.data[3].name).toEqual(testPayloadArray[3].name);
   });
@@ -122,7 +122,7 @@ describe('StandardResponseDecorator', () => {
   it("should support filtered responses and it's options", async () => {
     context = getContext(testPayloadArray, {
       isFiltered: true,
-      filteringFields: ['author', 'year'],
+      filterableFields: ['author', 'year'],
     });
     interceptor = new StandardResponseInterceptor(reflector);
     const userObservable = interceptor.intercept(context, handlerArray);
@@ -131,9 +131,9 @@ describe('StandardResponseDecorator', () => {
     expect(response.isArray).toEqual(true);
     expect(response.isFiltered).toEqual(true);
     expect(response.filtering).toBeDefined();
-    expect(response.filtering.filteringFields).toBeDefined();
-    expect(response.filtering.filteringFields.length).toEqual(2);
-    expect(response.filtering.filteringFields[1]).toEqual('year');
+    expect(response.filtering.filterableFields).toBeDefined();
+    expect(response.filtering.filterableFields.length).toEqual(2);
+    expect(response.filtering.filterableFields[1]).toEqual('year');
     expect(response.data.length).toEqual(4);
     expect(response.data[3].name).toEqual(testPayloadArray[3].name);
   });
@@ -145,9 +145,9 @@ describe('StandardResponseDecorator', () => {
       maxPageSize: 22,
       defaultPageSize: 11,
       isSorted: true,
-      sortingFields: ['title', 'author', 'country'],
+      sortableFields: ['title', 'author', 'country'],
       isFiltered: true,
-      filteringFields: ['author', 'year'],
+      filterableFields: ['author', 'year'],
     });
     interceptor = new StandardResponseInterceptor(reflector);
     const userObservable = interceptor.intercept(context, handlerArray);
@@ -163,15 +163,15 @@ describe('StandardResponseDecorator', () => {
 
     expect(response.isSorted).toEqual(true);
     expect(response.sorting).toBeDefined();
-    expect(response.sorting.sortingFields).toBeDefined();
-    expect(response.sorting.sortingFields.length).toEqual(3);
-    expect(response.sorting.sortingFields[1]).toEqual('author');
+    expect(response.sorting.sortableFields).toBeDefined();
+    expect(response.sorting.sortableFields.length).toEqual(3);
+    expect(response.sorting.sortableFields[1]).toEqual('author');
 
     expect(response.isFiltered).toEqual(true);
     expect(response.filtering).toBeDefined();
-    expect(response.filtering.filteringFields).toBeDefined();
-    expect(response.filtering.filteringFields.length).toEqual(2);
-    expect(response.filtering.filteringFields[1]).toEqual('year');
+    expect(response.filtering.filterableFields).toBeDefined();
+    expect(response.filtering.filterableFields.length).toEqual(2);
+    expect(response.filtering.filterableFields[1]).toEqual('year');
 
     expect(response.data.length).toEqual(4);
     expect(response.data[3].name).toEqual(testPayloadArray[3].name);
