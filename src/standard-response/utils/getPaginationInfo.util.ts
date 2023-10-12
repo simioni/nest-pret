@@ -78,19 +78,25 @@ export async function validatePaginationQuery(
     );
   }
 
-  const paginationInfo = new PaginationInfoDto(paginationOptions);
+  const paginationInfo = new PaginationInfoDto({
+    ...paginationOptions,
+    limit: paginationQuery.limit,
+    offset: paginationQuery.offset,
+  });
   const limitQueryExists = typeof request.query.limit !== 'undefined';
   const offsetQueryExists = typeof request.query.offset !== 'undefined';
+
+  if (!limitQueryExists && !offsetQueryExists) {
+    return paginationInfo;
+  }
 
   paginationInfo.query = '';
   if (limitQueryExists) {
     paginationInfo.query += `limit=${request.query.limit}`;
-    paginationInfo.limit = paginationQuery.limit;
   }
   if (offsetQueryExists) {
     if (limitQueryExists) paginationInfo.query += '&';
     paginationInfo.query += `offset=${request.query.offset}`;
-    paginationInfo.offset = paginationQuery.offset;
   }
 
   if (
