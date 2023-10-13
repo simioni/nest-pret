@@ -80,15 +80,15 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 
 # Standard Response Module <a name="StandardResponseModule"></a> 📦
 
+* Metadata-based wrapper to provide customizable standardized API response objects;
+
+* Allows route handlers to keep returning classes instead of wrapper objects, so they remain fully compatible with interceptors;
+
+* Optional built-in handling of pagination, sorting and filtering;
+
 </br>
 
-* Metadata-based wrapper to provide customizable standard API response objects, including pagination, sorting and filtering.
-
-* Allows route handlers to keep returning DTOs instead of wrapper objects, so they remain fully compatible with interceptors.
-
-</br>
-
-To set up, just import ```StandardResponseModule.forRoot()``` in the imports array of your application module.
+To set up, just add ```StandardResponseModule.forRoot()``` in the imports array of your application module.
 
 ```ts
 @Module({
@@ -102,25 +102,25 @@ export class AppModule {}
 ```
 
 </br>
+
+> This is a dynamic module. It can also accept a configuration object like this:  
+> ```StandardResponseModule.forRoot(options: {})```  
+> For options, see [advanced configuration](#StandardResponseConfiguration).  
+
+</br>
 </br>
 
 ## 🟠 &nbsp; @StandardResponse(_options?:_ [_StandardResponseOptions_](#StandardResponseOptions)) <a name="StandardResponseDecorator"></a>
 
 <br />
 
-The ```@StandardResponse()``` decorator causes the return of a route handler to be wrapped into a standardized API response object, while still allowing the handler to return true DTOs or other model class instances.
+A decorator that wraps the return of a route into a standardized API response object (while still allowing the handler to return true DTOs or other model class instances).
 
 This makes interceptors like caching, ```ClassSerializer```, or ```RoleSerializer``` work transparently.
 
-The wrapper allow custom messages to be set in the response, and has optional features to handle common tasks, like **pagination, sorting and filtering**.
+The wrapper allows custom messages to be set in the response, and has optional features to handle common tasks, like **pagination, sorting and filtering**.
 
-It can also optionally apply swagger's documentation ```@ApiResponse```, providing the correct combined schema for the DTO and the wrapper including any of its features.
-
-If given an array of Roles, it can also build Swagger route response examples for each user role, containing the reponse as it would be serialized for that user group.
-
-<br/>
-
-> Your route handler must return an instance of a concrete class (such as a DTO or Model), or an array of them. Plain JS objcts will not work! [See why](#HandlersMustReturnClassInstances)
+It can also optionally apply swagger's documentation, providing the correct combined schema for the DTO and the wrapper including any of its features. If given an array of Roles, it can also build Swagger route response examples for each user role, containing the reponse as it would be serialized for that user group.
 
 <br/>
 
@@ -238,7 +238,13 @@ export class UsersController {
 
 <br />
 
-The ```@StandardParam()``` is a parameter decorator used to inject a ```StandardParams``` object in the route handler. This object allows access to all metadata set by ```@StandardResponse()```, as well as all the information captured from query parameters.
+A parameter decorator used to inject a ```StandardParams``` object in the route handler.
+
+This object allows access to:
+
+* All options set in ```@StandardResponse()```;
+* Information captured from query parameters, parsed and validated;
+* Methods to include and modify fields in the response object;
 
 <br />
 
@@ -291,25 +297,50 @@ export class UsersController {
 
 <br />
 
-The params object injected with @StandardParam() contains three properties:
+The params object injected with @StandardParam() contains these keys:
 
-```ts
-{
-  pagination: PaginationInfo,
-  sorting: SortingInfo,
-  filtering: FilteringInfo,
-}
-
-```
-It also contain three methods, so you can update the data inside the handler when needed (like defining the pagination total count, which is only known after a DB query)
-
-```ts
-{
-  setPaginationInfo: (info: {}) => void,
-  setSortingInfo: (info: {}) => void,
-  setFilteringInfo: (info: {}) => void,
-}
-```
+<table style="width: 100%;">
+  <tr>
+    <th>Key</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>pagination</td>
+    <td><i>PaginationInfo</i></td>
+    <td>Only available when the response <code>isPaginated</code> option is <code>true</code>.</td>
+  </tr>
+  <tr>
+    <td>sorting</td>
+    <td><i>SortingInfo</i></td>
+    <td>Only available when the response <code>isSorted</code> option is <code>true</code>.</td>
+  </tr>
+  <tr>
+    <td>filtering</td>
+    <td><i>FilteringInfo</i></td>
+    <td>Only available when the response <code>isFiltered</code> option is <code>true</code>.</td>
+  </tr>
+  <tr>
+    <td>setPaginationInfo()</td>
+    <td><i>(info: {}) => void</i></td>
+    <td>Allows modifying the pagination metadata inside the route handler to add extra information or to reflect some dynamic condition. For example, to add a pagination <code>count</code>. The object passed to this method will be merged with the current information, so partial updates are OK.</td>
+  </tr>
+  <tr>
+    <td>setSortingInfo()</td>
+    <td><i>(info: {}) => void</i></td>
+    <td>Allows modifying the sorting metadata inside the route handler.</td>
+  </tr>
+  <tr>
+    <td>setFilteringInfo()</td>
+    <td><i>(info: {}) => void</i></td>
+    <td>Allows modifying the filtering metadata inside the route handler.</td>
+  </tr>
+  <tr>
+    <td>setMessage()</td>
+    <td><i>(message: string) => void</i></td>
+    <td>Allows setting a custom message in the response object.</td>
+  </tr>
+</table>
 
 <br />
 
