@@ -201,7 +201,7 @@ export class UsersController {
   <tr>
     <td>sortableFields</td>
     <td><i>string[]</i></td>
-    <td><i><b>(Sorting option) </b></i>A list of fields that can used for sorting. If left undefined, all fields will be accepted.</td>
+    <td><i><b>(Sorting option) </b></i>A list of fields that can used for sorting. If left undefined, all fields will be accepted. An empty array allows no fields.</td>
   </tr>
   <tr>
     <th colspan="3"></th>
@@ -209,7 +209,7 @@ export class UsersController {
   <tr>
     <td>filterableFields</td>
     <td><i>string[]</i></td>
-    <td><i><b>(Filtering option) </b></i>A list of fields that can used for filtering. If left undefined, all fields will be accepted.</td>
+    <td><i><b>(Filtering option) </b></i>A list of fields that can used for filtering. If left undefined, all fields will be accepted. An empty array allows no fields.</td>
   </tr>
 </table>
 
@@ -307,7 +307,7 @@ It also contain three methods, so you can update the data inside the handler whe
   <tr>
     <td>query?</td>
     <td><i>string</i></td>
-    <td>The original query string from the request for the pagination params.</td>
+    <td>The original string from the request for the <code>limit</code> and <code>offset</code> query params. <b>[ReadOnly]</b></td>
   </tr>
   <tr>
     <td>limit?</td>
@@ -327,47 +327,215 @@ It also contain three methods, so you can update the data inside the handler whe
   <tr>
     <td>maxPageSize?</td>
     <td><i>number</i></td>
-    <td>The maximum value accepted by the <code>limit</code> query param. (As set in the <code>@StandardResponse()</code> decorator options).</td>
+    <td>The maximum value accepted by the <code>limit</code> query param. <b>[ReadOnly]</b> <i>(From the options set in <code>@StandardResponse()</code>).</i></td>
   </tr>
   <tr>
     <td>minPageSize?</td>
     <td><i>number</i></td>
-    <td>The minimum value accepted by the <code>limit</code> query param. (As set in the <code>@StandardResponse()</code> decorator options).</td>
+    <td>The minimum value accepted by the <code>limit</code> query param. <b>[ReadOnly]</b> <i>(From the options set in <code>@StandardResponse()</code>).</i></td>
   </tr>
   <tr>
     <td>defaultPageSize?</td>
     <td><i>number</i></td>
-    <td>The default number of items to send if no query <code>limit</code> is provided. (As set in the <code>@StandardResponse()</code> decorator options).</td>
+    <td>The default number of items to send if no query <code>limit</code> is provided. <b>[ReadOnly]</b> <i>(From the options set in <code>@StandardResponse()</code>).</i></td>
   </tr>
 </table>
 
 <br />
+<br />
+<br />
 
 ## SortingInfo
 
+<table style="width: 100%;">
+  <tr>
+    <th>Property</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>query?</td>
+    <td><i>string</i></td>
+    <td>The original string from the request for the <code>sort</code> query param.</td>
+  </tr>
+  <tr>
+    <td>sortableFields?</td>
+    <td><i>string[]</i></td>
+    <td>A list of all the fields that can used for sorting. <b>[ReadOnly]</b> <i>(From the options set in <code>@StandardResponse()</code>).</i></td>
+  </tr>
+  <tr>
+    <td>sort?</td>
+    <td><i>SortingOperation[]</i></td>
+    <td>An array of <code>SortingOperation</code> objects parsed from the query.</td>
+  </tr>
+  <tr><td colspan="3">&nbsp;</td></tr>
+  <tr>
+    <th colspan="3">SortingOperation<th>
+  </tr>
+  <tr>
+    <td>field</td>
+    <td><i>string</i></td>
+    <td>The name of the field being sorted.</td>
+  </tr>
+  <tr>
+    <td>order</td>
+    <td><i>'asc' | 'des'</i></td>
+    <td>Order of the sorting operation. These strings are available in an enum for static typing: <code>SortingOrder.ASC</code> and <code>SortingOrder.DES</code>.</td>
+  </tr>
+</table>
+
 <br />
-
-```ts
-class PaginationInfoDto {
-  query?: string;
-  sort?: SortingOperation[];
-  sortableFields?: string[];
-}
-```
-
+<br />
 <br />
 
 ## FilteringInfo
 
-<br />
+<table style="width: 100%;">
+  <tr>
+    <th>Property</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>query?</td>
+    <td><i>string</i></td>
+    <td>The original string from the request for the <code>filter</code> query param.</td>
+  </tr>
+  <tr>
+    <td>filterableFields?</td>
+    <td><i>string[]</i></td>
+    <td>A list of all the fields that can used for filtering. <b>[ReadOnly]</b> <i>(From the options set in <code>@StandardResponse()</code>).</i></td>
+  </tr>
+  <tr>
+    <td>filter?</td>
+    <td><i>{ allOf: FilteringQueryGroup[] }</i></td>
+    <td>Filter is an object parsed from the query containing a single property: <b>allOf</b>. This is an array of <code>FilteringQueryGroup</code> objects. All of these filter groups should be combined using an <b>AND</b> operation.</td>
+  </tr>
+  <tr><td colspan="3">&nbsp;</td></tr>
+  <tr>
+    <th colspan="3">FilteringQueryGroup<th>
+  </tr>
+  <tr>
+    <td>anyOf</td>
+    <td><i>FilteringQueryOperation[]</i></td>
+    <td>An array of <code>FilteringQueryOperation</code> objects. These filters should be combined using an <b>OR</b> operation.</td>
+  </tr>
+  <tr><td colspan="3">&nbsp;</td></tr>
+  <tr>
+    <th colspan="3">FilteringQueryOperation<th>
+  </tr>
+  <tr>
+    <td>field</td>
+    <td><i>string</i></td>
+    <td>Name of the field to filter on.</td>
+  </tr>
+  <tr>
+    <td>operation</td>
+    <td><i>string</i></td>
+    <td>The comparison operation to perform. Possible operators are bellow.
+    </td>
+  </tr>
+  <tr>
+    <td>value</td>
+    <td><i>string</i></td>
+    <td>Value used for the comparison.</td>
+  </tr>
+  <tr><td colspan="3">&nbsp;</td></tr>
+  <tr>
+    <th colspan="3">Operations<th>
+  </tr>
+  <tr>
+    <td>==</td>
+    <td><i>Equals</i></td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <td>!=</td>
+    <td><i>Not Equals</i></td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <td><=</td>
+    <td><i>Less than or equal</i></td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <td><</td>
+    <td><i>Less than</i></td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <td>>=</td>
+    <td><i>More than or equal</i></td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <td>></td>
+    <td><i>More than</i></td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <td>!@</td>
+    <td><i>Contains</i></td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <td>!@</td>
+    <td><i>Does not contain</i></td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <td>=^</td>
+    <td><i>Starts with</i></td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <td>=$</td>
+    <td><i>Ends with</i></td>
+    <td>.</td>
+  </tr>
+</table>
+
+</br >
+
+<blockquote>
+These rules are similar to other APIs like <a href="https://developers.google.com/analytics/devguides/reporting/core/v3/reference#filters">Google Analytics</a> or <a href="https://developer.matomo.org/api-reference/reporting-api-segmentation">Matomo Analytics</a>.
+</blockquote>
+
+</br>
+
+## Building the search query
+
+When building a query, all AND operations should be separated by a semicolon (;), and all OR operations should be separed by a comma (,). For example:
+
+This query will filter all books available for lending, which were first published in France or Italy, between 1970 and 1999, whose author starts with Vittorio OR ends with Alatri:
+
+```
+available==true;country==France,country==Italy;year>=1970,year<=1999;author=^Vittorio,author=$Alatri
+```
+
+The resulting parsed object from this query will be:
 
 ```ts
-class PaginationInfoDto {
-  query?: string;
-  filter?: FilteringQueryGroup;
-  filterableFields?: string[];
-}
+{ allOf: [
+  { anyOf: [
+    { field: 'available', operation: '==', value: true },
+  ]},
+  { anyOf: [
+    { field: 'country', operation: '==', value: 'France' },
+    { field: 'country', operation: '==', value: 'Italy' },
+  ]},
+  { anyOf: [
+    { field: 'year', operation: '>=', value: 1970 },
+    { field: 'year', operation: '<=', value: 1999 },
+  ]},
+  { anyOf: [
+    { field: 'author', operation: '=^', value: 'Vittorio' },
+    { field: 'author', operation: '=$', value: 'Alatri' },
+  ]},
+]}
 ```
+</br>
 
 <br />
 <br />
