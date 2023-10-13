@@ -58,6 +58,7 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
     * [StandardResponseOptions](#StandardResponseOptions)
     * [@StandardParam()](#StandardParamDecorator) <sup>parameter decorator</sup>
   * [@RawResponse()](#RawResponseDecorator) <sup>decorator</sup>
+  * [Advanced Configuration](#StandardResponseConfiguration)
 
 </br>
 
@@ -587,7 +588,7 @@ If you're adding StandardResponse into an existing app, it might be useful to in
 
 <br />
 
-# Configuring
+# Advanced configuration <a name="StandardResponseConfiguration"></a>
 
 ## ✅ validateResponse
 
