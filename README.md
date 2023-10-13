@@ -555,16 +555,15 @@ The resulting parsed object from this query will be:
 ]}
 ```
 </br>
-
-<br />
-<br />
-<br />
+</br>
 
 ---------------------------------------------------
 
-<br />
+</br>
 
 ## 🟠 &nbsp;  @RawResponse() <a name="RawResponseDecorator"></a>
+
+<br />
 
 The default behavior of StandardResponse is to wrap the response from all routes application wide. This keeps the API consistent and predictable. However, if you need to skip this behavior for a particular route, just set the ```@RawResponse()``` decorator:
 
@@ -582,11 +581,13 @@ export class ExternalApiIntegrationController {
 
 If you're adding StandardResponse into an existing app, it might be useful to invert this behavior to create a gradual transition path. To do this, set the ```interceptAll``` option to ```false``` when importing the ```StandardResponseModule``` in your application. This way, routes will only be wrapped if they have explicitly set the ```@StandardResponse()``` decorator. See more information in the "Configuring" section bellow.
 
-<br />
+</br>
 
 ---------------------------------------------------
 
-<br />
+</br>
+</br>
+</br>
 
 # Advanced configuration <a name="StandardResponseConfiguration"></a>
 
@@ -664,6 +665,7 @@ Typescript interfaces are completely removed from compiled code. Since we want t
 - Add option for delayed email verification (right now it is either required or OFF)
 - Add test coverage
 
+</br>
 
 
 🏭 ⭐️ 🕹️ 💡 💎 🔩 ⚙️ 🧱 🔮 💈 🛍️ 🎁 🪭 ⚜️ ❇️ 🚩
