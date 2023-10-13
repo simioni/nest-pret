@@ -49,29 +49,43 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 ---------------------------------------------------------------------------
 # Reference
 
-* [Auth Module](#AuthModule)
-* [Policies Module](#PoliciesModule)
-* [User Module](#UserModule)
-* [Config Module](#ConfigModule)
-* [StandardResponse Module](#StandardResponseModule)
-  * [@StandardResponse() Decorator](#StandardResponseDecorator)
+* [Auth Module](#AuthModule) 🚪
+* [Policies Module](#PoliciesModule) 🏛️
+* [User Module](#UserModule) 👤
+* [Config Module](#ConfigModule) ⚙️
+* [StandardResponse Module](#StandardResponseModule) 📦
+  * [@StandardResponse()](#StandardResponseDecorator) <sup>decorator</sup>
     * [StandardResponseOptions](#StandardResponseOptions)
-    * [@StandardParam() Param Decorator](#StandardParamDecorator)
-  * [@RawResponse() Decorator](#RawResponseDecorator)
+    * [@StandardParam()](#StandardParamDecorator) <sup>parameter decorator</sup>
+  * [@RawResponse()](#RawResponseDecorator) <sup>decorator</sup>
 
-# Auth Module <a name="AuthModule"></a>
+</br>
 
-# Policies Module <a name="PoliciesModule"></a>
+# Auth Module <a name="AuthModule"></a> 🚪
 
-# User Module <a name="UserModule"></a>
+</br>
 
-# Config Module <a name="ConfigModule"></a>
+# Policies Module <a name="PoliciesModule"></a> 🏛️
 
-# Standard Response Module <a name="StandardResponseModule"></a>
+</br>
+
+# User Module <a name="UserModule"></a> 👤
+
+</br>
+
+# Config Module <a name="ConfigModule"></a> ⚙️
+
+</br>
+
+# Standard Response Module <a name="StandardResponseModule"></a> 📦
+
+</br>
 
 * Metadata-based wrapper to provide customizable standard API response objects, including pagination, sorting and filtering.
 
 * Allows route handlers to keep returning DTOs instead of wrapper objects, so they remain fully compatible with interceptors.
+
+</br>
 
 To set up, just import ```StandardResponseModule.forRoot()``` in the imports array of your application module.
 
@@ -86,7 +100,10 @@ To set up, just import ```StandardResponseModule.forRoot()``` in the imports arr
 export class AppModule {}
 ```
 
-## ✅ @StandardResponse(_options?:_ [_StandardResponseOptions_](#StandardResponseOptions)) <a name="StandardResponseDecorator"></a>
+</br>
+</br>
+
+## 🟠 &nbsp; @StandardResponse(_options?:_ [_StandardResponseOptions_](#StandardResponseOptions)) <a name="StandardResponseDecorator"></a>
 
 <br />
 
@@ -137,12 +154,9 @@ export class UsersController {
 (TODO image of swagger UI with the response examples dropdown open. Comparing a response for User and Admin, with arrows showcasing the extra fields returned only to admin)
 
 <br />
-
--------------------------------------------
-
 <br />
 
-## ✅ StandardResponseOptions <a name="StandardResponseOptions"></a>
+## 🔸 &nbsp; StandardResponseOptions <a name="StandardResponseOptions"></a>
 
 <br />
 
@@ -217,7 +231,9 @@ export class UsersController {
 
 ---------------------------------------------------
 
-## ✅ @StandardParam() <a name="StandardParamDecorator"></a>
+</br>
+
+## 🟠 &nbsp; @StandardParam() <a name="StandardParamDecorator"></a>
 
 <br />
 
@@ -296,7 +312,7 @@ It also contain three methods, so you can update the data inside the handler whe
 
 <br />
 
-## PaginationInfo
+## 🔸 &nbsp; PaginationInfo
 
 <table style="width: 100%;">
   <tr>
@@ -345,7 +361,7 @@ It also contain three methods, so you can update the data inside the handler whe
 <br />
 <br />
 
-## SortingInfo
+## 🔸 &nbsp; SortingInfo
 
 <table style="width: 100%;">
   <tr>
@@ -388,7 +404,7 @@ It also contain three methods, so you can update the data inside the handler whe
 <br />
 <br />
 
-## FilteringInfo
+## 🔸 &nbsp; FilteringInfo
 
 <table style="width: 100%;">
   <tr>
@@ -504,14 +520,14 @@ These rules are similar to other APIs like <a href="https://developers.google.co
 
 </br>
 
-## Building the search query
+## 🔸 &nbsp; Building the search query
 
-When building a query, all AND operations should be separated by a semicolon (;), and all OR operations should be separed by a comma (,). For example:
+When building a query, all **AND** operations should be separated by a **semicolon (;)**, and all **OR** operations should be separed by a **comma (,)**. For example:
 
-This query will filter all books available for lending, which were first published in France or Italy, between 1970 and 1999, whose author starts with Vittorio OR ends with Alatri:
+This query will filter all books available for lending, which were first published in France OR Italy, between 1970 AND 1999, whose author starts with Vittorio OR ends with Alatri:
 
 ```
-available==true;country==France,country==Italy;year>=1970,year<=1999;author=^Vittorio,author=$Alatri
+available==true;country==France,country==Italy;year>=1970;year<=1999;author=^Vittorio,author=$Alatri
 ```
 
 The resulting parsed object from this query will be:
@@ -527,6 +543,8 @@ The resulting parsed object from this query will be:
   ]},
   { anyOf: [
     { field: 'year', operation: '>=', value: 1970 },
+  ]},
+  { anyOf: [
     { field: 'year', operation: '<=', value: 1999 },
   ]},
   { anyOf: [
@@ -545,7 +563,7 @@ The resulting parsed object from this query will be:
 
 <br />
 
-## ✅ @RawResponse() <a name="RawResponseDecorator"></a>
+## 🟠 &nbsp;  @RawResponse() <a name="RawResponseDecorator"></a>
 
 The default behavior of StandardResponse is to wrap the response from all routes application wide. This keeps the API consistent and predictable. However, if you need to skip this behavior for a particular route, just set the ```@RawResponse()``` decorator:
 
@@ -618,7 +636,7 @@ export class AppModule {}
 
 # Tips
 
-## ✅ You should return class instances from route handlers, not plain objects or DB documents <a name="HandlersMustReturnClassInstances"></a>
+## 🔮 You should return class instances from route handlers, not plain objects or DB documents <a name="HandlersMustReturnClassInstances"></a>
 NestJS' request pipeline greatly benefits from receiving DTOs or Model class instances as responses from request handlers. This allows interceptors to perform serialization, caching, and other data transformations to the document before sending it to the client.
 
 StandardResponse also rely on an interceptor that uses reflection to read the metadata set by its decorators. Since the typing information and other metadata for Models or DTOs is set on the class that represents them, you need to return instances of these classes from route handlers.
@@ -626,7 +644,7 @@ StandardResponse also rely on an interceptor that uses reflection to read the me
 <br />
 <br />
 
-## ✅ Use concrete JS classes as types, not typescript interfaces
+## 🔮 Use concrete JS classes as types, not typescript interfaces
 
 Typescript interfaces are completely removed from compiled code. Since we want to perform data validation and transformation during execution, we need the typing information to be available at runtime. NestJS (as well as this library) achieve this by storing type, validation constrainsts and other metadata as properties in the classes that describe the data objects. These can be Models, Entities, Schemas, DTOs or any other class that was anotated with the proper decorators.
 
@@ -638,9 +656,15 @@ Typescript interfaces are completely removed from compiled code. Since we want t
 
 <br />
 
-## 🚀 TODO Milestones
+## 🚀 &nbsp; TODO Milestones
 
 - Add user consent forms with versioned policies
 - Add option for log-in using social media accounts
 - Add option for delayed email verification (right now it is either required or OFF)
 - Add test coverage
+
+
+
+🏭 ⭐️ 🕹️ 💡 💎 🔩 ⚙️ 🧱 🔮 💈 🛍️ 🎁 🪭 ⚜️ ❇️ 🚩
+📦 🏷️ 📮 
+🟠 🟧 🔶 🔸
