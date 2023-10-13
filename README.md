@@ -298,19 +298,48 @@ It also contain three methods, so you can update the data inside the handler whe
 
 ## PaginationInfo
 
-<br />
-
-```ts
-class PaginationInfoDto {
-  query?: string;
-  count?: number;
-  limit: number;
-  offset: number;
-  maxPageSize?: number;
-  minPageSize?: number;
-  defaultPageSize?: number;
-}
-```
+<table style="width: 100%;">
+  <tr>
+    <th>Property</th>
+    <th>Type</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>query?</td>
+    <td><i>string</i></td>
+    <td>The original query string from the request for the pagination params.</td>
+  </tr>
+  <tr>
+    <td>limit?</td>
+    <td><i>number</i></td>
+    <td>How many items to send. This is the same as the <code>limit</code> query param, but parsed and validated.</td>
+  </tr>
+  <tr>
+    <td>offset?</td>
+    <td><i>number</i></td>
+    <td>How many items to skip. This is the same as the <code>offset</code> query param, but parsed and validated.</td>
+  </tr>
+  <tr>
+    <td>count?</td>
+    <td><i>number</i></td>
+    <td>The total count of items that are being paginated. This value needs to be set inside the handler using the <code>setPaginationInfo()</code> method.</td>
+  </tr>
+  <tr>
+    <td>maxPageSize?</td>
+    <td><i>number</i></td>
+    <td>The maximum value accepted by the <code>limit</code> query param. (As set in the <code>@StandardResponse()</code> decorator options).</td>
+  </tr>
+  <tr>
+    <td>minPageSize?</td>
+    <td><i>number</i></td>
+    <td>The minimum value accepted by the <code>limit</code> query param. (As set in the <code>@StandardResponse()</code> decorator options).</td>
+  </tr>
+  <tr>
+    <td>defaultPageSize?</td>
+    <td><i>number</i></td>
+    <td>The default number of items to send if no query <code>limit</code> is provided. (As set in the <code>@StandardResponse()</code> decorator options).</td>
+  </tr>
+</table>
 
 <br />
 
