@@ -555,7 +555,6 @@ The resulting parsed object from this query will be:
 ]}
 ```
 </br>
-</br>
 
 ---------------------------------------------------
 
