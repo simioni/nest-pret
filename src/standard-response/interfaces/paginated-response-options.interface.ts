@@ -1,5 +1,5 @@
 export interface PaginatedResponseOptions {
-  minPageSize?: number;
-  maxPageSize?: number;
-  defaultPageSize?: number;
+  minLimit?: number;
+  maxLimit?: number;
+  defaultLimit?: number;
 }

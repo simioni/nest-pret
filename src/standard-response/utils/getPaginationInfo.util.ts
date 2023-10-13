@@ -64,7 +64,7 @@ export async function validatePaginationQuery(
   }
 
   if (isNaN(queryData.limit)) {
-    queryData.limit = paginationOptions?.defaultPageSize || 10;
+    queryData.limit = paginationOptions?.defaultLimit || 10;
   }
 
   const paginationQuery = plainToInstance(PaginationQueryDto, queryData);
@@ -102,22 +102,22 @@ export async function validatePaginationQuery(
   }
 
   if (
-    paginationOptions?.minPageSize &&
-    paginationQuery.limit < paginationOptions.minPageSize
+    paginationOptions?.minLimit &&
+    paginationQuery.limit < paginationOptions.minLimit
   ) {
     throw new BadRequestException({
       field: 'limit',
-      error: `limit can't be smaller than ${paginationOptions.minPageSize}`,
+      error: `limit can't be smaller than ${paginationOptions.minLimit}`,
     });
   }
 
   if (
-    paginationOptions?.maxPageSize &&
-    paginationQuery.limit > paginationOptions.maxPageSize
+    paginationOptions?.maxLimit &&
+    paginationQuery.limit > paginationOptions.maxLimit
   ) {
     throw new BadRequestException({
       field: 'limit',
-      error: `limit can't be larger than ${paginationOptions.maxPageSize}`,
+      error: `limit can't be larger than ${paginationOptions.maxLimit}`,
     });
   }
 

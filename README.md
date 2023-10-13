@@ -196,17 +196,17 @@ export class UsersController {
     <th colspan="3"></th>
   </tr>
   <tr>
-    <td>defaultPageSize</td>
+    <td>defaultLimit</td>
     <td><i>number</i></td>
     <td><i><b>(Pagination option) </b></i>The value to used for <code>limit</code> if the query param is missing. <i><b>(Defaults to 10)</b></i></td>
   </tr>
   <tr>
-    <td>maxPageSize</td>
+    <td>maxLimit</td>
     <td><i>number</i></td>
     <td><i><b>(Pagination option) </b></i>The maximum value accepted by the <code>limit</code> query param.</td>
   </tr>
   <tr>
-    <td>minPageSize</td>
+    <td>minLimit</td>
     <td><i>number</i></td>
     <td><i><b>(Pagination option) </b></i>The minimum value accepted by the <code>limit</code> query param.</td>
   </tr>
@@ -373,17 +373,17 @@ The params object injected with @StandardParam() contains these keys:
     <td>The total count of items that are being paginated. This value needs to be set inside the handler using the <code>setPaginationInfo()</code> method.</td>
   </tr>
   <tr>
-    <td>maxPageSize?</td>
+    <td>maxLimit?</td>
     <td><i>number</i></td>
     <td>The maximum value accepted by the <code>limit</code> query param. <b>[ReadOnly]</b> <i>(From the options set in <code>@StandardResponse()</code>).</i></td>
   </tr>
   <tr>
-    <td>minPageSize?</td>
+    <td>minLimit?</td>
     <td><i>number</i></td>
     <td>The minimum value accepted by the <code>limit</code> query param. <b>[ReadOnly]</b> <i>(From the options set in <code>@StandardResponse()</code>).</i></td>
   </tr>
   <tr>
-    <td>defaultPageSize?</td>
+    <td>defaultLimit?</td>
     <td><i>number</i></td>
     <td>The default number of items to send if no query <code>limit</code> is provided. <b>[ReadOnly]</b> <i>(From the options set in <code>@StandardResponse()</code>).</i></td>
   </tr>

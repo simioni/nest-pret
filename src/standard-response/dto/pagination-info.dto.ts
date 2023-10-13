@@ -24,17 +24,17 @@ export class PaginationInfoDto implements PaginatedResponseOptions {
   @ApiPropertyOptional()
   @IsInt()
   @IsPositive()
-  maxPageSize?: number;
+  maxLimit?: number;
 
   @ApiPropertyOptional()
   @IsInt()
   @IsPositive()
-  minPageSize?: number;
+  minLimit?: number;
 
   @ApiPropertyOptional()
   @IsInt()
   @IsPositive()
-  defaultPageSize?: number;
+  defaultLimit?: number;
 
   constructor(init?: Partial<PaginationInfoDto>) {
     Object.assign(this, init);

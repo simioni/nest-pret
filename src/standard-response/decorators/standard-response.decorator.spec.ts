@@ -82,9 +82,9 @@ describe('StandardResponseDecorator', () => {
   it("should support paginated responses and it's options", async () => {
     context = getContext(testPayloadArray, {
       isPaginated: true,
-      minPageSize: 4,
-      maxPageSize: 22,
-      defaultPageSize: 11,
+      minLimit: 4,
+      maxLimit: 22,
+      defaultLimit: 11,
     });
     interceptor = new StandardResponseInterceptor(reflector);
     const userObservable = interceptor.intercept(context, handlerArray);
@@ -93,9 +93,9 @@ describe('StandardResponseDecorator', () => {
     expect(response.isArray).toEqual(true);
     expect(response.isPaginated).toEqual(true);
     expect(response.pagination).toBeDefined();
-    expect(response.pagination.minPageSize).toEqual(4);
-    expect(response.pagination.maxPageSize).toEqual(22);
-    expect(response.pagination.defaultPageSize).toEqual(11);
+    expect(response.pagination.minLimit).toEqual(4);
+    expect(response.pagination.maxLimit).toEqual(22);
+    expect(response.pagination.defaultLimit).toEqual(11);
     expect(response.data.length).toEqual(4);
     expect(response.data[3].name).toEqual(testPayloadArray[3].name);
   });
@@ -141,9 +141,9 @@ describe('StandardResponseDecorator', () => {
   it('should support combined features and all their options', async () => {
     context = getContext(testPayloadArray, {
       isPaginated: true,
-      minPageSize: 4,
-      maxPageSize: 22,
-      defaultPageSize: 11,
+      minLimit: 4,
+      maxLimit: 22,
+      defaultLimit: 11,
       isSorted: true,
       sortableFields: ['title', 'author', 'country'],
       isFiltered: true,
@@ -157,9 +157,9 @@ describe('StandardResponseDecorator', () => {
 
     expect(response.isPaginated).toEqual(true);
     expect(response.pagination).toBeDefined();
-    expect(response.pagination.minPageSize).toEqual(4);
-    expect(response.pagination.maxPageSize).toEqual(22);
-    expect(response.pagination.defaultPageSize).toEqual(11);
+    expect(response.pagination.minLimit).toEqual(4);
+    expect(response.pagination.maxLimit).toEqual(22);
+    expect(response.pagination.defaultLimit).toEqual(11);
 
     expect(response.isSorted).toEqual(true);
     expect(response.sorting).toBeDefined();

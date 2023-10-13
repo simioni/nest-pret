@@ -27,11 +27,11 @@ export function StandardResponse<TModel extends ResponseModelType>({
   isPaginated,
   isSorted,
   isFiltered,
-  maxPageSize,
-  minPageSize = 1,
-  defaultPageSize = 10,
-  sortableFields: sortingFields,
-  filterableFields: filteringFields,
+  maxLimit,
+  minLimit = 1,
+  defaultLimit = 10,
+  sortableFields,
+  filterableFields,
 }: StandardResponseOptions<TModel> = {}) {
   let isArray = false;
   let returnType: AnyClass | string;
@@ -46,10 +46,10 @@ export function StandardResponse<TModel extends ResponseModelType>({
   }
 
   const helpText = [];
-  if (typeof minPageSize !== 'undefined') helpText.push(`min: ${minPageSize}`);
-  if (typeof maxPageSize !== 'undefined') helpText.push(`max: ${maxPageSize}`);
-  if (typeof defaultPageSize !== 'undefined')
-    helpText.push(`default: ${defaultPageSize}`);
+  if (typeof minLimit !== 'undefined') helpText.push(`min: ${minLimit}`);
+  if (typeof maxLimit !== 'undefined') helpText.push(`max: ${maxLimit}`);
+  if (typeof defaultLimit !== 'undefined')
+    helpText.push(`default: ${defaultLimit}`);
   const limitHelpText = helpText.length > 0 ? ` (${helpText.join(', ')})` : '';
 
   const responseFeatures = [];
@@ -74,16 +74,16 @@ export function StandardResponse<TModel extends ResponseModelType>({
   if (isPaginated) {
     decoratorsToApply.push(
       SetStandardResponsePaginationInfo({
-        minPageSize,
-        maxPageSize,
-        defaultPageSize,
+        minLimit: minLimit,
+        maxLimit: maxLimit,
+        defaultLimit: defaultLimit,
       }),
       ApiQuery({
         name: 'limit',
         required: false,
         description: `How many items to retrieve${limitHelpText}:`,
-        // example: defaultPageSize,
-        // schema: { type: 'integer', minimum: minPageSize, maximum: maxPageSize },
+        // example: defaultLimit,
+        // schema: { type: 'integer', minimum: minLimit, maximum: maxLimit },
       }),
       ApiQuery({
         name: 'offset',
@@ -98,7 +98,7 @@ export function StandardResponse<TModel extends ResponseModelType>({
   if (isSorted) {
     decoratorsToApply.push(
       SetStandardResponseSortingInfo({
-        sortableFields: sortingFields,
+        sortableFields: sortableFields,
       }),
       ApiQuery({
         name: 'sort',
@@ -113,7 +113,7 @@ export function StandardResponse<TModel extends ResponseModelType>({
   if (isFiltered) {
     decoratorsToApply.push(
       SetStandardResponseFilteringInfo({
-        filterableFields: filteringFields,
+        filterableFields: filterableFields,
       }),
       ApiQuery({
         name: 'filter',

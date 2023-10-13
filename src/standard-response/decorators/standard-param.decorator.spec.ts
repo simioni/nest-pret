@@ -115,10 +115,8 @@ describe('StandardParamDecorator', () => {
     // PAGINATION - from decorator options
     expect(response.isPaginated).toEqual(true);
     expect(response.pagination).toBeDefined();
-    expect(response.pagination.defaultPageSize).toBeDefined();
-    expect(response.pagination.limit).toEqual(
-      response.pagination.defaultPageSize,
-    );
+    expect(response.pagination.defaultLimit).toBeDefined();
+    expect(response.pagination.limit).toEqual(response.pagination.defaultLimit);
     expect(response.pagination.offset).toBeDefined();
     expect(response.isSorted).toEqual(true);
     expect(response.sorting).toBeDefined();
@@ -131,9 +129,9 @@ describe('StandardParamDecorator', () => {
       testPayload,
       {
         isPaginated: true,
-        minPageSize: 4,
-        maxPageSize: 22,
-        defaultPageSize: 12,
+        minLimit: 4,
+        maxLimit: 22,
+        defaultLimit: 12,
         isSorted: true,
         sortableFields: ['title', 'author', 'country', 'year'],
         isFiltered: true,
@@ -168,9 +166,9 @@ describe('StandardParamDecorator', () => {
     // PAGINATION - from decorator options
     expect(response.isPaginated).toEqual(true);
     expect(response.pagination).toBeDefined();
-    expect(response.pagination.minPageSize).toEqual(4);
-    expect(response.pagination.maxPageSize).toEqual(22);
-    expect(response.pagination.defaultPageSize).toEqual(12);
+    expect(response.pagination.minLimit).toEqual(4);
+    expect(response.pagination.maxLimit).toEqual(22);
+    expect(response.pagination.defaultLimit).toEqual(12);
 
     // PAGINATION - from user query
     expect(response.pagination.query).toEqual('limit=8&offset=16');

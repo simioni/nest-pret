@@ -25,8 +25,9 @@ export class AppController {
   @StandardResponse({
     type: [SomeResponseDto],
     isPaginated: true,
-    maxPageSize: 20,
-    minPageSize: 5,
+    maxLimit: 20,
+    minLimit: 5,
+    defaultLimit: 12,
     isSorted: true,
     sortableFields: ['popularity', 'title', 'year'],
     isFiltered: true,
