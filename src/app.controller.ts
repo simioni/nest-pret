@@ -1,12 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiExtraModels } from '@nestjs/swagger';
-import { AppService } from './app.service';
-import { StandardResponse } from './standard-response/decorators/standard-response.decorator';
 import {
-  StandardParams,
+  StandardResponse,
   StandardParam,
-} from './standard-response/decorators/standard-param.decorator';
-import { RawResponse } from './standard-response/decorators/raw-response.decorator';
+  StandardParams,
+  RawResponse,
+} from 'nest-standard-response';
+import { AppService } from './app.service';
 
 class SomeResponseDto {
   value: string;
