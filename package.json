@@ -4,6 +4,10 @@
   "description": "A production-ready NestJS starting project with a full auth module containing registration, email verification, password recovery, claims-based access control, standardized and paginated responses, OpenAPI auto-documentation and more.",
   "author": "Ricardo Simioni",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/simioni/nest-pret/issues"
+  },
+  "homepage": "https://github.com/simioni/nest-pret#readme",
   "scripts": {
     "dev": "docker-compose -f docker-compose.dev.yml up --build -d",
     "build": "nest build",
