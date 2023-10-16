@@ -29,6 +29,7 @@
     "class-validator": "^0.14.0",
     "express-rate-limit": "^7.0.2",
     "helmet": "^7.0.0",
+    "nest-standard-response": "^1.1.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1"
   },
@@ -63,7 +64,9 @@
       "ts"
     ],
     "rootDir": "./",
-    "modulePaths": ["<rootDir>"],
+    "modulePaths": [
+      "<rootDir>"
+    ],
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"

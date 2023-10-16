@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
+import { StandardResponseModule } from 'nest-standard-response';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { StandardResponseModule } from './standard-response/standard-response.module';
 
 @Module({
   imports: [
