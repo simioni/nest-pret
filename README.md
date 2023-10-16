@@ -86,7 +86,93 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 
 * Allows route handlers to keep returning classes instead of wrapper objects, so they remain fully compatible with interceptors;
 
-[StandardReponse](https://github.com/simioni/nest-standard-response) has been exported to it's own package. Check out the full [documentation](https://github.com/simioni/nest-standard-response) in it's own repo.
+<table style="width: 100%">
+<tr>
+<td>
+
+```ts
+// 👇 just annotate a route with
+// @StandardResponse() and choose
+// the features you need
+@get("/books")
+@StandardResponse({
+  isPaginated: true,
+  isSorted: true,
+})
+async listBooks(
+  // 👇 then inject a @StandardParam() into
+  // the handler to access the features
+  @StandardParam() params: StandardParams
+): BookDto[] {
+  const {
+    books,
+    count
+  } = await this.bookService.list({
+    // 👇 this route can now be called with
+    // query parameters, fully parsed and
+    // validated to use in services
+    limit: params.pagination.limit,
+    offset: params.pagination.offset,
+    sort: params.pagination.sort,
+  });
+  // 👆 to see how the 'sort' and 'filter'
+  // params are parsed, look at the 
+  // SortingInfo and FilteringInfo classes
+  // in the @StandardParam() section of
+  // StandardResponse's Docs
+
+  // 👇 add extra information into the response
+  params.setPaginationInfo({ count: count })
+  return books;
+}
+```
+
+</td>
+<td>
+
+```ts
+// response
+{
+  success: true,
+  isArray: true,
+  isPaginated: true,
+  isSorted: true,
+  pagination: {
+    limit: 10,
+    offset: 0,
+    defaultLimit: 10,
+    // 👇 added in handler
+    count: 33
+  },
+  sorting: {
+    query: ...,
+    sortableFields: [...],
+    sort: SortingInfo
+    // check docs
+  },
+  filtering: {
+    query: ...,
+    filterableFields: [...],
+    filter: FilteringInfo
+    // check docs
+  },
+  data: [
+    { title: "Dune", year: 1965 },
+    { title: "Jaws", year: 1974 },
+    { title: "Emma", year: 1815 },
+  ]
+}
+
+
+```
+
+</td>
+</tr>
+</table>
+
+> [StandardReponse](https://github.com/simioni/nest-standard-response) has been exported into a separate package and now has it's own repo.
+
+ℹ️ Check out the full [documentation](https://github.com/simioni/nest-standard-response).
 
 <br />
 <br />
