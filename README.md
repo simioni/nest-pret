@@ -1,6 +1,10 @@
-# NestJS + Mongoose + Passport + Casl + Swagger + Docker
+# Nest Pret
 
-A fully tested, fully documented, production-ready NestJS project that solves much of the common basic functionality required for many projects.
+### A decorated nest ready to move _(into production)_
+
+</br>
+
+Fully tested, fully documented, production-ready NestJS project that solves much of the common basic functionality required for many projects.
 
 - User registration
 - E-mail verification
@@ -11,7 +15,8 @@ A fully tested, fully documented, production-ready NestJS project that solves mu
   - Restricted access to specific documents by ownership or other conditional policies
   - Serialization of the response object to contain only the fields to which the user role has access to
 - Standardized API responses, including:
-  - Automatic wrapping of the route handlers return object into a StandardResponse
+  - Automatic wrapping of return objects into a StandardResponse
+  - Handling of pagination, sorting and filtering
   - Generation of OpenAPI documentation for routes with proper response schema
   - Generation of OpenAPI response examples with proper serialization for each user role
 - Secure defaults:
@@ -64,6 +69,11 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 
 # Auth Module <a name="AuthModule"></a> 🚪
 
+- Allows account creation;
+- Sends e-mail verification and keeps track of confirmation status;
+- Manages log-in and keeps sessions;
+- Guard routes from unlogged users and injects the logged-in user into the request.
+
 </br>
 
 # Policies Module <a name="PoliciesModule"></a> 🏛️
@@ -79,6 +89,10 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 </br>
 
 # Standard Response Module <a name="StandardResponseModule"></a> 📦
+
+> [StandardReponse](https://github.com/simioni/nest-standard-response) has been exported into a separate package. The full documentation now resides in [it's own repo](https://github.com/simioni/nest-standard-response).
+
+</br>
 
 * Metadata-based wrapper to provide customizable and standardized API response objects;
 
@@ -179,9 +193,18 @@ async listBooks(
 </tr>
 </table>
 
-> [StandardReponse](https://github.com/simioni/nest-standard-response) has been exported into a separate package and now has it's own repo.
+```ts
+// this route can now be called using query params like this:
+'/books?limit=8&offset=16&sort=-author,title&filter=author^=Frank;year>=1960;year>=1970'
+```
 
-ℹ️ Check out the full [documentation](https://github.com/simioni/nest-standard-response).
+ℹ️ Check out the [full documentation](https://github.com/simioni/nest-standard-response) to learn:
+
+- How to [build the query](https://github.com/simioni/nest-standard-response#--building-the-search-query);
+- How the query is parsed: [SortingInfo](https://github.com/simioni/nest-standard-response#--sortinginfo), [FilteringInfo](https://github.com/simioni/nest-standard-response#--filteringinfo) and [PaginationInfo](https://github.com/simioni/nest-standard-response#--paginationinfo);
+- How to use the decorators: [@StandardResponse()](https://github.com/simioni/nest-standard-response#--standardresponseoptions-standardresponseoptions-) and [@StandardParam()](https://github.com/simioni/nest-standard-response#--standardparam-);
+- and other options.
+
 
 <br />
 <br />
