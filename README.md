@@ -98,6 +98,7 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 @StandardResponse({
   isPaginated: true,
   isSorted: true,
+  isFiltered: true,
 })
 async listBooks(
   // 👇 then inject a @StandardParam() into
@@ -114,6 +115,7 @@ async listBooks(
     limit: params.pagination.limit,
     offset: params.pagination.offset,
     sort: params.pagination.sort,
+    filter: params.pagination.filter,
   });
   // 👆 to see how the 'sort' and 'filter'
   // params are parsed, look at the 
@@ -123,6 +125,7 @@ async listBooks(
 
   // 👇 add extra information into the response
   params.setPaginationInfo({ count: count })
+  params.setMessage('Custom message...')
   return books;
 }
 ```
@@ -134,9 +137,11 @@ async listBooks(
 // response
 {
   success: true,
+  message: "Custom message...",
   isArray: true,
   isPaginated: true,
   isSorted: true,
+  isFiltered: true,
   pagination: {
     limit: 10,
     offset: 0,
@@ -162,6 +167,7 @@ async listBooks(
     { title: "Emma", year: 1815 },
   ]
 }
+
 
 
 ```
