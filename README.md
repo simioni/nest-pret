@@ -17,7 +17,7 @@ Fully tested, fully documented, production-ready NestJS project that solves much
 - Standardized API responses, including:
   - Automatic wrapping of return objects into a StandardResponse
   - Handling of pagination, sorting and filtering
-  - Metadata-based, handler remains returning DTOs or model classes usable by interceptors
+  - Metadata-based — handler remains returning DTOs or model classes usable by interceptors
   - Generation of OpenAPI documentation for routes with proper response schema
   - Generation of OpenAPI response examples with proper serialization for each user role
 - Secure defaults:
