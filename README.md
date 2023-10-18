@@ -4,7 +4,7 @@
 
 </br>
 
-Fully tested, fully documented, production-ready NestJS project that solves much of the functionality required for many projects.
+Fully tested, fully documented, production-ready NestJS project that solves much of the functionality required from a modern web app.
 
 - User registration
 - E-mail verification
