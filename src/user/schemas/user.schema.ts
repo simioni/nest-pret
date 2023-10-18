@@ -2,6 +2,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Transform } from 'class-transformer';
+import {
+  IsDateString,
+  IsEmail,
+  IsInt,
+  IsNumber,
+  Min,
+  MinLength,
+} from 'class-validator';
 import { HydratedDocument, Types } from 'mongoose';
 import { UserRole } from '../user.constants';
 import { UserAuth } from './user-auth.schema';
@@ -10,7 +18,9 @@ import { UserSettings } from './user-settings.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class User {
   // _id should NOT be declared explicitly to mongoose (with the @Prop() decorator)
   @ApiProperty({ type: 'string' })
@@ -23,9 +33,11 @@ export class User {
 
   @Prop()
   @ApiProperty({ example: 'chasehiggens3310@gmail.com' })
+  @IsEmail()
   email: string;
 
   @Prop({ type: Date, default: Date.now })
+  @IsDateString()
   date: Date;
 
   @Prop()
@@ -38,11 +50,14 @@ export class User {
 
   @Prop()
   @ApiProperty({ example: '09 3478857' })
+  @IsInt()
+  @Min(100000, { message: 'phone must have at least 6 digits' })
   phone?: string;
 
   @Prop()
   @ApiProperty({ example: '07-23-1992' })
   @Expose({ groups: ['Admin'] })
+  @IsDateString()
   birthdaydate?: Date;
 
   @Prop({ type: [String], enum: UserRole, default: [UserRole.USER] })

@@ -1,18 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiExtraModels } from '@nestjs/swagger';
 import {
-  StandardResponse,
   StandardParam,
   StandardParams,
-  RawResponse,
+  StandardResponse,
 } from 'nest-standard-response';
 import { AppService } from './app.service';
 
 class SomeResponseDto {
-  value: string;
-}
-
-class SomeRawObjectDefition {
   value: string;
 }
 
@@ -52,41 +47,6 @@ export class AppController {
     }
     const rv = new SomeResponseDto();
     rv.value = this.appService.getHello();
-    return [rv];
-  }
-
-  @Get('/2')
-  @StandardResponse({ type: 'string' })
-  getHello2(): SomeResponseDto {
-    const rv = new SomeResponseDto();
-    rv.value = 'hello2';
-    return rv;
-  }
-
-  @Get('/3')
-  @StandardResponse({ type: ['string'] })
-  getHello3(): SomeResponseDto[] {
-    const rv = new SomeResponseDto();
-    rv.value = 'hello3';
-    return [rv, rv];
-  }
-
-  @Get('/4')
-  @StandardResponse({ type: [SomeResponseDto] })
-  getHello4(): SomeResponseDto[] {
-    const rv = new SomeResponseDto();
-    rv.value = 'hello4';
-    return [rv, rv];
-  }
-
-  @Get('/5')
-  @RawResponse({
-    type: SomeRawObjectDefition,
-    description: 'This is a RAW response!',
-  })
-  getHello5(): SomeResponseDto[] {
-    const rv = new SomeResponseDto();
-    rv.value = 'raw hello';
     return [rv];
   }
 }

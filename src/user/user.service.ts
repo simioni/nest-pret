@@ -1,14 +1,19 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { hash } from 'bcryptjs';
+import { isEmail } from 'class-validator';
+import { Model } from 'mongoose';
 
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { RegistrationValidationError } from './errors/registration-validation.error';
 import { User, UserDocument } from './schemas/user.schema';
 import { REGISTRATION_ERROR, USER_ERROR } from './user.constants';
 
@@ -20,63 +25,44 @@ export class UserService {
     @InjectModel('User') private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async findAll() {
-    const users: UserDocument[] = await this.userModel.find().exec();
+  async findAll({ limit = 100, offset = 0 }) {
+    // TODO Add seek pagination instead of offset
+    // https://www.moesif.com/blog/technical/api-design/REST-API-Design-Filtering-Sorting-and-Pagination/
+    const users: UserDocument[] = await this.userModel
+      .find()
+      .limit(limit)
+      .skip(offset)
+      .exec();
     return users.map((user) => new User(user.toJSON()));
   }
 
-  async findByEmail(email: string): Promise<User> {
-    const user = await this.userModel.findOne({ email: email }).exec();
+  async findOne(idOrEmail: string): Promise<User> {
+    const query = isEmail(idOrEmail)
+      ? { email: idOrEmail }
+      : { _id: idOrEmail };
+    const user = await this.userModel.findOne(query).exec();
     if (!user) {
       throw new NotFoundException(USER_ERROR.USER_NOT_FOUND);
     }
     return new User(user.toJSON());
   }
 
-  async findOne(id: string): Promise<User> {
-    const user = await this.userModel.findById(id).exec();
-    if (!user) {
-      throw new NotFoundException(USER_ERROR.USER_NOT_FOUND);
+  async createNewUser(newUserData: CreateUserDto): Promise<User> {
+    const newUser = plainToInstance(CreateUserDto, newUserData);
+    const errors = await validate(newUser);
+    if (errors.length) {
+      throw new RegistrationValidationError(errors);
     }
-    return new User(user.toJSON());
-  }
-
-  async createNewUser(newUser: CreateUserDto): Promise<User> {
-    if (
-      !this.isValidEmail(newUser.email) ||
-      typeof newUser.password !== 'string'
-    ) {
-      throw new ForbiddenException(
-        REGISTRATION_ERROR.MISSING_MANDATORY_PARAMETERS,
-      );
-    }
-    if (!this.isStrongPassword(newUser.password)) {
-      throw new ForbiddenException(REGISTRATION_ERROR.PASSWORD_TOO_WEAK);
-    }
-
     const existingUser = await this.userModel
       .findOne({ email: newUser.email })
       .exec();
-    // if (existingUser?.auth?.email?.valid) {
     if (existingUser) {
-      throw new ForbiddenException(REGISTRATION_ERROR.EMAIL_ALREADY_REGISTERED);
+      throw new ConflictException(REGISTRATION_ERROR.EMAIL_ALREADY_REGISTERED);
     }
-    // if (existingUser) {
-    //   return new User(existingUser.toJSON()); // already exists but has unverified email
-    // }
-
     newUser.password = await hash(newUser.password, saltRounds);
     const createdUser = new this.userModel(newUser);
     await createdUser.save();
-
     return new User(createdUser.toJSON());
-  }
-
-  isValidEmail(email: string) {
-    if (!email) return false;
-    const regex =
-      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return regex.test(email);
   }
 
   isStrongPassword(password: string) {
@@ -96,11 +82,28 @@ export class UserService {
     return true;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(idOrEmail: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const query = isEmail(idOrEmail)
+      ? { email: idOrEmail }
+      : { _id: idOrEmail };
+    const user = await this.userModel.findOne(query).exec();
+    if (!user) {
+      throw new NotFoundException(USER_ERROR.USER_NOT_FOUND);
+    }
+    user.set(updateUserDto);
+    await user.save();
+    return new User(user.toJSON());
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(idOrEmail: string): Promise<void> {
+    const query = isEmail(idOrEmail)
+      ? { email: idOrEmail }
+      : { _id: idOrEmail };
+    const user = await this.userModel.findOne(query).exec();
+    if (!user) {
+      throw new NotFoundException(USER_ERROR.USER_NOT_FOUND);
+    }
+    await this.userModel.deleteOne(query).exec();
+    // return true;
   }
 }
