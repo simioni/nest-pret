@@ -1,0 +1,10 @@
+{
+  "language": "ts",
+  "collection": "@nestjs/schematics",
+  "generateOptions": {
+    "flat": true
+  },
+  "compilerOptions": {
+    "deleteOutDir": true
+  }
+}
