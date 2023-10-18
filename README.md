@@ -1,6 +1,6 @@
 # Nest Pret
 
-### A decorated nest ready to move _(into production)_
+### A decorated nest ready to move into production
 
 </br>
 
