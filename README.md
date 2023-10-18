@@ -4,23 +4,24 @@
 
 </br>
 
-Fully tested, fully documented, production-ready NestJS project that solves much of the common basic functionality required for many projects.
+Fully tested, fully documented, production-ready NestJS project that solves much of the functionality required for many projects.
 
 - User registration
 - E-mail verification
 - Password recovery
 - User consent for TOS, Cookies, Policies, etc
 - Claims-based access control, including:
-  - Restricted access to routes via policies to specific user groups
+  - Restricted access to routes via policies
   - Restricted access to specific documents by ownership or other conditional policies
-  - Serialization of the response object to contain only the fields to which the user role has access to
+  - Serialization of response objects exposing only the fields the user has access to
 - Standardized API responses, including:
   - Automatic wrapping of return objects into a StandardResponse
   - Handling of pagination, sorting and filtering
+  - Metadata-based, handler remains returning DTOs or model classes usable by interceptors
   - Generation of OpenAPI documentation for routes with proper response schema
   - Generation of OpenAPI response examples with proper serialization for each user role
 - Secure defaults:
-  - Sets secure HTTP response headers (using helmet)
+  - Sets secure HTTP response headers
   - Global IP request rate limiting
   - Account creation rate limiting
 
