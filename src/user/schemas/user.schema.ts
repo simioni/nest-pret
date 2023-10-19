@@ -2,14 +2,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Transform } from 'class-transformer';
-import {
-  IsDateString,
-  IsEmail,
-  IsInt,
-  IsNumber,
-  Min,
-  MinLength,
-} from 'class-validator';
+import { IsDateString, IsEmail, IsInt, Min } from 'class-validator';
 import { HydratedDocument, Types } from 'mongoose';
 import { UserRole } from '../user.constants';
 import { UserAuth } from './user-auth.schema';
