@@ -31,7 +31,7 @@ export class User {
   @Exclude()
   password: string;
 
-  @Prop()
+  @Prop({ index: { unique: true } })
   @ApiProperty({ example: 'chasehiggens3310@gmail.com' })
   @IsEmail()
   email: string;
@@ -49,7 +49,7 @@ export class User {
   surname: string;
 
   @Prop()
-  @ApiProperty({ example: '09 3478857' })
+  @ApiProperty({ example: '093478857' })
   @IsInt()
   @Min(100000, { message: 'phone must have at least 6 digits' })
   phone?: string;
