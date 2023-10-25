@@ -237,6 +237,9 @@ Typescript interfaces are completely removed from compiled code. Since we want t
 
 ## 🚀 &nbsp; TODO Milestones
 
+- Replace express-rate-limit with nestjs' built-in throttler, exposing it's config via .env, and sharing storage in Redis
+- Add a Redis instance in docker-compose and expose it's config via .env
+- Add a [mgob](https://github.com/maxisam/mgob) instance to docker-compose for automated mongo backups (and add its configurations via .env)
 - Add user consent forms with versioned policies
 - Add option for log-in using social media accounts
 - Add option for delayed email verification (right now it is either required or OFF)
