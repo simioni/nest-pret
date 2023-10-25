@@ -47,7 +47,7 @@ export class UserService {
     return new User(user.toJSON());
   }
 
-  async createNewUser(newUserData: CreateUserDto): Promise<User> {
+  async create(newUserData: CreateUserDto): Promise<User> {
     const newUser = plainToInstance(CreateUserDto, newUserData);
     const errors = await validate(newUser);
     if (errors.length) {

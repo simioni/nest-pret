@@ -37,7 +37,7 @@ export class UserController {
     description: 'User created successfully',
   })
   create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.createNewUser(createUserDto);
+    return this.userService.create(createUserDto);
   }
 
   @Get()
