@@ -7,10 +7,9 @@ import {
   HttpStatus,
   Param,
   Post,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiBody, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StandardParam, StandardParams } from 'nest-standard-response';
 import {
   ApiConfig,
