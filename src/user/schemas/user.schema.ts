@@ -86,7 +86,9 @@ export class User {
     Object.assign(this, partial);
   }
 
-  isVerified: () => boolean;
+  isVerified() {
+    return this.auth?.email?.valid ?? false;
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
