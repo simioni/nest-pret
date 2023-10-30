@@ -180,7 +180,7 @@ export class AuthService {
         '>Click here to activate your account</a>', // html body
     };
 
-    const sent = await new Promise<boolean>(async function (resolve, reject) {
+    const sent = await new Promise<boolean>(async function (resolve) {
       return await transporter.sendMail(mailOptions, async (error, info) => {
         if (error) {
           console.log('Message sent: %s', error);
