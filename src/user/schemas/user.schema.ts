@@ -11,8 +11,15 @@ import { UserSettings } from './user-settings.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
+const removePassword = function (doc: UserDocument, ret: Record<string, any>) {
+  delete ret.password;
+  return ret;
+};
+
 @Schema({
   timestamps: true,
+  toJSON: { transform: removePassword },
+  toObject: { transform: removePassword },
 })
 export class User {
   // _id should NOT be declared explicitly to mongoose (with the @Prop() decorator)
@@ -78,10 +85,16 @@ export class User {
   constructor(partial: Partial<User> = {}) {
     Object.assign(this, partial);
   }
+
+  isVerified: () => boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.virtual('isAdmin').get(function () {
-  return this.roles.includes(UserRole.ADMIN);
-});
+// UserSchema.virtual('isAdmin').get(function () {
+//   return this.roles.includes(UserRole.ADMIN);
+// });
+
+UserSchema.methods.isVerified = function () {
+  return this.auth?.email?.valid ?? false;
+};

@@ -7,8 +7,15 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   StandardParam,
   StandardParams,
@@ -21,6 +28,8 @@ import { User } from './schemas/user.schema';
 import { UserService } from './user.service';
 
 @Controller('user')
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth()
 @ApiTags('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

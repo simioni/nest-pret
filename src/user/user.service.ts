@@ -7,7 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { hash } from 'bcryptjs';
 import { isEmail } from 'class-validator';
-import { Model } from 'mongoose';
+import { Document, Model } from 'mongoose';
 
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
@@ -36,14 +36,19 @@ export class UserService {
     return users.map((user) => new User(user.toJSON()));
   }
 
-  async findOne(idOrEmail: string): Promise<User> {
+  async findOne(
+    idOrEmail: string,
+    options: {
+      // intended only for internal use by the auth module (a raw return includes passwords)
+      returnRawMongooseObject?: boolean;
+    } = {},
+  ): Promise<User | UserDocument> {
     const query = isEmail(idOrEmail)
       ? { email: idOrEmail }
       : { _id: idOrEmail };
     const user = await this.userModel.findOne(query).exec();
-    if (!user) {
-      throw new NotFoundException(USER_ERROR.USER_NOT_FOUND);
-    }
+    if (!user) throw new NotFoundException(USER_ERROR.USER_NOT_FOUND);
+    if (options?.returnRawMongooseObject) return user;
     return new User(user.toJSON());
   }
 
@@ -65,14 +70,20 @@ export class UserService {
     return new User(createdUser.toJSON());
   }
 
-  isStrongPassword(password: string) {
-    return typeof password === 'string' && password.length >= 8;
+  async verifyEmail(email: string): Promise<boolean> {
+    const user = await this.userModel.findOne({
+      email: email,
+    });
+    if (!user) return false;
+    user.auth.email.valid = true;
+    await user.save();
+    return true;
   }
 
   async setPassword(email: string, newPassword: string): Promise<boolean> {
-    if (!this.isStrongPassword(newPassword)) {
-      throw new ForbiddenException(REGISTRATION_ERROR.PASSWORD_TOO_WEAK);
-    }
+    // if (!this.isStrongPassword(newPassword)) {
+    //   throw new ForbiddenException(REGISTRATION_ERROR.PASSWORD_TOO_WEAK);
+    // }
     const user = await this.userModel.findOne({ email: email }).exec();
     if (!user) {
       throw new NotFoundException(USER_ERROR.USER_NOT_FOUND);
