@@ -65,16 +65,16 @@ export class User {
   @Expose({ groups: ['Admin'] })
   roles: UserRole[];
 
-  @Prop({ type: UserAuth, _id: false })
+  @Prop({ type: UserAuth, _id: false, default: {} })
   @ApiProperty()
   @Expose({ groups: ['Admin'] })
   auth: UserAuth;
 
-  @Prop({ type: UserSettings, _id: false })
+  @Prop({ type: UserSettings, _id: false, default: {} })
   @ApiProperty()
   settings: UserSettings;
 
-  @Prop({ type: UserPhotos, _id: false })
+  @Prop({ type: UserPhotos, _id: false, default: {} })
   @ApiProperty()
   photos: UserPhotos;
 

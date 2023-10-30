@@ -75,7 +75,7 @@ export class UserService {
       email: email,
     });
     if (!user) return false;
-    user.auth.email.valid = true;
+    user.set('auth.email.valid', true);
     await user.save();
     return true;
   }
