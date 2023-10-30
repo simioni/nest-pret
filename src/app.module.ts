@@ -7,6 +7,8 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import configurationFactory from './config/configuration.factory';
 import { DbConfig } from './config/interfaces/db-config.interface';
+import { AuthModule } from './auth/auth.module';
+import { validateEnvironmentVariables } from './config/env.validation';
 
 function getMongoUri(dbConfig: DbConfig) {
   const userString =
@@ -34,6 +36,7 @@ function getMongoUri(dbConfig: DbConfig) {
   imports: [
     ConfigModule.forRoot({
       cache: true,
+      validate: validateEnvironmentVariables,
       load: [configurationFactory],
     }),
     MongooseModule.forRootAsync({
@@ -52,6 +55,7 @@ function getMongoUri(dbConfig: DbConfig) {
     }),
     // AuthModule,
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
