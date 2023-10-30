@@ -1,0 +1,3 @@
+export const AUTH_ERROR = {
+  EMAIL_SYNTAX_ERROR: 'AUTH.EMAIL_SYNTAX_ERROR',
+};
