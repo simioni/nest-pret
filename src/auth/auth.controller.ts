@@ -133,7 +133,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary:
-      'Set a new password for a user. Requires either the current password or a token send via email',
+      'Set a new password for a user, requiring either the current password or a token send via email',
   })
   async setNewPassord(
     @Body() resetPassword: ResetPasswordDto,
