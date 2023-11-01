@@ -1,23 +1,23 @@
 version: '3.1'
-name: 'nest-pret'
+name: 'nest-pret-e2e'
 
 services:
   mongo:
     image: mongo
     volumes:
-      - mongodata:/data/db
+      - testmongodata:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     networks:
-      - internalNetwork
+      - testNetwork
 
   mongo-express:
     image: mongo-express
     ports:
       - 8081:8081
     networks:
-      - internalNetwork
+      - testNetwork
     environment:
       ME_CONFIG_MONGODB_ENABLE_ADMIN: true
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
@@ -32,25 +32,17 @@ services:
   api:
     image: api
     build: .
-    restart: always
-    command: npm run start:dev
+    command: npm run test:e2e
+    tty: true
     environment:
       - NODE_ENV=development
-    ports:
-      - 3000:3000
-    # volumes:
-    #   - nestjsdata:/usr/src/app
-    volumes:
-    - type: bind
-      source: .
-      target: /usr/src/app
     networks:
-      - internalNetwork
+      - testNetwork
     depends_on:
       - mongo
 
 volumes:
-  mongodata:
+  testmongodata:
 
 networks:
-  internalNetwork:
+  testNetwork:
