@@ -40,7 +40,7 @@ export class AppController {
     ],
   })
   getHello(@StandardParam() params: StandardParams): SomeResponseDto[] {
-    console.log(params);
+    // console.log(params);
     if (params.paginationInfo.limit === 8) {
       params.setPaginationInfo({ count: 326 });
       params.setMessage('you choose 8!');
