@@ -4,7 +4,7 @@ import {
   PartialType,
   PickType,
 } from '@nestjs/swagger';
-import { MinLength } from 'class-validator';
+import { IsString, MinLength } from 'class-validator';
 import { User } from '../schemas/user.schema';
 
 const requiredFields = ['email'] as const;
