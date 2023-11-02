@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HostConfig } from 'src/config/interfaces/host-config.interface';
 import { MailerConfig } from 'src/config/interfaces/mailer-config.interface';
-import nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class MailerService {
@@ -28,10 +28,6 @@ export class MailerService {
 
   async sendEmailVerification(email: string, token: string): Promise<boolean> {
     if (!token) throw new ForbiddenException('REGISTER.USER_NOT_REGISTERED');
-
-    console.log(
-      `sending email from: ${this.mailerConfig.fromName} <${this.mailerConfig.fromEmail}>`,
-    );
     const mailOptions = {
       from: `${this.mailerConfig.fromName} <${this.mailerConfig.fromEmail}>`,
       to: email, // list of receivers (separated by ,)
@@ -47,8 +43,7 @@ export class MailerService {
         token +
         '>Click here to activate your account</a>', // html body
     };
-
-    const sent = await new Promise<boolean>(async function (resolve) {
+    const sent = await new Promise<boolean>(async (resolve) => {
       return await this.transporter.sendMail(
         mailOptions,
         async (error, info) => {
@@ -61,7 +56,42 @@ export class MailerService {
         },
       );
     });
+    return sent;
+  }
 
+  async sendEmailForgotPassword(
+    email: string,
+    token: string,
+  ): Promise<boolean> {
+    if (!token) throw new ForbiddenException('REGISTER.USER_NOT_REGISTERED');
+    const mailOptions = {
+      from: `${this.mailerConfig.fromName} <${this.mailerConfig.fromEmail}>`,
+      to: email, // list of receivers (separated by ,)
+      subject: 'Frogotten Password',
+      text: 'Forgot Password',
+      html:
+        'Hi! <br><br> If you requested to reset your password<br><br>' +
+        '<a href=' +
+        this.hostConfig.url +
+        ':' +
+        this.hostConfig.port +
+        '/auth/email/reset-password/' +
+        token +
+        '>Click here</a>', // html body
+    };
+    const sent = await new Promise<boolean>(async (resolve, reject) => {
+      return await this.transporter.sendMail(
+        mailOptions,
+        async (error, info) => {
+          if (error) {
+            console.log('Message sent: %s', error);
+            return reject(false);
+          }
+          console.log('Message sent: %s', info.messageId);
+          resolve(true);
+        },
+      );
+    });
     return sent;
   }
 }
