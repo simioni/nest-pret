@@ -18,11 +18,13 @@ import {
   ForgottenPassword,
   ForgottenPasswordSchema,
 } from './schemas/forgotten-password.schema';
+import { MailerModule } from 'src/mailer/mailer.module';
 
 @Module({
   imports: [
     ConfigModule,
     UserModule,
+    MailerModule,
     MongooseModule.forFeature([
       { name: EmailVerification.name, schema: EmailVerificationSchema },
       { name: ForgottenPassword.name, schema: ForgottenPasswordSchema },

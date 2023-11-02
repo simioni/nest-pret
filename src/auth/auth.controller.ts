@@ -17,6 +17,12 @@ import {
 } from 'src/config/interfaces/api-config.interface';
 import { REGISTRATION_ERROR } from 'src/user/user.constants';
 import { UserService } from 'src/user/user.service';
+import {
+  EMAIL_VERIFICATION_SUCCESS,
+  LOGIN_ERROR,
+  LOGIN_SUCCESS,
+  REGISTRATION_SUCCESS,
+} from './auth.constants';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -40,8 +46,16 @@ export class AuthController {
   @ApiOperation({
     summary: 'Log a user in',
   })
-  async login(@Body() loginDto: LoginDto) {
-    return await this.authService.login(loginDto.email, loginDto.password);
+  async login(
+    @Body() loginDto: LoginDto,
+    @StandardParam() params: StandardParams,
+  ) {
+    const login = await this.authService.login(
+      loginDto.email,
+      loginDto.password,
+    );
+    params.setMessage(LOGIN_SUCCESS.SUCCESS);
+    return login;
   }
 
   @Post('email/register')
@@ -55,16 +69,15 @@ export class AuthController {
     try {
       const newUser = await this.userService.create(registerDto);
       //await this.authService.saveUserConsent(newUser.email); //[GDPR user content]
-      if (this.apiConfig.emailVerification !== EmailVerificationOptions.off) {
+      if (this.apiConfig.emailVerification !== EmailVerificationOptions.off)
         await this.authService.sendEmailVerification(newUser.email);
-      }
       if (
         this.apiConfig.emailVerification === EmailVerificationOptions.required
       ) {
-        params.setMessage('REGISTRATION.SUCCESS.VERIFY_EMAIL_TO_PROCEED');
+        params.setMessage(REGISTRATION_SUCCESS.VERIFY_EMAIL_TO_PROCEED);
         return {};
       }
-      params.setMessage('REGISTRATION.SUCCESS.AUTO_LOGIN');
+      params.setMessage(REGISTRATION_SUCCESS.AUTO_LOGIN);
       return await this.authService.login(
         registerDto.email,
         registerDto.password,
@@ -74,20 +87,23 @@ export class AuthController {
         registrationError.response.message ===
         REGISTRATION_ERROR.EMAIL_ALREADY_REGISTERED
       ) {
-        // auto-switch to login for frictionless UX
         try {
+          // auto-switch to login for frictionless UX
           const loginResponse = await this.authService.login(
             registerDto.email,
             registerDto.password,
           );
           if (loginResponse) {
-            params.setMessage('USER.ALREADY_EXISTS.AUTO_SWITCHED_TO_LOGIN');
+            params.setMessage(LOGIN_SUCCESS.AUTO_SWITCH);
             return loginResponse;
           }
-        } catch {
-          throw registrationError;
+        } catch (loginError) {
+          if (loginError.response.message === LOGIN_ERROR.EMAIL_NOT_VERIFIED)
+            throw loginError;
+          else throw registrationError;
         }
       }
+      throw registrationError;
     }
   }
 
@@ -98,7 +114,7 @@ export class AuthController {
     @StandardParam() params: StandardParams,
   ) {
     await this.authService.verifyEmail(token);
-    params.setMessage('USER.EMAIL_VERIFIED');
+    params.setMessage(EMAIL_VERIFICATION_SUCCESS.SUCCESS);
     return {};
   }
 
