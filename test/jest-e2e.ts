@@ -9,8 +9,8 @@ const config: Config = {
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
-  verbose: false,
-  silent: false,
+  verbose: true,
+  silent: true,
 };
 
 export default config;
