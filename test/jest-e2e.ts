@@ -10,7 +10,7 @@ const config: Config = {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
   verbose: true,
-  silent: true,
+  silent: false,
 };
 
 export default config;
