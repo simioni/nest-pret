@@ -21,6 +21,15 @@ export default (): {
     port: parseInt(process.env.DATABASE_PORT),
     databaseName: process.env.DATABASE_NAME,
     authSource: process.env.DATABASE_AUTH_SOURCE,
+    getDatabaseUri() {
+      const userString =
+        this.user && this.password ? `${this.user}:${this.password}@` : '';
+      const authSource = this.authSource
+        ? `?authSource=${this.authSource}&w=1`
+        : '';
+      const mongoUri = `mongodb://${userString}${this.host}:${this.port}/${this.databaseName}${authSource}`;
+      return mongoUri;
+    },
   },
   jwt: {
     secret: process.env.JWT_SECRET,

@@ -15,4 +15,5 @@ export interface DbConfig {
   port: number;
   databaseName: string;
   authSource: string;
+  getDatabaseUri: () => string;
 }
