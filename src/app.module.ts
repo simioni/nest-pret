@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { StandardResponseModule } from 'nest-standard-response';
@@ -9,28 +9,7 @@ import configurationFactory from './config/configuration.factory';
 import { DbConfig } from './config/interfaces/db-config.interface';
 import { AuthModule } from './auth/auth.module';
 import { validateEnvironmentVariables } from './config/env.validation';
-
-function getMongoUri(dbConfig: DbConfig) {
-  const userString =
-    dbConfig.user && dbConfig.password
-      ? dbConfig.user + ':' + dbConfig.password + '@'
-      : '';
-  const authSource = dbConfig.authSource
-    ? '?authSource=' + dbConfig.authSource + '&w=1'
-    : '';
-
-  const mongoUri =
-    'mongodb://' +
-    userString +
-    dbConfig.host +
-    ':' +
-    (dbConfig.port || '27017') +
-    '/' +
-    dbConfig.databaseName +
-    authSource;
-
-  return mongoUri;
-}
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -42,7 +21,7 @@ function getMongoUri(dbConfig: DbConfig) {
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        uri: getMongoUri(configService.get('db')),
+        uri: configService.get<DbConfig>('db').getDatabaseUri(),
       }),
       inject: [ConfigService],
     }),
@@ -53,11 +32,19 @@ function getMongoUri(dbConfig: DbConfig) {
         return true;
       },
     }),
-    // AuthModule,
-    UserModule,
     AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    },
+    AppService,
+  ],
 })
 export class AppModule {}
