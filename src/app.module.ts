@@ -10,6 +10,7 @@ import { DbConfig } from './config/interfaces/db-config.interface';
 import { AuthModule } from './auth/auth.module';
 import { validateEnvironmentVariables } from './config/env.validation';
 import { APP_PIPE } from '@nestjs/core';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { APP_PIPE } from '@nestjs/core';
     }),
     AuthModule,
     UserModule,
+    MailerModule,
   ],
   controllers: [AppController],
   providers: [
