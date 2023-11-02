@@ -12,23 +12,6 @@ services:
     networks:
       - testNetwork
 
-  mongo-express:
-    image: mongo-express
-    ports:
-      - 8081:8081
-    networks:
-      - testNetwork
-    environment:
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_SERVER: mongo
-      ME_CONFIG_MONGODB_PORT: 27017
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: password
-    depends_on:
-      - mongo
-
   api:
     image: api
     build: .
