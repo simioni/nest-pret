@@ -12,9 +12,6 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
 import { Model } from 'mongoose';
-import * as nodemailer from 'nodemailer';
-import { HostConfig } from 'src/config/interfaces/host-config.interface';
-import { MailerConfig } from 'src/config/interfaces/mailer-config.interface';
 import { User, UserDocument } from 'src/user/schemas/user.schema';
 import { UserService } from 'src/user/user.service';
 import {
