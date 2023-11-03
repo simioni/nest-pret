@@ -39,6 +39,8 @@ export default (): {
     //Your server URL. This is used to create links in the emails sent (eg: for email confirmation)
     url: process.env.HOST_URL,
     port: parseInt(process.env.HOST_PORT),
+    internalUrl: process.env.HOST_INTERNAL_URL,
+    internalPort: parseInt(process.env.HOST_INTERNAL_PORT),
   },
   mailer: {
     host: process.env.MAILER_HOST,
