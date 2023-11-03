@@ -1,4 +1,9 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  Module,
+  ValidationError,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { StandardResponseModule } from 'nest-standard-response';
@@ -11,6 +16,7 @@ import { AuthModule } from './auth/auth.module';
 import { validateEnvironmentVariables } from './config/env.validation';
 import { APP_PIPE } from '@nestjs/core';
 import { MailerModule } from './mailer/mailer.module';
+import { VALIDATION_ERROR } from './app.constants';
 
 @Module({
   imports: [
@@ -44,6 +50,16 @@ import { MailerModule } from './mailer/mailer.module';
       useValue: new ValidationPipe({
         whitelist: true,
         forbidNonWhitelisted: true,
+        exceptionFactory: (errors: ValidationError[]) =>
+          new BadRequestException({
+            statusCode: 400,
+            error: 'Bad Request',
+            message: VALIDATION_ERROR.ERROR,
+            errors: errors.map((error) => ({
+              field: error.property,
+              errors: error.constraints,
+            })),
+          }),
       }),
     },
     AppService,
