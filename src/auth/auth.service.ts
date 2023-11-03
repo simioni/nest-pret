@@ -47,16 +47,15 @@ export class AuthService {
   ) {}
 
   async login(email, password) {
-    let user: Partial<UserDocument>;
-    try {
-      user = await this.userService.findOne(email, {
+    const user: Partial<UserDocument> = await this.userService
+      .findOne(email, {
         returnRawMongooseObject: true,
+      })
+      .catch((userError) => {
+        throw new NotFoundException(LOGIN_ERROR.EMAIL_NOT_FOUND, {
+          cause: userError,
+        });
       });
-    } catch (userError) {
-      throw new NotFoundException(LOGIN_ERROR.EMAIL_NOT_FOUND, {
-        cause: userError,
-      });
-    }
 
     const isValidPass = await bcrypt.compare(password, user.password);
     if (!isValidPass)
@@ -85,15 +84,18 @@ export class AuthService {
       const elapsedMinutes =
         (new Date().getTime() - existingToken.timestamp.getTime()) / 60000;
       if (elapsedMinutes < 15)
-        throw new HttpException(EMAIL_VERIFICATION_ERROR.SENT_RECENTLY, 429);
+        throw new HttpException(
+          EMAIL_VERIFICATION_ERROR.EMAIL_SENT_RECENTLY,
+          429,
+        );
     }
-
-    const user = await this.userService.findOne(email);
-    if (!user)
+    const user = await this.userService.findOne(email).catch(() => {
       throw new NotFoundException(EMAIL_VERIFICATION_ERROR.USER_NOT_FOUND);
+    });
     if (user.isVerified())
-      throw new ForbiddenException(EMAIL_VERIFICATION_ERROR.ALREADY_VERIFIED);
-
+      throw new ForbiddenException(
+        EMAIL_VERIFICATION_ERROR.EMAIL_ALREADY_VERIFIED,
+      );
     const token = await this.emailVerificationModel.findOneAndUpdate(
       { email: email },
       {
@@ -120,12 +122,12 @@ export class AuthService {
       const elapsedMinutes =
         (new Date().getTime() - existingToken.timestamp.getTime()) / 60000;
       if (elapsedMinutes < 15)
-        throw new HttpException(FORGOT_PASSWORD_ERROR.SENT_RECENTLY, 429);
+        throw new HttpException(FORGOT_PASSWORD_ERROR.EMAIL_SENT_RECENTLY, 429);
     }
 
-    const user = await this.userService.findOne(email);
-    if (!user)
+    await this.userService.findOne(email).catch(() => {
       throw new NotFoundException(FORGOT_PASSWORD_ERROR.USER_NOT_FOUND);
+    });
 
     const token = await this.forgottenPasswordModel.findOneAndUpdate(
       { email: email },
@@ -183,15 +185,16 @@ export class AuthService {
     currentPassword: string,
     newPassword: string,
   ): Promise<boolean> {
-    const user = await this.userService.findOne(email, {
-      returnRawMongooseObject: true,
-    });
-    if (!user) throw new NotFoundException('RESET_PASSWORD.USER_NOT_FOUND');
-
+    const user = await this.userService
+      .findOne(email, {
+        returnRawMongooseObject: true,
+      })
+      .catch(() => {
+        throw new NotFoundException('RESET_PASSWORD.USER_NOT_FOUND');
+      });
     const isValidPass = await bcrypt.compare(currentPassword, user.password);
     if (!isValidPass)
       throw new UnauthorizedException('RESET_PASSWORD.UNAUTHORIZED');
-
     await this.userService.setPassword(email, newPassword);
     return true;
   }
