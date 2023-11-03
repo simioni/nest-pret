@@ -1,8 +1,12 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HostConfig } from 'src/config/interfaces/host-config.interface';
 import { MailerConfig } from 'src/config/interfaces/mailer-config.interface';
 import * as nodemailer from 'nodemailer';
+import {
+  EMAIL_VERIFICATION_ERROR,
+  FORGOT_PASSWORD_ERROR,
+} from 'src/auth/auth.constants';
 
 @Injectable()
 export class MailerService {
@@ -27,7 +31,11 @@ export class MailerService {
   }
 
   async sendEmailVerification(email: string, token: string): Promise<boolean> {
-    if (!token) throw new ForbiddenException('REGISTER.USER_NOT_REGISTERED');
+    if (!token)
+      throw new InternalServerErrorException(
+        EMAIL_VERIFICATION_ERROR.EMAIL_NOT_SENT,
+      );
+
     const mailOptions = {
       from: `${this.mailerConfig.fromName} <${this.mailerConfig.fromEmail}>`,
       to: email, // list of receivers (separated by ,)
@@ -63,7 +71,11 @@ export class MailerService {
     email: string,
     token: string,
   ): Promise<boolean> {
-    if (!token) throw new ForbiddenException('REGISTER.USER_NOT_REGISTERED');
+    if (!token)
+      throw new InternalServerErrorException(
+        FORGOT_PASSWORD_ERROR.EMAIL_NOT_SENT,
+      );
+
     const mailOptions = {
       from: `${this.mailerConfig.fromName} <${this.mailerConfig.fromEmail}>`,
       to: email, // list of receivers (separated by ,)
