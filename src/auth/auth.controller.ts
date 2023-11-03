@@ -19,9 +19,11 @@ import { REGISTRATION_ERROR } from 'src/user/user.constants';
 import { UserService } from 'src/user/user.service';
 import {
   EMAIL_VERIFICATION_SUCCESS,
+  FORGOT_PASSWORD_SUCCESS,
   LOGIN_ERROR,
   LOGIN_SUCCESS,
   REGISTRATION_SUCCESS,
+  RESET_PASSWORD_SUCCESS,
 } from './auth.constants';
 import { AuthService } from './auth.service';
 import { EmailDto } from './dto/email.dto';
@@ -87,21 +89,16 @@ export class AuthController {
         registrationError.response.message ===
         REGISTRATION_ERROR.EMAIL_ALREADY_REGISTERED
       ) {
-        try {
-          // auto-switch to login for frictionless UX
-          const loginResponse = await this.authService.login(
-            registerDto.email,
-            registerDto.password,
-          );
-          if (loginResponse) {
-            params.setMessage(LOGIN_SUCCESS.AUTO_SWITCH);
-            return loginResponse;
-          }
-        } catch (loginError) {
-          if (loginError.response.message === LOGIN_ERROR.EMAIL_NOT_VERIFIED)
-            throw loginError;
-          else throw registrationError;
-        }
+        // auto-switch to login for frictionless UX
+        const loginResponse = await this.authService
+          .login(registerDto.email, registerDto.password)
+          .catch((loginError) => {
+            if (loginError.response.message === LOGIN_ERROR.EMAIL_NOT_VERIFIED)
+              throw loginError;
+            else throw registrationError;
+          });
+        params.setMessage(LOGIN_SUCCESS.AUTO_SWITCH);
+        return loginResponse;
       }
       throw registrationError;
     }
@@ -141,7 +138,7 @@ export class AuthController {
     @StandardParam() params: StandardParams,
   ) {
     await this.authService.sendEmailForgotPassword(email);
-    params.setMessage('USER.FORGOT_PASSWORD_EMAIL_SENT');
+    params.setMessage(FORGOT_PASSWORD_SUCCESS.EMAIL_SENT);
     return {};
   }
 
@@ -155,9 +152,6 @@ export class AuthController {
     @Body() resetPassword: ResetPasswordDto,
     @StandardParam() params: StandardParams,
   ) {
-    if (!resetPassword.resetPasswordToken && !resetPassword.currentPassword)
-      throw new BadRequestException('RESET_PASSWORD.PASSWORD_NOT_CHANGED');
-
     if (resetPassword.resetPasswordToken) {
       await this.authService.resetPasswordFromToken(
         resetPassword.resetPasswordToken,
@@ -170,7 +164,7 @@ export class AuthController {
         resetPassword.password,
       );
     }
-    params.setMessage('RESET_PASSWORD.SUCCESS');
+    params.setMessage(RESET_PASSWORD_SUCCESS.SUCCESS);
     return {};
   }
 }

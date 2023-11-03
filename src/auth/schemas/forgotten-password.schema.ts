@@ -5,10 +5,10 @@ export type ForgottenPasswordDocument = HydratedDocument<ForgottenPassword>;
 
 @Schema()
 export class ForgottenPassword {
-  @Prop()
+  @Prop({ index: true })
   email: string;
 
-  @Prop()
+  @Prop({ index: true })
   newPasswordToken: string;
 
   @Prop()

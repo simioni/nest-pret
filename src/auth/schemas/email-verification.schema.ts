@@ -5,10 +5,10 @@ export type EmailVerificationDocument = HydratedDocument<EmailVerification>;
 
 @Schema()
 export class EmailVerification {
-  @Prop()
+  @Prop({ index: true })
   email: string;
 
-  @Prop()
+  @Prop({ index: true })
   emailToken: string;
 
   @Prop()

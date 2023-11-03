@@ -30,6 +30,7 @@ import {
   EMAIL_VERIFICATION_ERROR,
   FORGOT_PASSWORD_ERROR,
   LOGIN_ERROR,
+  RESET_PASSWORD_ERROR,
 } from './auth.constants';
 import { MailerService } from 'src/mailer/mailer.service';
 
@@ -190,11 +191,11 @@ export class AuthService {
         returnRawMongooseObject: true,
       })
       .catch(() => {
-        throw new NotFoundException('RESET_PASSWORD.USER_NOT_FOUND');
+        throw new NotFoundException(RESET_PASSWORD_ERROR.USER_NOT_FOUND);
       });
     const isValidPass = await bcrypt.compare(currentPassword, user.password);
     if (!isValidPass)
-      throw new UnauthorizedException('RESET_PASSWORD.UNAUTHORIZED');
+      throw new UnauthorizedException(RESET_PASSWORD_ERROR.UNAUTHORIZED);
     await this.userService.setPassword(email, newPassword);
     return true;
   }
@@ -207,7 +208,7 @@ export class AuthService {
       newPasswordToken: token,
     });
     if (!forgottenPassword)
-      throw new NotFoundException('RESET_PASSWORD.REQUEST_NOT_FOUND');
+      throw new NotFoundException(RESET_PASSWORD_ERROR.REQUEST_NOT_FOUND);
 
     // oportunistic email confirmation in case it's not confirmed already
     await this.userService.verifyEmail(forgottenPassword.email);
@@ -215,7 +216,7 @@ export class AuthService {
     const elapsedMinutes =
       (new Date().getTime() - forgottenPassword.timestamp.getTime()) / 60000;
     if (elapsedMinutes > 20)
-      throw new GoneException('RESET_PASSWORD.LINK_EXPIRED');
+      throw new GoneException(RESET_PASSWORD_ERROR.LINK_EXPIRED);
 
     await this.userService.setPassword(forgottenPassword.email, newPassword);
     await forgottenPassword.deleteOne();

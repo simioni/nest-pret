@@ -1,5 +1,5 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, ValidateIf } from 'class-validator';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 export class ResetPasswordDto extends PickType(CreateUserDto, [
@@ -12,7 +12,7 @@ export class ResetPasswordDto extends PickType(CreateUserDto, [
       'This field is mutually exclusive with resetPasswordToken, and one of them is required.',
   })
   @IsString()
-  @IsOptional()
+  @ValidateIf((obj) => !obj.resetPasswordToken)
   currentPassword: string;
 
   @ApiProperty({
@@ -21,6 +21,6 @@ export class ResetPasswordDto extends PickType(CreateUserDto, [
       'This field is mutually exclusive with currentPassword, and one of them is required.',
   })
   @IsString()
-  @IsOptional()
+  @ValidateIf((obj) => !obj.currentPassword)
   resetPasswordToken: string;
 }
