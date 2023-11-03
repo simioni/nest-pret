@@ -24,10 +24,10 @@ import {
   REGISTRATION_SUCCESS,
 } from './auth.constants';
 import { AuthService } from './auth.service';
+import { EmailDto } from './dto/email.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { EmailPipe } from './pipes/email.pipe';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -124,11 +124,11 @@ export class AuthController {
       'Resend the email with the verification token in case the first one was lost',
   })
   async sendEmailVerification(
-    @Param('email', EmailPipe) email: string,
+    @Param() { email }: EmailDto,
     @StandardParam() params: StandardParams,
   ) {
     await this.authService.sendEmailVerification(email);
-    params.setMessage('USER.VERIFICATION_EMAIL_RESENT');
+    params.setMessage(EMAIL_VERIFICATION_SUCCESS.EMAIL_RESENT);
     return {};
   }
 
@@ -137,7 +137,7 @@ export class AuthController {
     summary: 'Send an email with a link to create a new password',
   })
   async sendEmailForgotPassword(
-    @Param('email', EmailPipe) email: string,
+    @Param() { email }: EmailDto,
     @StandardParam() params: StandardParams,
   ) {
     await this.authService.sendEmailForgotPassword(email);
