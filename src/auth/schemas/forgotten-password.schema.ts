@@ -9,10 +9,14 @@ export class ForgottenPassword {
   email: string;
 
   @Prop({ index: true })
-  newPasswordToken: string;
+  token: string;
 
   @Prop()
-  timestamp: Date;
+  generatedAt: Date;
+
+  constructor(partial: Partial<ForgottenPassword> = {}) {
+    Object.assign(this, partial);
+  }
 }
 
 export const ForgottenPasswordSchema =

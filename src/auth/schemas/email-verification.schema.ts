@@ -9,10 +9,14 @@ export class EmailVerification {
   email: string;
 
   @Prop({ index: true })
-  emailToken: string;
+  token: string;
 
   @Prop()
-  timestamp: Date;
+  generatedAt: Date;
+
+  constructor(partial: Partial<EmailVerification> = {}) {
+    Object.assign(this, partial);
+  }
 }
 
 export const EmailVerificationSchema =

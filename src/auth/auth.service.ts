@@ -19,6 +19,8 @@ import {
 import { MailerService } from 'src/mailer/mailer.service';
 import { User, UserDocument } from 'src/user/schemas/user.schema';
 import { UserService } from 'src/user/user.service';
+import * as crypto from 'node:crypto';
+
 import {
   EMAIL_VERIFICATION_ERROR,
   FORGOT_PASSWORD_ERROR,
@@ -89,6 +91,19 @@ export class AuthService {
     return REGISTRATION_SUCCESS.SUCCESS;
   }
 
+  private async generateSecureUrlSafeToken(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      crypto.randomBytes(48, function (error, buffer) {
+        if (error) reject(error);
+        // crypto randomBytes include the URL unsafe characters / and +
+        // so those need to be replaced for something else like  _ and -
+        resolve(
+          buffer.toString('base64').replace(/\//g, '_').replace(/\+/g, '-'),
+        );
+      });
+    });
+  }
+
   private async createEmailToken(
     email: string,
   ): Promise<EmailVerificationDocument> {
@@ -97,7 +112,7 @@ export class AuthService {
     });
     if (existingToken) {
       const elapsedMinutes =
-        (new Date().getTime() - existingToken.timestamp.getTime()) / 60000;
+        (new Date().getTime() - existingToken.generatedAt.getTime()) / 60000;
       if (elapsedMinutes < 15)
         throw new HttpException(
           EMAIL_VERIFICATION_ERROR.EMAIL_SENT_RECENTLY,
@@ -111,13 +126,14 @@ export class AuthService {
       throw new ForbiddenException(
         EMAIL_VERIFICATION_ERROR.EMAIL_ALREADY_VERIFIED,
       );
+    const newEmailVerification = new EmailVerification({
+      email: email,
+      token: await this.generateSecureUrlSafeToken(),
+      generatedAt: new Date(),
+    });
     const token = await this.emailVerificationModel.findOneAndUpdate(
       { email: email },
-      {
-        email: email,
-        emailToken: (Math.floor(Math.random() * 9000000) + 1000000).toString(), //Generate 7 digits number
-        timestamp: new Date(),
-      },
+      newEmailVerification,
       { upsert: true, new: true },
     );
     if (!token)
@@ -135,24 +151,21 @@ export class AuthService {
     });
     if (existingToken) {
       const elapsedMinutes =
-        (new Date().getTime() - existingToken.timestamp.getTime()) / 60000;
+        (new Date().getTime() - existingToken.generatedAt.getTime()) / 60000;
       if (elapsedMinutes < 15)
         throw new HttpException(FORGOT_PASSWORD_ERROR.EMAIL_SENT_RECENTLY, 429);
     }
-
     await this.userService.findOne(email).catch(() => {
       throw new NotFoundException(FORGOT_PASSWORD_ERROR.USER_NOT_FOUND);
     });
-
+    const newForgottenPassword = new ForgottenPassword({
+      email: email,
+      token: await this.generateSecureUrlSafeToken(),
+      generatedAt: new Date(),
+    });
     const token = await this.forgottenPasswordModel.findOneAndUpdate(
       { email: email },
-      {
-        email: email,
-        newPasswordToken: (
-          Math.floor(Math.random() * 9000000) + 1000000
-        ).toString(), //Generate 7 digits number,
-        timestamp: new Date(),
-      },
+      newForgottenPassword,
       { upsert: true, new: true },
     );
     if (!token)
@@ -164,7 +177,7 @@ export class AuthService {
 
   async verifyEmail(token: string): Promise<boolean> {
     const verification = await this.emailVerificationModel.findOne({
-      emailToken: token,
+      token: token,
     });
     if (!verification || !verification.email)
       throw new NotFoundException(EMAIL_VERIFICATION_ERROR.TOKEN_NOT_FOUND);
@@ -181,7 +194,7 @@ export class AuthService {
     const verification = await this.createEmailToken(email);
     const sent = await this.mailerService.sendEmailVerification(
       email,
-      verification.emailToken,
+      verification.token,
     );
     return sent;
   }
@@ -190,7 +203,7 @@ export class AuthService {
     const forgotten = await this.createForgottenPasswordToken(email);
     const sent = await this.mailerService.sendEmailForgotPassword(
       email,
-      forgotten.newPasswordToken,
+      forgotten.token,
     );
     return sent;
   }
@@ -219,7 +232,7 @@ export class AuthService {
     newPassword: string,
   ): Promise<boolean> {
     const forgottenPassword = await this.forgottenPasswordModel.findOne({
-      newPasswordToken: token,
+      token: token,
     });
     if (!forgottenPassword)
       throw new NotFoundException(RESET_PASSWORD_ERROR.REQUEST_NOT_FOUND);
@@ -228,7 +241,7 @@ export class AuthService {
     await this.userService.verifyEmail(forgottenPassword.email);
 
     const elapsedMinutes =
-      (new Date().getTime() - forgottenPassword.timestamp.getTime()) / 60000;
+      (new Date().getTime() - forgottenPassword.generatedAt.getTime()) / 60000;
     if (elapsedMinutes > 20)
       throw new GoneException(RESET_PASSWORD_ERROR.LINK_EXPIRED);
 

@@ -69,7 +69,7 @@ describe('AuthController (e2e)', () => {
     );
     getEmailVerificationTokenFor = async (email) => {
       const verification = await emailVerificationModel.findOne({ email });
-      return verification.emailToken;
+      return verification.token;
     };
     registerNewUser = async (options) => {
       const stubUser = createFakeUser(options);
@@ -273,9 +273,12 @@ describe('AuthController (e2e)', () => {
         });
     });
     it('Should succeed if enough time has passed since an email was last sent', async () => {
+      const partialUpdate = new EmailVerification({
+        generatedAt: new Date(new Date().getTime() - 20 * 60 * 1000),
+      });
       await emailVerificationModel.findOneAndUpdate(
         { email: registeredUser.email },
-        { timestamp: new Date(new Date().getTime() - 20 * 60 * 1000) },
+        partialUpdate,
       );
       await spec()
         .withPathParams('email', registeredUser.email)
@@ -415,16 +418,19 @@ describe('AuthController (e2e)', () => {
     });
     it('Should fail with an expired token', async () => {
       await authService.sendEmailForgotPassword(registeredUser.email);
+      const partialUpdate = new ForgottenPassword({
+        generatedAt: new Date(new Date().getTime() - 30 * 60 * 1000),
+      });
       const forgottenPassword = await forgottenPasswordModel.findOneAndUpdate(
         { email: registeredUser.email },
-        { timestamp: new Date(new Date().getTime() - 30 * 60 * 1000) },
+        partialUpdate,
         { new: true },
       );
       await spec()
         .withBody({
           email: registeredUser.email,
           password: registeredUser.password,
-          resetPasswordToken: forgottenPassword.newPasswordToken,
+          resetPasswordToken: forgottenPassword.token,
         })
         .expectStatus(410)
         .expectJsonLike({ message: RESET_PASSWORD_ERROR.LINK_EXPIRED });
@@ -442,7 +448,7 @@ describe('AuthController (e2e)', () => {
         .withBody({
           email: registeredUser.email,
           password: registeredUser.password,
-          resetPasswordToken: forgottenPassword.newPasswordToken,
+          resetPasswordToken: forgottenPassword.token,
         })
         .expectStatus(200)
         .expectJsonLike({ message: RESET_PASSWORD_SUCCESS.SUCCESS });
