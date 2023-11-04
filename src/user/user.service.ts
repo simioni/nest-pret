@@ -15,7 +15,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegistrationValidationError } from './errors/registration-validation.error';
 import { User, UserDocument } from './schemas/user.schema';
-import { REGISTRATION_ERROR, USER_ERROR } from './user.constants';
+import { USER_REGISTRATION_ERROR, USER_ERROR } from './user.constants';
 
 const saltRounds = 10;
 
@@ -62,7 +62,9 @@ export class UserService {
       .findOne({ email: newUser.email })
       .exec();
     if (existingUser) {
-      throw new ConflictException(REGISTRATION_ERROR.EMAIL_ALREADY_REGISTERED);
+      throw new ConflictException(
+        USER_REGISTRATION_ERROR.EMAIL_ALREADY_REGISTERED,
+      );
     }
     newUser.password = await hash(newUser.password, saltRounds);
     const createdUser = new this.userModel(newUser);
