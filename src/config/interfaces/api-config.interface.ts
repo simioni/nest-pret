@@ -6,4 +6,6 @@ export enum EmailVerificationOptions {
 
 export interface ApiConfig {
   emailVerification: EmailVerificationOptions;
+  emailVerificationIsOn: () => boolean;
+  emailVerificationIsRequired: () => boolean;
 }

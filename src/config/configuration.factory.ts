@@ -68,5 +68,11 @@ export default (): {
   api: {
     emailVerification:
       EmailVerificationOptions[process.env.API_EMAIL_VERIFICATION] || 'off',
+    emailVerificationIsOn() {
+      return this.emailVerification !== EmailVerificationOptions.off;
+    },
+    emailVerificationIsRequired() {
+      return this.emailVerification === EmailVerificationOptions.required;
+    },
   },
 });
