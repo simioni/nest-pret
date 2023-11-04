@@ -26,7 +26,7 @@ import {
   ForgottenPasswordDocument,
 } from 'src/auth/schemas/forgotten-password.schema';
 import { MailerService } from 'src/mailer/mailer.service';
-import { REGISTRATION_ERROR } from 'src/user/user.constants';
+import { USER_REGISTRATION_ERROR } from 'src/user/user.constants';
 import { UserService } from 'src/user/user.service';
 import { AppModule } from './../src/app.module';
 import { createFakeUser, FakeUser, FakeUserOptions } from './stubs/user.stub';
@@ -124,7 +124,7 @@ describe('AuthController (e2e)', () => {
         .withBody({ ...userStub, password: 'wrongpass' })
         .expectStatus(409)
         .expectJsonLike({
-          message: REGISTRATION_ERROR.EMAIL_ALREADY_REGISTERED,
+          message: USER_REGISTRATION_ERROR.EMAIL_ALREADY_REGISTERED,
         });
     });
     describe('Should upgrade to login if email is already registered and password is correct', () => {
