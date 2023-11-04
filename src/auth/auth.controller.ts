@@ -10,11 +10,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StandardParam, StandardParams } from 'nest-standard-response';
-import {
-  ApiConfig,
-  EmailVerificationOptions,
-} from 'src/config/interfaces/api-config.interface';
-import { REGISTRATION_ERROR } from 'src/user/user.constants';
+import { ApiConfig } from 'src/config/interfaces/api-config.interface';
+import { USER_REGISTRATION_ERROR } from 'src/user/user.constants';
 import { UserService } from 'src/user/user.service';
 import {
   EMAIL_VERIFICATION_SUCCESS,
@@ -62,44 +59,40 @@ export class AuthController {
   @Post('email/register')
   @ApiOperation({
     summary: 'Register a new user and send an email verification to them',
+    description:
+      'If the email is already registed and the password is correct, this endpoint will auto-upgrade to login instead.',
   })
   async register(
     @Body() registerDto: RegisterDto,
     @StandardParam() params: StandardParams,
   ) {
     try {
-      const newUser = await this.userService.create(registerDto);
-      //await this.authService.saveUserConsent(newUser.email); //[GDPR user content]
-      if (this.apiConfig.emailVerification !== EmailVerificationOptions.off)
-        await this.authService.sendEmailVerification(newUser.email);
-      if (
-        this.apiConfig.emailVerification === EmailVerificationOptions.required
-      ) {
-        params.setMessage(REGISTRATION_SUCCESS.VERIFY_EMAIL_TO_PROCEED);
+      const registrationMessage = await this.authService.register(
+        registerDto.email,
+        registerDto.password,
+      );
+      params.setMessage(registrationMessage);
+      if (registrationMessage === REGISTRATION_SUCCESS.VERIFY_EMAIL_TO_PROCEED)
         return {};
-      }
       params.setMessage(REGISTRATION_SUCCESS.AUTO_LOGIN);
       return await this.authService.login(
         registerDto.email,
         registerDto.password,
       );
     } catch (registrationError) {
-      if (
+      const userExists =
         registrationError.response.message ===
-        REGISTRATION_ERROR.EMAIL_ALREADY_REGISTERED
-      ) {
-        // auto-switch to login for frictionless UX
-        const loginResponse = await this.authService
-          .login(registerDto.email, registerDto.password)
-          .catch((loginError) => {
-            if (loginError.response.message === LOGIN_ERROR.EMAIL_NOT_VERIFIED)
-              throw loginError;
-            else throw registrationError;
-          });
-        params.setMessage(LOGIN_SUCCESS.AUTO_SWITCH);
-        return loginResponse;
-      }
-      throw registrationError;
+        USER_REGISTRATION_ERROR.EMAIL_ALREADY_REGISTERED;
+      if (!userExists) throw registrationError;
+      const loginResponse = await this.authService
+        .login(registerDto.email, registerDto.password)
+        .catch((loginError) => {
+          if (loginError.response.message === LOGIN_ERROR.EMAIL_NOT_VERIFIED)
+            throw loginError;
+          else throw registrationError;
+        });
+      params.setMessage(LOGIN_SUCCESS.AUTO_SWITCH);
+      return loginResponse;
     }
   }
 

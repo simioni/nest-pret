@@ -12,12 +12,20 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
 import { Model } from 'mongoose';
-import { User, UserDocument } from 'src/user/schemas/user.schema';
-import { UserService } from 'src/user/user.service';
 import {
   ApiConfig,
   EmailVerificationOptions,
 } from 'src/config/interfaces/api-config.interface';
+import { MailerService } from 'src/mailer/mailer.service';
+import { User, UserDocument } from 'src/user/schemas/user.schema';
+import { UserService } from 'src/user/user.service';
+import {
+  EMAIL_VERIFICATION_ERROR,
+  FORGOT_PASSWORD_ERROR,
+  LOGIN_ERROR,
+  REGISTRATION_SUCCESS,
+  RESET_PASSWORD_ERROR,
+} from './auth.constants';
 import {
   EmailVerification,
   EmailVerificationDocument,
@@ -26,16 +34,11 @@ import {
   ForgottenPassword,
   ForgottenPasswordDocument,
 } from './schemas/forgotten-password.schema';
-import {
-  EMAIL_VERIFICATION_ERROR,
-  FORGOT_PASSWORD_ERROR,
-  LOGIN_ERROR,
-  RESET_PASSWORD_ERROR,
-} from './auth.constants';
-import { MailerService } from 'src/mailer/mailer.service';
 
 @Injectable()
 export class AuthService {
+  private apiConfig: ApiConfig;
+
   constructor(
     @InjectModel(EmailVerification.name)
     private readonly emailVerificationModel: Model<EmailVerificationDocument>,
@@ -45,7 +48,9 @@ export class AuthService {
     private mailerService: MailerService,
     private userService: UserService,
     private jwtService: JwtService,
-  ) {}
+  ) {
+    this.apiConfig = this.configService.get<ApiConfig>('api');
+  }
 
   async login(email, password) {
     const user: Partial<UserDocument> = await this.userService
@@ -57,7 +62,6 @@ export class AuthService {
           cause: userError,
         });
       });
-
     const isValidPass = await bcrypt.compare(password, user.password);
     if (!isValidPass)
       throw new UnauthorizedException(LOGIN_ERROR.INVALID_PASSWORD);
@@ -73,6 +77,16 @@ export class AuthService {
       access_token: await this.jwtService.signAsync(payload),
       user: new User(user.toJSON()),
     };
+  }
+
+  async register(email, password): Promise<REGISTRATION_SUCCESS> {
+    const newUser = await this.userService.create({ email, password });
+    //await this.authService.saveUserConsent(newUser.email); //[GDPR user content]
+    if (this.apiConfig.emailVerificationIsOn())
+      await this.sendEmailVerification(newUser.email);
+    if (this.apiConfig.emailVerificationIsRequired())
+      return REGISTRATION_SUCCESS.VERIFY_EMAIL_TO_PROCEED;
+    return REGISTRATION_SUCCESS.SUCCESS;
   }
 
   private async createEmailToken(
