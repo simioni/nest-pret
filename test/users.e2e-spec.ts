@@ -4,7 +4,6 @@ import { Connection } from 'mongoose';
 import * as pactum from 'pactum';
 import { UserService } from '../src/user/user.service';
 import { TestingServer } from './config/setup-test-server';
-// import { getApp, getBaseUrl, getTestingModule } from './config/setup-e2e-tests';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -18,38 +17,8 @@ describe('AppController (e2e)', () => {
     app = testingServer.getApp();
     baseUrl = testingServer.getBaseUrl();
     userService = await testingModule.resolve(UserService);
-    // authService = await moduleFixture.resolve(AuthService);
-    // const port = await getDynamicPort(
-    //   __filename,
-    //   __dirname,
-    //   configService.get('host.internalPort'),
-    // );
-    // baseUrl = `${configService.get('host.internalUrl')}:${port}`;
-    // baseUrl = getBaseUrl();
-    // emailVerificationModel = await testingModule.resolve(
-    //   getModelToken(EmailVerification.name),
-    // );
-    // forgottenPasswordModel = await testingModule.resolve(
-    //   getModelToken(ForgottenPassword.name),
-    // );
-    // getEmailVerificationTokenFor = async (email) => {
-    //   const verification = await emailVerificationModel.findOne({ email });
-    //   return verification.token;
-    // };
-    // registerNewUser = async (options) => {
-    //   const stubUser = createFakeUser(options);
-    //   await pactum
-    //     .spec()
-    //     .post(`${baseUrl}/auth/email/register`)
-    //     .withRequestTimeout(6000)
-    //     .withBody(stubUser)
-    //     .expectStatus(201);
-    //   return stubUser;
-    // };
     mongooseConnection = await testingModule.resolve(getConnectionToken());
     await mongooseConnection.db.dropDatabase();
-    // await app.init();
-    // await app.listen(port);
   });
 
   afterAll(async () => {
