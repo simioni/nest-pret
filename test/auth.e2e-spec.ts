@@ -1,7 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { getConnectionToken, getModelToken } from '@nestjs/mongoose';
-import { Test, TestingModule } from '@nestjs/testing';
 import { Connection, Model } from 'mongoose';
 import * as pactum from 'pactum';
 import { VALIDATION_ERROR } from '../src/app.constants';
@@ -25,18 +23,14 @@ import {
   ForgottenPassword,
   ForgottenPasswordDocument,
 } from '../src/auth/schemas/forgotten-password.schema';
-import { MailerService } from '../src/mailer/mailer.service';
 import { USER_REGISTRATION_ERROR } from '../src/user/user.constants';
 import { UserService } from '../src/user/user.service';
-import { AppModule } from '../src/app.module';
-import { getDynamicPort } from './config/get-dynamic-port';
 import { TestingServer } from './config/setup-test-server';
 import { createFakeUser, FakeUser, FakeUserOptions } from './stubs/user.stub';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   let mongooseConnection: Connection;
-  let configService: ConfigService;
   let authService: AuthService;
   let userService: UserService;
   let registerNewUser: (options?: FakeUserOptions) => Promise<FakeUser>;
@@ -46,34 +40,12 @@ describe('AuthController (e2e)', () => {
   let baseUrl: string;
 
   beforeAll(async () => {
-    // const testingModule: TestingModule = await Test.createTestingModule({
-    //   imports: [AppModule],
-    // })
-    //   .overrideProvider(MailerService)
-    //   .useValue({
-    //     sendEmailVerification: jest.fn(),
-    //     sendEmailForgotPassword: jest.fn(),
-    //   })
-    //   .compile();
-    // app = testingModule.createNestApplication();
-    // const testingServer: TestingServer = global.testingServer;
     const testingServer = await new TestingServer().create();
     const testingModule = testingServer.getModule();
     app = testingServer.getApp();
     baseUrl = testingServer.getBaseUrl();
-    // const testingModule = getTestingModule();
-    // app = getApp();
-    // const port = getPort();
-    // baseUrl = getBaseUrl();
     userService = await testingModule.resolve(UserService);
     authService = await testingModule.resolve(AuthService);
-    configService = await testingModule.resolve(ConfigService);
-    // const port = await getDynamicPort(
-    //   __filename,
-    //   __dirname,
-    //   configService.get('host.internalPort'),
-    // );
-    // baseUrl = `${configService.get('host.internalUrl')}:${port}`;
     emailVerificationModel = await testingModule.resolve(
       getModelToken(EmailVerification.name),
     );
@@ -96,8 +68,6 @@ describe('AuthController (e2e)', () => {
     };
     mongooseConnection = await testingModule.resolve(getConnectionToken());
     await mongooseConnection.db.dropDatabase();
-    // await app.init();
-    // await app.listen(port);
   });
 
   afterAll(async () => {
