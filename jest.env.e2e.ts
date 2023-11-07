@@ -9,18 +9,16 @@ class CustomEnvironment extends NodeEnvironment {
 
   constructor(config, context) {
     super(config, context);
-    console.error(context);
-    console.log(config.globalConfig);
-    console.log(config.projectConfig);
-    console.log(context.testPath);
-    console.log(context.docblockPragmas);
+    // console.log(config.globalConfig);
+    // console.log(config.projectConfig);
+    // console.log(context.testPath);
+    // console.log(context.docblockPragmas);
     // this.testPath = context.testPath;
     // this.docblockPragmas = context.docblockPragmas;
   }
 
   async setup() {
     await super.setup();
-    // await someSetupTasks(this.testPath);
     console.error('SETTING UP:', process.env.JEST_WORKER_ID);
     // this.testingServer = new TestingServer();
     // await this.testingServer.create();
