@@ -10,17 +10,10 @@ import { TestingServer } from './config/setup-test-server';
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let mongooseConnection: Connection;
-  let configService: ConfigService;
-  // let authService: AuthService;
   let userService: UserService;
-  // let registerNewUser: (options?: FakeUserOptions) => Promise<FakeUser>;
-  // let getEmailVerificationTokenFor: (email: string) => Promise<string>;
-  // let emailVerificationModel: Model<EmailVerificationDocument>;
-  // let forgottenPasswordModel: Model<ForgottenPasswordDocument>;
   let baseUrl: string;
 
   beforeAll(async () => {
-    // const testingServer: TestingServer = global.testingServer;
     const testingServer = await new TestingServer().create();
     const testingModule = testingServer.getModule();
     app = testingServer.getApp();
@@ -40,7 +33,6 @@ describe('AppController (e2e)', () => {
     // app = testingModule.createNestApplication();
     userService = await testingModule.resolve(UserService);
     // authService = await moduleFixture.resolve(AuthService);
-    configService = await testingModule.resolve(ConfigService);
     // const port = await getDynamicPort(
     //   __filename,
     //   __dirname,
