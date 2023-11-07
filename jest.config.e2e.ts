@@ -3,8 +3,6 @@ import type { Config } from 'jest';
 const config: Config = {
   rootDir: './',
   moduleFileExtensions: ['js', 'json', 'ts'],
-  // moduleDirectories: ['<rootDir>', 'node_modules'],
-  // moduleDirectories: ['<rootDir>'],
   moduleDirectories: ['<rootDir>', 'node_modules'],
   // modulePaths: ['./'],
   testRegex: '.e2e-spec.ts$',
