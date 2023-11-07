@@ -1,5 +1,4 @@
 import { INestApplication } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import * as pactum from 'pactum';
@@ -18,19 +17,6 @@ describe('AppController (e2e)', () => {
     const testingModule = testingServer.getModule();
     app = testingServer.getApp();
     baseUrl = testingServer.getBaseUrl();
-    // const testingModule = getTestingModule();
-    // const moduleFixture: TestingModule = await Test.createTestingModule({
-    //   imports: [AppModule],
-    // })
-    //   .overrideProvider(MailerService)
-    //   .useValue({
-    //     sendEmailVerification: jest.fn(),
-    //     sendEmailForgotPassword: jest.fn(),
-    //   })
-    //   .compile();
-    // app = getApp();
-    // const port = getPort();
-    // app = testingModule.createNestApplication();
     userService = await testingModule.resolve(UserService);
     // authService = await moduleFixture.resolve(AuthService);
     // const port = await getDynamicPort(
