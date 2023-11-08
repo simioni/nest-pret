@@ -1,4 +1,4 @@
-import { User } from 'src/user/schemas/user.schema';
+import { User } from '../../user/schemas/user.schema';
 
 export class LoginResponse {
   constructor(token: JwtToken, user: User) {

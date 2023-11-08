@@ -2,23 +2,23 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserModule } from 'src/user/user.module';
+import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
   EmailVerification,
   EmailVerificationSchema,
 } from './schemas/email-verification.schema';
-import { JwtConfig } from 'src/config/interfaces/jwt-config.interface';
-import { ApiConfig } from 'src/config/interfaces/api-config.interface';
-import { MailerConfig } from 'src/config/interfaces/mailer-config.interface';
+import { JwtConfig } from '../config/interfaces/jwt-config.interface';
+import { ApiConfig } from '../config/interfaces/api-config.interface';
+import { MailerConfig } from '../config/interfaces/mailer-config.interface';
 import { MissingMailerConfigError } from './errors/missing-mailer-config.error';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import {
   ForgottenPassword,
   ForgottenPasswordSchema,
 } from './schemas/forgotten-password.schema';
-import { MailerModule } from 'src/mailer/mailer.module';
+import { MailerModule } from '../mailer/mailer.module';
 
 @Module({
   imports: [

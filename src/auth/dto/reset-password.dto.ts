@@ -1,6 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsOptional, IsString, ValidateIf } from 'class-validator';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from '../../user/dto/create-user.dto';
 
 export class ResetPasswordDto extends PickType(CreateUserDto, [
   'email',

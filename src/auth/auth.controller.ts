@@ -10,9 +10,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StandardParam, StandardParams } from 'nest-standard-response';
-import { ApiConfig } from 'src/config/interfaces/api-config.interface';
-import { USER_REGISTRATION_ERROR } from 'src/user/user.constants';
-import { UserService } from 'src/user/user.service';
+import { ApiConfig } from '../config/interfaces/api-config.interface';
+import { USER_REGISTRATION_ERROR } from '../user/user.constants';
+import { UserService } from '../user/user.service';
 import {
   EMAIL_VERIFICATION_SUCCESS,
   FORGOT_PASSWORD_SUCCESS,

@@ -15,10 +15,10 @@ import { Model } from 'mongoose';
 import {
   ApiConfig,
   EmailVerificationOptions,
-} from 'src/config/interfaces/api-config.interface';
-import { MailerService } from 'src/mailer/mailer.service';
-import { User, UserDocument } from 'src/user/schemas/user.schema';
-import { UserService } from 'src/user/user.service';
+} from '../config/interfaces/api-config.interface';
+import { MailerService } from '../mailer/mailer.service';
+import { User, UserDocument } from '../user/schemas/user.schema';
+import { UserService } from '../user/user.service';
 import * as crypto from 'node:crypto';
 
 import {
@@ -237,8 +237,10 @@ export class AuthService {
     if (!forgottenPassword)
       throw new NotFoundException(RESET_PASSWORD_ERROR.REQUEST_NOT_FOUND);
 
-    // oportunistic email confirmation in case it's not confirmed already
-    await this.userService.verifyEmail(forgottenPassword.email);
+    // oportunistic email verification, catch and ignore error if it's already verified
+    await this.userService
+      .verifyEmail(forgottenPassword.email)
+      .catch(() => null);
 
     const elapsedMinutes =
       (new Date().getTime() - forgottenPassword.generatedAt.getTime()) / 60000;
