@@ -20,6 +20,9 @@ import {
   StandardParams,
   StandardResponse,
 } from 'nest-standard-response';
+import { Action, UserAbility } from 'src/policies/casl-ability.factory';
+import { CheckPolicies } from 'src/policies/decorators/check-policies.decorator';
+import { PoliciesGuard } from 'src/policies/guards/policies.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { EmailOrIdPipe } from './pipes/email-or-id.pipe';
@@ -27,28 +30,14 @@ import { User } from './schemas/user.schema';
 import { UserService } from './user.service';
 
 @Controller('user')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), PoliciesGuard)
 @ApiBearerAuth()
 @ApiTags('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  @ApiOperation({
-    summary: 'Create a new user',
-    description:
-      'Adds a new user to the DB using the given email and password. This request will fail if the email already exists or if the password is too weak.',
-  })
-  @StandardResponse({
-    type: User,
-    status: 201,
-    description: 'User created successfully',
-  })
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
   @Get()
+  @CheckPolicies((ability: UserAbility) => ability.can(Action.List, User))
   @ApiOperation({
     summary: 'List all users',
     description: 'Get a list of all users. Supports pagination.',
@@ -65,7 +54,24 @@ export class UserController {
     });
   }
 
+  @Post()
+  @CheckPolicies((ability: UserAbility) => ability.can(Action.Create, User))
+  @ApiOperation({
+    summary: 'Create a new user',
+    description:
+      'Adds a new user to the DB using the given email and password. This request will fail if the email already exists or if the password is too weak.',
+  })
+  @StandardResponse({
+    type: User,
+    status: 201,
+    description: 'User created successfully',
+  })
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
+  }
+
   @Get(':idOrEmail')
+  @CheckPolicies((ability: UserAbility) => ability.can(Action.Read, User))
   @ApiOperation({ summary: 'Find one user by their email or ID' })
   @ApiParam({ name: 'idOrEmail', type: 'string' })
   @StandardResponse({ type: User })
@@ -77,6 +83,7 @@ export class UserController {
   }
 
   @Patch(':idOrEmail')
+  @CheckPolicies((ability: UserAbility) => ability.can(Action.Update, User))
   @ApiOperation({ summary: 'Update data for one user by their email or ID' })
   @ApiParam({ name: 'idOrEmail', type: 'string' })
   @StandardResponse({
@@ -92,6 +99,7 @@ export class UserController {
   }
 
   @Delete(':idOrEmail')
+  @CheckPolicies((ability: UserAbility) => ability.can(Action.Delete, User))
   @ApiOperation({ summary: 'Delete one user by their email or ID' })
   @ApiParam({ name: 'idOrEmail', type: 'string' })
   @StandardResponse({
