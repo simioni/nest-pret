@@ -1,12 +1,12 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { HostConfig } from 'src/config/interfaces/host-config.interface';
-import { MailerConfig } from 'src/config/interfaces/mailer-config.interface';
+import { HostConfig } from '../config/interfaces/host-config.interface';
+import { MailerConfig } from '../config/interfaces/mailer-config.interface';
 import * as nodemailer from 'nodemailer';
 import {
   EMAIL_VERIFICATION_ERROR,
   FORGOT_PASSWORD_ERROR,
-} from 'src/auth/auth.constants';
+} from '../auth/auth.constants';
 
 @Injectable()
 export class MailerService {
