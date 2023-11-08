@@ -5,19 +5,19 @@ services:
   mongo:
     image: mongo
     volumes:
-      - mongodata:/data/db
+      - mongo-data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     networks:
-      - internalNetwork
+      - internal-network
 
   mongo-express:
     image: mongo-express
     ports:
       - 8081:8081
     networks:
-      - internalNetwork
+      - internal-network
     environment:
       ME_CONFIG_MONGODB_ENABLE_ADMIN: true
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
@@ -45,12 +45,12 @@ services:
       source: .
       target: /usr/src/app
     networks:
-      - internalNetwork
+      - internal-network
     depends_on:
       - mongo
 
 volumes:
-  mongodata:
+  mongo-data:
 
 networks:
-  internalNetwork:
+  internal-network:

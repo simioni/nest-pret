@@ -5,27 +5,31 @@ services:
   mongo:
     image: mongo
     volumes:
-      - testmongodata:/data/db
+      - mongo-data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     networks:
-      - testNetwork
+      - internal-network
 
   api:
     image: api
     build: .
-    command: npm run test:e2e
+    command: npm run test:e2e -- ${TEST_ARG}
     tty: true
     environment:
       - NODE_ENV=development
+    volumes:
+    - type: bind
+      source: .
+      target: /usr/src/app
     networks:
-      - testNetwork
+      - internal-network
     depends_on:
       - mongo
 
 volumes:
-  testmongodata:
+  mongo-data:
 
 networks:
-  testNetwork:
+  internal-network:
