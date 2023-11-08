@@ -26,18 +26,18 @@ import {
 import { USER_REGISTRATION_ERROR } from '../src/user/user.constants';
 import { UserService } from '../src/user/user.service';
 import { TestingServer } from './config/setup-test-server';
-import { createFakeUser, FakeUser, FakeUserOptions } from './stubs/user.stub';
+import { UserStubFactory } from './stubs/user-stub.factory';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   let mongooseConnection: Connection;
   let authService: AuthService;
   let userService: UserService;
-  let registerNewUser: (options?: FakeUserOptions) => Promise<FakeUser>;
   let getEmailVerificationTokenFor: (email: string) => Promise<string>;
   let emailVerificationModel: Model<EmailVerificationDocument>;
   let forgottenPasswordModel: Model<ForgottenPasswordDocument>;
   let baseUrl: string;
+  let stub: UserStubFactory;
 
   beforeAll(async () => {
     const testingServer = await new TestingServer().create();
@@ -56,16 +56,7 @@ describe('AuthController (e2e)', () => {
       const verification = await emailVerificationModel.findOne({ email });
       return verification.token;
     };
-    registerNewUser = async (options) => {
-      const stubUser = createFakeUser(options);
-      await pactum
-        .spec()
-        .post(`${baseUrl}/auth/email/register`)
-        .withRequestTimeout(6000)
-        .withBody(stubUser)
-        .expectStatus(201);
-      return stubUser;
-    };
+    stub = new UserStubFactory(testingServer);
     mongooseConnection = await testingModule.resolve(getConnectionToken());
     await mongooseConnection.db.dropDatabase();
   });
@@ -77,13 +68,17 @@ describe('AuthController (e2e)', () => {
   it('should be defined', () => {
     expect(app).toBeDefined();
     expect(userService).toBeDefined();
+    expect(authService).toBeDefined();
   });
 
   describe('/email/register (POST)', () => {
     const spec = () => pactum.spec().post(`${baseUrl}/auth/email/register`);
-    const userStub = createFakeUser({ firstName: 'John' });
+    let user;
     beforeAll(async () => {
-      await mongooseConnection.db.dropDatabase();
+      user = stub.createFakeUser({ firstName: 'John' });
+    });
+    afterAll(async () => {
+      await stub.deleteUser(user.email);
     });
     it('Should fail with an invalid body and provide an array of validation errors as message', async () => {
       const res = await spec().withBody({}).expectStatus(400).toss();
@@ -98,13 +93,13 @@ describe('AuthController (e2e)', () => {
       ).toBeDefined();
     });
     it('Should succeed', async () => {
-      await spec().withBody(userStub).expectStatus(201).expectJsonLike({
+      await spec().withBody(user).expectStatus(201).expectJsonLike({
         message: REGISTRATION_SUCCESS.VERIFY_EMAIL_TO_PROCEED,
       });
     });
     it('Should fail when the email is already registered and the password is wrong', async () => {
       await spec()
-        .withBody({ ...userStub, password: 'wrongpass' })
+        .withBody({ ...user, password: 'wrongpass' })
         .expectStatus(409)
         .expectJsonLike({
           message: USER_REGISTRATION_ERROR.EMAIL_ALREADY_REGISTERED,
@@ -112,15 +107,15 @@ describe('AuthController (e2e)', () => {
     });
     describe('Should upgrade to login if email is already registered and password is correct', () => {
       it('Login should fail if email is not verified', async () => {
-        await spec().withBody(userStub).expectStatus(403).expectJsonLike({
+        await spec().withBody(user).expectStatus(403).expectJsonLike({
           message: LOGIN_ERROR.EMAIL_NOT_VERIFIED,
         });
       });
       it('Login should succeed if email is verified', async () => {
         await authService.verifyEmail(
-          await await getEmailVerificationTokenFor(userStub.email),
+          await await getEmailVerificationTokenFor(user.email),
         );
-        await spec().withBody(userStub).expectStatus(201).expectJsonLike({
+        await spec().withBody(user).expectStatus(201).expectJsonLike({
           message: LOGIN_SUCCESS.AUTO_SWITCH,
         });
       });
@@ -129,11 +124,15 @@ describe('AuthController (e2e)', () => {
 
   describe('/email/login (POST)', () => {
     const spec = () => pactum.spec().post(`${baseUrl}/auth/email/login`);
-    const unregisteredUserStub = createFakeUser();
+    let unregisteredUser;
     let registeredUser;
     beforeAll(async () => {
-      await mongooseConnection.db.dropDatabase();
-      registeredUser = await registerNewUser();
+      unregisteredUser = stub.createFakeUser();
+      registeredUser = await stub.registerNewUser();
+    });
+    afterAll(async () => {
+      await stub.deleteUser(unregisteredUser.email);
+      await stub.deleteUser(registeredUser.email);
     });
     it('Should fail with an invalid body and provide an array of validation errors as message', async () => {
       const res = await spec().withBody({}).expectStatus(400).toss();
@@ -149,7 +148,7 @@ describe('AuthController (e2e)', () => {
     });
     it('Should fail with a syntactically valid but unregistered email', async () => {
       await spec()
-        .withBody(unregisteredUserStub)
+        .withBody(unregisteredUser)
         .expectStatus(404)
         .expectJsonLike({ message: LOGIN_ERROR.EMAIL_NOT_FOUND });
     });
@@ -176,8 +175,16 @@ describe('AuthController (e2e)', () => {
   describe('email/verify/:token (GET)', () => {
     const spec = () =>
       pactum.spec().get(`${baseUrl}/auth/email/verify/{token}`);
+    let user;
+    let deletedUser;
     beforeAll(async () => {
-      await mongooseConnection.db.dropDatabase();
+      user = await stub.registerNewUser({ firstName: 'Mark' });
+      deletedUser = await stub.registerNewUser({ firstName: 'Katerine' });
+      await userService.remove(deletedUser.email);
+    });
+    afterAll(async () => {
+      stub.deleteUser(user.email);
+      // stub.deleteUser(deletedUser.email);
     });
     it('Should fail with an invalid token', async () => {
       await spec()
@@ -186,23 +193,17 @@ describe('AuthController (e2e)', () => {
         .expectJsonLike({ message: EMAIL_VERIFICATION_ERROR.TOKEN_NOT_FOUND });
     });
     it('Should fail with an old token that points to a user that no longer exists', async () => {
-      const stubUser = await registerNewUser();
-      await userService.remove(stubUser.email);
       await spec()
         .withPathParams(
           'token',
-          await getEmailVerificationTokenFor(stubUser.email),
+          await getEmailVerificationTokenFor(deletedUser.email),
         )
         .expectStatus(404)
         .expectJsonLike({ message: EMAIL_VERIFICATION_ERROR.USER_NOT_FOUND });
     });
     it('Should succeed', async () => {
-      const stubUser = await registerNewUser();
       await spec()
-        .withPathParams(
-          'token',
-          await getEmailVerificationTokenFor(stubUser.email),
-        )
+        .withPathParams('token', await getEmailVerificationTokenFor(user.email))
         .expectStatus(200)
         .expectJsonLike({ message: EMAIL_VERIFICATION_SUCCESS.SUCCESS });
     });
@@ -211,16 +212,20 @@ describe('AuthController (e2e)', () => {
   describe('email/resend-verification/:email (POST)', () => {
     const spec = () =>
       pactum.spec().post(`${baseUrl}/auth/email/resend-verification/{email}`);
-    const unregisteredUser = createFakeUser({ firstName: 'John' });
+    let unregisteredUser;
     let registeredUser;
     let verifiedUser;
     beforeAll(async () => {
-      await mongooseConnection.db.dropDatabase();
-      registeredUser = await registerNewUser({ firstName: 'Mary' });
-      verifiedUser = await registerNewUser({ firstName: 'Matt' });
+      unregisteredUser = stub.createFakeUser({ firstName: 'John' });
+      registeredUser = await stub.registerNewUser({ firstName: 'Mary' });
+      verifiedUser = await stub.registerNewUser({ firstName: 'Matt' });
       await authService.verifyEmail(
         await getEmailVerificationTokenFor(verifiedUser.email),
       );
+    });
+    afterAll(async () => {
+      stub.deleteUser(registeredUser.email);
+      stub.deleteUser(verifiedUser.email);
     });
     it('Should fail with an invalid email and provide an array of validation errors as message', async () => {
       const res = await spec()
@@ -273,11 +278,15 @@ describe('AuthController (e2e)', () => {
   describe('email/forgot-password/:email (POST)', () => {
     const spec = () =>
       pactum.spec().post(`${baseUrl}/auth/email/forgot-password/{email}`);
-    const unregisteredUser = createFakeUser({ firstName: 'Charles' });
+    let unregisteredUser;
     let registeredUser;
     beforeAll(async () => {
-      await mongooseConnection.db.dropDatabase();
-      registeredUser = await registerNewUser({ firstName: 'Jackline' });
+      unregisteredUser = stub.createFakeUser({ firstName: 'Charles' });
+      registeredUser = await stub.registerNewUser({ firstName: 'Jackline' });
+    });
+    afterAll(async () => {
+      stub.deleteUser(unregisteredUser.email);
+      stub.deleteUser(registeredUser.email);
     });
     it('Should fail with an invalid email and provide an array of validation errors as message', async () => {
       const res = await spec()
@@ -315,11 +324,15 @@ describe('AuthController (e2e)', () => {
   describe('email/reset-password (POST)', () => {
     const spec = () =>
       pactum.spec().post(`${baseUrl}/auth/email/reset-password`);
-    const unregisteredUser = createFakeUser({ firstName: 'Patrick' });
+    let unregisteredUser;
     let registeredUser;
     beforeAll(async () => {
-      await mongooseConnection.db.dropDatabase();
-      registeredUser = await registerNewUser({ firstName: 'Dawson' });
+      unregisteredUser = stub.createFakeUser({ firstName: 'Patrick' });
+      registeredUser = await stub.registerNewUser({ firstName: 'Dawson' });
+    });
+    afterAll(async () => {
+      stub.deleteUser(unregisteredUser.email);
+      stub.deleteUser(registeredUser.email);
     });
     it('Should fail with an invalid body and provide an array of validation errors as message', async () => {
       const res = await spec().expectStatus(400).toss();
