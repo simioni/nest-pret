@@ -25,7 +25,7 @@ import {
 } from '../src/auth/schemas/forgotten-password.schema';
 import { USER_REGISTRATION_ERROR } from '../src/user/user.constants';
 import { UserService } from '../src/user/user.service';
-import { TestingServer } from './config/setup-test-server';
+import { TestingServerFactory } from './config/testing-server.factory';
 import { UserStubFactory } from './stubs/user-stub.factory';
 
 describe('AuthController (e2e)', () => {
@@ -40,7 +40,7 @@ describe('AuthController (e2e)', () => {
   let stub: UserStubFactory;
 
   beforeAll(async () => {
-    const testingServer = await new TestingServer().create();
+    const testingServer = await new TestingServerFactory().create();
     const testingModule = testingServer.getModule();
     app = testingServer.getApp();
     baseUrl = testingServer.getBaseUrl();
