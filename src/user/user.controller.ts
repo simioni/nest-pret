@@ -2,10 +2,13 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Patch,
   Post,
+  Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -22,8 +25,10 @@ import {
 } from 'nest-standard-response';
 import { Action, UserAbility } from 'src/policies/casl-ability.factory';
 import { CheckPolicies } from 'src/policies/decorators/check-policies.decorator';
+import { UserAbilityParam } from 'src/policies/decorators/user-ability-param.decorator';
 import { PoliciesGuard } from 'src/policies/guards/policies.guard';
 import { CreateUserDto } from './dto/create-user.dto';
+import { DeleteUserDto } from './dto/delete-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { EmailOrIdPipe } from './pipes/email-or-id.pipe';
 import { User } from './schemas/user.schema';
@@ -77,8 +82,10 @@ export class UserController {
   @StandardResponse({ type: User })
   async findOne(
     @Param('idOrEmail', EmailOrIdPipe) idOrEmail: string,
+    @UserAbilityParam() userAbility: UserAbility,
   ): Promise<User> {
     const user = await this.userService.findOne(idOrEmail);
+    if (!userAbility.can(Action.Read, user)) throw new ForbiddenException();
     return user;
   }
 
@@ -93,8 +100,10 @@ export class UserController {
   async update(
     @Param('idOrEmail', EmailOrIdPipe) idOrEmail: string,
     @Body() updateUserDto: UpdateUserDto,
+    @UserAbilityParam() userAbility: UserAbility,
   ): Promise<User> {
     const user = await this.userService.update(idOrEmail, updateUserDto);
+    if (!userAbility.can(Action.Update, user)) throw new ForbiddenException();
     return user;
   }
 
@@ -107,7 +116,9 @@ export class UserController {
   })
   async remove(
     @Param('idOrEmail', EmailOrIdPipe) idOrEmail: string,
+    @Body() deleteUserDto: DeleteUserDto,
   ): Promise<Record<string, never>> {
+    console.log(deleteUserDto);
     await this.userService.remove(idOrEmail);
     return {};
   }
