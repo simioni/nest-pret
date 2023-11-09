@@ -3,9 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { MailerService } from '../../src/mailer/mailer.service';
-import { getDynamicPort } from './get-dynamic-port';
 
-export class TestingServer {
+export class TestingServerFactory {
   private testingModule: TestingModule;
   private testingApp: INestApplication;
   private baseUrl: string;
@@ -18,18 +17,11 @@ export class TestingServer {
       .useValue({
         sendEmailVerification: () => true,
         sendEmailForgotPassword: () => true,
-        // sendEmailVerification: jest.fn(),
-        // sendEmailForgotPassword: jest.fn(),
       })
       .compile();
 
     this.testingApp = this.testingModule.createNestApplication();
     const configService = await this.testingModule.resolve(ConfigService);
-    // const port = await getDynamicPort(
-    //   __filename,
-    //   __dirname,
-    //   configService.get('host.internalPort'),
-    // );
     const url = configService.get('host.internalUrl');
     const jestWorkerIndex = parseInt(process.env.JEST_WORKER_ID || '1');
     const port =
