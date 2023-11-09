@@ -16,6 +16,7 @@ services:
     image: api
     build: .
     command: npm run test:e2e -- ${TEST_ARG}
+    stdin_open: true
     tty: true
     environment:
       - NODE_ENV=development
