@@ -39,7 +39,6 @@ export class CaslAbilityFactory {
     // Users
     if (user.roles.includes(UserRole.USER)) {
       can([Action.Read, Action.Update], User, { _id: user._id });
-      // can(Action.Read, User, { birthdaydate: user.birthdaydate })
       // can([Action.Read, Action.Update], Article, { authorId: user._id });
     }
     // Admins
