@@ -3,11 +3,12 @@ import { getConnectionToken } from '@nestjs/mongoose';
 import { TestingModule } from '@nestjs/testing';
 import { Connection } from 'mongoose';
 import * as pactum from 'pactum';
-import { TestingServer } from 'test/config/setup-test-server';
+import { TestingServerFactory } from 'test/config/testing-server.factory';
 
 export type FakeUser = {
   email: string;
   password: string;
+  name?: string;
 };
 
 export type FakeUserOptions = {
@@ -18,19 +19,22 @@ export type FakeUserOptions = {
 };
 
 export class UserStubFactory {
-  private testingServer: TestingServer;
+  private testingServer: TestingServerFactory;
   private testingModule: TestingModule;
   private baseUrl: string;
 
-  constructor(testingServer: TestingServer) {
+  constructor(testingServer: TestingServerFactory) {
     this.testingServer = testingServer;
     this.testingModule = testingServer.getModule();
     this.baseUrl = this.testingServer.getBaseUrl();
   }
 
   public createFakeUser(options?: FakeUserOptions): FakeUser {
+    // const name = options.firstName || faker.person.firstName();
     return {
+      // name: name,
       email: faker.internet.email(options),
+      // email: faker.internet.email({ ...options, firstName: name }),
       password: faker.internet.password({ length: 8 }),
     };
   }
