@@ -41,10 +41,8 @@ export class AuthController {
   }
 
   @Post('email/login')
-  @ApiOperation({
-    summary: 'Log a user in',
-  })
-  async login(
+  @ApiOperation({ summary: 'Log a user in' })
+  public async login(
     @Body() loginDto: LoginDto,
     @StandardParam() params: StandardParams,
   ) {
@@ -62,7 +60,7 @@ export class AuthController {
     description:
       'If the email is already registed and the password is correct, this endpoint will auto-upgrade to login instead.',
   })
-  async register(
+  public async register(
     @Body() registerDto: RegisterDto,
     @StandardParam() params: StandardParams,
   ) {
@@ -98,7 +96,7 @@ export class AuthController {
 
   @Get('email/verify/:token')
   @ApiOperation({ summary: 'Verify an email using the token sent to email' })
-  async verifyEmail(
+  public async verifyEmail(
     @Param('token') token: string,
     @StandardParam() params: StandardParams,
   ) {
@@ -112,7 +110,7 @@ export class AuthController {
     summary:
       'Resend the email with the verification token in case the first one was lost',
   })
-  async sendEmailVerification(
+  public async sendEmailVerification(
     @Param() { email }: EmailDto,
     @StandardParam() params: StandardParams,
   ) {
@@ -125,7 +123,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Send an email with a link to create a new password',
   })
-  async sendEmailForgotPassword(
+  public async sendEmailForgotPassword(
     @Param() { email }: EmailDto,
     @StandardParam() params: StandardParams,
   ) {
@@ -140,7 +138,7 @@ export class AuthController {
     summary:
       'Set a new password for a user, requiring either the current password or a token send via email',
   })
-  async setNewPassord(
+  public async setNewPassord(
     @Body() resetPassword: ResetPasswordDto,
     @StandardParam() params: StandardParams,
   ) {
