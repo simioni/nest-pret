@@ -7,7 +7,6 @@ import {
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { StandardResponseModule } from 'nest-standard-response';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import configurationFactory from './config/configuration.factory';
@@ -43,7 +42,7 @@ import { VALIDATION_ERROR } from './app.constants';
     UserModule,
     MailerModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
     {
       provide: APP_PIPE,
