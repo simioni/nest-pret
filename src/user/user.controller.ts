@@ -28,12 +28,13 @@ import { PoliciesGuard } from 'src/policies/guards/policies.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { EmailVerifiedGuard } from './guards/email-verified.guard';
 import { EmailOrIdPipe } from './pipes/email-or-id.pipe';
 import { User } from './schemas/user.schema';
 import { UserService } from './user.service';
 
 @Controller('user')
-@UseGuards(AuthGuard('jwt'), PoliciesGuard)
+@UseGuards(AuthGuard('jwt'), PoliciesGuard, EmailVerifiedGuard)
 @ApiBearerAuth()
 @ApiTags('user')
 export class UserController {
@@ -41,16 +42,13 @@ export class UserController {
 
   @Get()
   @CheckPolicies((ability: UserAbility) => ability.can(Action.List, User))
-  @ApiOperation({
-    summary: 'List all users',
-    description: 'Get a list of all users. Supports pagination.',
-  })
+  @ApiOperation({ summary: 'List all users' })
   @StandardResponse({
     type: [User],
     description: 'The list of users',
     isPaginated: true,
   })
-  findAll(@StandardParam() param: StandardParams) {
+  public findAll(@StandardParam() param: StandardParams) {
     return this.userService.findAll({
       limit: param.paginationInfo.limit,
       offset: param.paginationInfo.offset,
@@ -69,7 +67,7 @@ export class UserController {
     status: 201,
     description: 'User created successfully',
   })
-  create(@Body() createUserDto: CreateUserDto) {
+  public create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
@@ -77,8 +75,8 @@ export class UserController {
   @CheckPolicies((ability: UserAbility) => ability.can(Action.Read, User))
   @ApiOperation({ summary: 'Find one user by their email or ID' })
   @ApiParam({ name: 'idOrEmail', type: 'string' })
-  @StandardResponse({ type: User })
-  async findOne(
+  @StandardResponse({ type: User, description: 'User found' })
+  public async findOne(
     @Param('idOrEmail', EmailOrIdPipe) idOrEmail: string,
     @UserAbilityParam() userAbility: UserAbility,
   ): Promise<User> {
@@ -91,11 +89,8 @@ export class UserController {
   @CheckPolicies((ability: UserAbility) => ability.can(Action.Update, User))
   @ApiOperation({ summary: 'Update data for one user by their email or ID' })
   @ApiParam({ name: 'idOrEmail', type: 'string' })
-  @StandardResponse({
-    type: User,
-    description: 'User updated successfully',
-  })
-  async update(
+  @StandardResponse({ type: User, description: 'User updated successfully' })
+  public async update(
     @Param('idOrEmail', EmailOrIdPipe) idOrEmail: string,
     @Body() updateUserDto: UpdateUserDto,
     @UserAbilityParam() userAbility: UserAbility,
@@ -109,14 +104,11 @@ export class UserController {
   @CheckPolicies((ability: UserAbility) => ability.can(Action.Delete, User))
   @ApiOperation({ summary: 'Delete one user by their email or ID' })
   @ApiParam({ name: 'idOrEmail', type: 'string' })
-  @StandardResponse({
-    description: 'User deleted successfully',
-  })
-  async remove(
+  @StandardResponse({ description: 'User deleted successfully' })
+  public async remove(
     @Param('idOrEmail', EmailOrIdPipe) idOrEmail: string,
-    @Body() deleteUserDto: DeleteUserDto,
+    @Body() _ignored_dto_still_validated_by_global_validator: DeleteUserDto,
   ): Promise<Record<string, never>> {
-    console.log(deleteUserDto);
     await this.userService.remove(idOrEmail);
     return {};
   }
