@@ -35,13 +35,6 @@ export default (): {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN,
   },
-  host: {
-    //Your server URL. This is used to create links in the emails sent (eg: for email confirmation)
-    url: process.env.HOST_URL,
-    port: parseInt(process.env.HOST_PORT),
-    internalUrl: process.env.HOST_INTERNAL_URL,
-    internalPort: parseInt(process.env.HOST_INTERNAL_PORT),
-  },
   mailer: {
     host: process.env.MAILER_HOST,
     port: parseInt(process.env.MAILER_PORT),
@@ -74,5 +67,13 @@ export default (): {
     emailVerificationIsRequired() {
       return this.emailVerification === EmailVerificationOptions.required;
     },
+    // Docker internal URL and port for the api server
+    internalUrl: process.env.API_INTERNAL_URL,
+    internalPort: parseInt(process.env.API_INTERNAL_PORT),
+  },
+  host: {
+    // System external (public) URL. This is used to create links back to the service in the emails sent (eg: for email confirmation)
+    url: process.env.HOST_URL,
+    port: parseInt(process.env.HOST_PORT),
   },
 });

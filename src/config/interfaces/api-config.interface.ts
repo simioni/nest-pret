@@ -8,4 +8,6 @@ export interface ApiConfig {
   emailVerification: EmailVerificationOptions;
   emailVerificationIsOn: () => boolean;
   emailVerificationIsRequired: () => boolean;
+  internalUrl: string;
+  internalPort: string | number;
 }

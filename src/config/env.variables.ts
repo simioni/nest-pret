@@ -23,10 +23,22 @@ export class EnvironmentVariables {
   @IsOptional()
   PORT: number;
 
+  /**
+   * API
+   * */
   @IsEnum(EmailVerificationOptions)
   @IsOptional()
   API_EMAIL_VERIFICATION: EmailVerificationOptions;
 
+  @IsString()
+  API_INTERNAL_URL: string;
+
+  @IsNumber()
+  API_INTERNAL_PORT: number;
+
+  /**
+   * DB
+   */
   @IsString()
   DATABASE_USER: string;
 
@@ -45,11 +57,18 @@ export class EnvironmentVariables {
   @IsString()
   DATABASE_AUTH_SOURCE: string;
 
+  /**
+   * JWT
+   */
   @IsString()
   JWT_SECRET: string;
 
   @IsString()
   JWT_EXPIRES_IN: string;
+
+  /**
+   * MAILER
+   */
 
   @IsString()
   @IsOptional()
@@ -92,6 +111,10 @@ export class EnvironmentVariables {
   @IsString()
   @IsOptional()
   MAILER_TLS_CIPHERS: string;
+
+  /**
+   * HOST
+   */
 
   @IsString()
   HOST_URL: string;
