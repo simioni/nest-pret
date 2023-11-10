@@ -22,10 +22,10 @@ export class TestingServerFactory {
 
     this.testingApp = this.testingModule.createNestApplication();
     const configService = await this.testingModule.resolve(ConfigService);
-    const url = configService.get('host.internalUrl');
+    const url = configService.get('api.internalUrl');
     const jestWorkerIndex = parseInt(process.env.JEST_WORKER_ID || '1');
     const port =
-      parseInt(configService.get('host.internalPort')) + jestWorkerIndex;
+      parseInt(configService.get('api.internalPort')) + jestWorkerIndex;
     this.baseUrl = `${url}:${port}`;
     await this.testingApp.init();
     await this.testingApp.listen(port);
