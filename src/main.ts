@@ -1,20 +1,17 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {
+  DocumentBuilder,
+  SwaggerCustomOptions,
+  SwaggerModule,
+} from '@nestjs/swagger';
 import expressRateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-
 import { AppModule } from './app.module';
+import { Environment } from './config/env.variables';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
-  /**********************************
-   *
-   * Security
-   *
-   ******************************* */
   // app.enable('trust proxy'); // See: https://github.com/express-rate-limit/express-rate-limit/wiki/Troubleshooting-Proxy-Issues
   app.use(helmet());
 
@@ -32,11 +29,22 @@ async function bootstrap() {
   });
   app.use('/auth/email/register', createAccountLimiter);
 
-  /**********************************
-   *
-   * Open API Auto Documentation
-   *
-   ******************************* */
+  if (process.env.NODE_ENV === Environment.Development) {
+    setupOpenApiDocs(app);
+  }
+
+  await app.listen(3000);
+}
+bootstrap();
+
+/**********************************
+ *
+ * Open API Auto Documentation
+ *
+ ******************************* */
+function setupOpenApiDocs(app: NestExpressApplication) {
+  // app.useStaticAssets(join(__dirname, '../..', 'docs'), { prefix: '/docs' });
+
   const config = new DocumentBuilder()
     .setTitle('API Live Documentation')
     .setDescription(
@@ -46,7 +54,7 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
 
-  const swaggerUiOptions = {
+  const swaggerUiOptions: SwaggerCustomOptions = {
     // explorer: true,
     swaggerOptions: {
       filter: true,
@@ -56,8 +64,5 @@ async function bootstrap() {
     },
   };
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, swaggerUiOptions);
-
-  await app.listen(3000);
+  SwaggerModule.setup('docs', app, document, swaggerUiOptions);
 }
-bootstrap();
