@@ -30,7 +30,6 @@ import { UserStubFactory } from './stubs/user-stub.factory';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
-  let mongooseConnection: Connection;
   let authService: AuthService;
   let userService: UserService;
   let getEmailVerificationTokenFor: (email: string) => Promise<string>;
@@ -57,8 +56,6 @@ describe('AuthController (e2e)', () => {
       return verification.token;
     };
     stub = new UserStubFactory(testingServer);
-    mongooseConnection = await testingModule.resolve(getConnectionToken());
-    await mongooseConnection.db.dropDatabase();
   });
 
   afterAll(async () => {

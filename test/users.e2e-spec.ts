@@ -1,40 +1,48 @@
 import { INestApplication } from '@nestjs/common';
-import { getConnectionToken } from '@nestjs/mongoose';
-import { Connection } from 'mongoose';
 import * as pactum from 'pactum';
+import { EMAIL_VERIFICATION_ERROR, USER_ERROR } from 'src/user/user.constants';
 import { UserService } from '../src/user/user.service';
 import { TestingServerFactory } from './config/testing-server.factory';
 import { FakeUser, UserStubFactory } from './stubs/user-stub.factory';
 
 describe('UserController (e2e)', () => {
   let app: INestApplication;
-  let mongooseConnection: Connection;
   let userService: UserService;
   let baseUrl: string;
   let stub: UserStubFactory;
 
+  let unverifiedUser: FakeUser;
   let verifiedUser: FakeUser;
   let adminUser: FakeUser;
+  let unverifiedUserToken: string;
   let verifiedUserToken: string;
   let adminUserToken: string;
 
   beforeAll(async () => {
+    // API_EMAIL_VERIFICATION=delayed allows loggin-in without verifing an email first.
+    // This makes it possible to test the EmailVerifiedGuard.
+    process.env.API_EMAIL_VERIFICATION = 'delayed';
+
     const testingServer = await new TestingServerFactory().create();
     const testingModule = testingServer.getModule();
     app = testingServer.getApp();
     baseUrl = testingServer.getBaseUrl();
     userService = await testingModule.resolve(UserService);
-    mongooseConnection = await testingModule.resolve(getConnectionToken());
-    await mongooseConnection.db.dropDatabase();
 
     stub = new UserStubFactory(testingServer);
+    unverifiedUser = await stub.registerNewUser({ firstName: 'Debra' });
     verifiedUser = await stub.registerNewVerifiedUser({ firstName: 'Martha' });
     adminUser = await stub.registerNewAdmin({ firstName: 'Charles' });
+
+    unverifiedUserToken = await stub.getLoginTokenForUser(unverifiedUser);
     verifiedUserToken = await stub.getLoginTokenForUser(verifiedUser);
     adminUserToken = await stub.getLoginTokenForUser(adminUser);
   });
 
   afterAll(async () => {
+    await stub.deleteUser(unverifiedUser.email);
+    await stub.deleteUser(verifiedUser.email);
+    await stub.deleteUser(adminUser.email);
     await app.close();
   });
 
@@ -90,6 +98,35 @@ describe('UserController (e2e)', () => {
         .withPathParams('idOrEmail', verifiedUser.email)
         .expectStatus(401);
     });
+    it("Should fail for a logged-in user without a verified email (due to 'delayed' email verification config + EmailVerifiedGuard)", async () => {
+      await spec()
+        .withBearerToken(unverifiedUserToken)
+        .expectStatus(403)
+        .expectJsonLike({
+          message: EMAIL_VERIFICATION_ERROR.VERIFY_EMAIL_TO_PROCEED,
+        });
+    });
+    it('Should fail without a valid id or email', async () => {
+      await spec()
+        .withBearerToken(adminUserToken)
+        .withPathParams('idOrEmail', '1234')
+        .expectStatus(400)
+        .expectJsonLike({ message: USER_ERROR.INVALID_EMAIL_OR_ID });
+    });
+    it('Should fail for a valid but inexistent email', async () => {
+      await spec()
+        .withBearerToken(adminUserToken)
+        .withPathParams('idOrEmail', 'valid_email@butunregistered.com')
+        .expectStatus(404)
+        .expectJsonLike({ message: USER_ERROR.USER_NOT_FOUND });
+    });
+    it('Should fail for a valid but inexistent id', async () => {
+      await spec()
+        .withBearerToken(adminUserToken)
+        .withPathParams('idOrEmail', '654cd95d2fb58b119d91d190')
+        .expectStatus(404)
+        .expectJsonLike({ message: USER_ERROR.USER_NOT_FOUND });
+    });
     it('Should succeed for a user reading their own info', async () => {
       await spec()
         .withBearerToken(verifiedUserToken)
@@ -116,6 +153,35 @@ describe('UserController (e2e)', () => {
       await spec()
         .withPathParams('idOrEmail', verifiedUser.email)
         .expectStatus(401);
+    });
+    it("Should fail for a logged-in user without a verified email (due to 'delayed' email verification config + EmailVerifiedGuard)", async () => {
+      await spec()
+        .withBearerToken(unverifiedUserToken)
+        .expectStatus(403)
+        .expectJsonLike({
+          message: EMAIL_VERIFICATION_ERROR.VERIFY_EMAIL_TO_PROCEED,
+        });
+    });
+    it('Should fail without a valid id or email', async () => {
+      await spec()
+        .withBearerToken(adminUserToken)
+        .withPathParams('idOrEmail', '1234')
+        .expectStatus(400)
+        .expectJsonLike({ message: USER_ERROR.INVALID_EMAIL_OR_ID });
+    });
+    it('Should fail for a valid but inexistent email', async () => {
+      await spec()
+        .withBearerToken(adminUserToken)
+        .withPathParams('idOrEmail', 'valid_email@butunregistered.com')
+        .expectStatus(404)
+        .expectJsonLike({ message: USER_ERROR.USER_NOT_FOUND });
+    });
+    it('Should fail for a valid but inexistent id', async () => {
+      await spec()
+        .withBearerToken(adminUserToken)
+        .withPathParams('idOrEmail', '654cd95d2fb58b119d91d190')
+        .expectStatus(404)
+        .expectJsonLike({ message: USER_ERROR.USER_NOT_FOUND });
     });
     it('Should succeed for a user changing their own info', async () => {
       await spec()
@@ -157,6 +223,29 @@ describe('UserController (e2e)', () => {
         .withBearerToken(verifiedUserToken)
         .withPathParams('idOrEmail', verifiedUser.email)
         .expectStatus(403);
+    });
+    it('Should fail without a valid id or email', async () => {
+      await spec()
+        .withBearerToken(adminUserToken)
+        .withPathParams('idOrEmail', '1234')
+        .expectStatus(400)
+        .expectJsonLike({ message: USER_ERROR.INVALID_EMAIL_OR_ID });
+    });
+    it('Should fail for a valid but inexistent email', async () => {
+      await spec()
+        .withBearerToken(adminUserToken)
+        .withPathParams('idOrEmail', 'valid_email@butunregistered.com')
+        .withBody({ confirmationString: 'DELETE USER' })
+        .expectStatus(404)
+        .expectJsonLike({ message: USER_ERROR.USER_NOT_FOUND });
+    });
+    it('Should fail for a valid but inexistent id', async () => {
+      await spec()
+        .withBearerToken(adminUserToken)
+        .withPathParams('idOrEmail', '654cd95d2fb58b119d91d190')
+        .withBody({ confirmationString: 'DELETE USER' })
+        .expectStatus(404)
+        .expectJsonLike({ message: USER_ERROR.USER_NOT_FOUND });
     });
     it('Should fail for a request missing the confirmation string', async () => {
       const validationError = await spec()
