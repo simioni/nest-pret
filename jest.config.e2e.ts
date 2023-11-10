@@ -15,8 +15,10 @@ const config: Config = {
       },
     ],
   },
-  // setupFilesAfterEnv: ['<rootDir>/test/config/setup-e2e-tests.ts'],
-  testEnvironment: './jest.env.e2e.ts',
+  globalSetup: '<rootDir>/test/config/global-setup.ts',
+  globalTeardown: '<rootDir>/test/config/global-teardown.ts',
+  setupFilesAfterEnv: ['<rootDir>/test/config/setup-after-env.ts'],
+  // testEnvironment: './jest.env.e2e.ts',
   verbose: true,
   silent: false,
 };

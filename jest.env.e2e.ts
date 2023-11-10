@@ -6,6 +6,7 @@ import NodeEnvironment from 'jest-environment-node';
 
 class CustomEnvironment extends NodeEnvironment {
   // private testingServer: TestingServer;
+  private testPath;
 
   constructor(config, context) {
     super(config, context);
@@ -13,8 +14,19 @@ class CustomEnvironment extends NodeEnvironment {
     // console.log(config.projectConfig);
     // console.log(context.testPath);
     // console.log(context.docblockPragmas);
-    // this.testPath = context.testPath;
     // this.docblockPragmas = context.docblockPragmas;
+    this.testPath = context.testPath;
+    if (this.testPath === '/usr/src/app/test/users.e2e-spec.ts') {
+      console.error('Using API_EMAIL_VERIFICATION=delayed for ', this.testPath);
+      process.env = {
+        ...process.env,
+        API_EMAIL_VERIFICATION: 'delayed',
+      };
+      console.error(
+        'new process.env.API_EMAIL_VERIFICATION: ',
+        process.env.API_EMAIL_VERIFICATION,
+      );
+    }
   }
 
   async setup() {
