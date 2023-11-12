@@ -72,13 +72,56 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 
 - Allows account creation;
 - Sends e-mail verification and keeps track of confirmation status;
-- Manages log-in and keeps sessions;
+- Sends forgotten password emails and allows password reset;
+- Manages log-in and JWTs;
 - Guard routes from unlogged users and injects the logged-in user into the request.
 
 </br>
 
 # Policies Module <a name="PoliciesModule"></a> 🏛️
 
+- Defines policies limiting any individual user to access only resources they can claim;
+- Claims define which `Actions` (create, read, update, etc...) any user `Role` can take on each `Model`;
+- Claims can also define *constraint queries*, for example allowing a user to read the `User` model, but only for his own user; or to update `Articles`, but only those authored by himself;
+
+> Note: There is no `Articles` module provided by this app. This is just an example on how you can define policies for any model you want.
+
+Policies are defined using [Casl](https://github.com/stalniy/casl).
+
+## Protect routes
+
+Just use the `PoliciesGuard` on any controller or route. Since policies depend on the user object, using it also requires using `AuthGuard` or other mechanism that guarantees log-in.
+
+```ts
+@UseGuards(AuthGuard('jwt'), PoliciesGuard)
+```
+
+Once this guard is in place, you can add the `@CheckPolicies()` decorator to any route, and choose the claims that are required by this route. `@CheckPolicies()` expects a simple function that is called with the `userAbility` object, so you can use `can` or `cannot` methods on it to define which Actions this route requires on which Models.
+
+```ts
+@CheckPolicies((ability: UserAbility) => ability.can(Action.List, User))
+```
+
+Checking policies in this way is very efficient, since requests can be dennied at the Guard level, without even executing the route handler. But it is also limited: it cannot check for *constraint queries* since no document has been retrieved from the DB yet. If the logged-in user has access to ***at least one document*** for a given Model, it will be granted access by the guard, and you should check for constraints during the route handling.
+
+## Protect access per-document
+
+- The `userAbility` object is also injected in the request object, and you can retrieve it by using `req.userAbility`;
+- If this is all you're using from the request object, it can be cleaner to inject it directly using the custom param decorator `@UserAbilityParam()`;
+
+This allows you to retrieve documents from the database and call the `can` or `cannot` methods against them. Note that here these methods are called using an instance of the model (instead of on the Model class itself).
+
+```ts
+function findOne(
+  @UserAbilityParam() userAbility: UserAbility,
+) {
+  const user = await this.userService.findOne(idOrEmail);
+  if (userAbility.cannot(Action.Read, user)) {
+    throw new ForbiddenException();
+  }
+  return user;
+}
+```
 </br>
 
 # User Module <a name="UserModule"></a> 👤
