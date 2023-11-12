@@ -1,29 +1,37 @@
-# Nest Pret
-
-### A decorated nest ready to move into production
+# A fully-decorated nest ready to move
 
 </br>
 
-Fully tested, fully documented, production-ready NestJS project that solves much of the functionality required from a modern web app.
+Tested, documented, and production-ready.
+
+Nest Pret is replicable NestJS project that solves much of the functionality required from a modern web app.
 
 - User registration
-- E-mail verification
-- Password recovery
-- User consent for TOS, Cookies, Policies, etc
+- Password recovery<!-- - User consent for TOS, Cookies, Policies, etc -->
+- E-mail verification, configurable between:
+  - *required* before login;
+  - *delayed* until a route with `@EmailVerifiedGuard()` enforces it;
+  - or *off*;
 - Claims-based access control, including:
-  - Restricted access to routes via policies
-  - Restricted access to specific documents by ownership or other conditional policies
-  - Serialization of response objects exposing only the fields the user has access to
+  - Restricted access to routes via policies;
+  - Restricted access to specific documents by ownership or other conditional constraints;
+  - Serialization of response objects exposing only the fields the user has access to;
 - Standardized API responses, including:
-  - Automatic wrapping of return objects into a StandardResponse
-  - Handling of pagination, sorting and filtering
-  - Metadata-based — handler remains returning DTOs or model classes usable by interceptors
-  - Generation of OpenAPI documentation for routes with proper response schema
-  - Generation of OpenAPI response examples with proper serialization for each user role
+  - Automatic wrapping of return objects into a StandardResponse;
+  - Metadata-based — handlers remains returning Classes compatible with interceptors;
+  - Handling of pagination, sorting and filtering;
+  - Generation of OpenAPI documentation for routes with proper response schema;
+  <!-- - Generation of OpenAPI response examples with proper serialization for each user role -->
 - Secure defaults:
   - Sets secure HTTP response headers
   - Global IP request rate limiting
   - Account creation rate limiting
+- Configurable
+  - Config module parses and validates .env variables buring bootstrap
+  - Config service makes them available app-wide with proper type definitions
+- Deployable
+  - Docker compose environmets for dev and e2e testing
+  - Docker swarm stack ready for continous deployment
 
 <br />
 
