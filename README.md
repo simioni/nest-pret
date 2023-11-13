@@ -61,7 +61,7 @@ It will use docker compose to lift a Mongo DB, a Mongo-Express visual DB admin p
 <br />
 <br />
 
-## 💻 &nbsp; Start without docker
+## 🐧 &nbsp; Start without docker
 
 Make sure to edit ```.env``` file to add the connection information for your mongo database, then run:
 
