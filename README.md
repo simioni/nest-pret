@@ -98,7 +98,7 @@ Policies are defined using [Casl](https://github.com/stalniy/casl).
 
 ## Protecting routes
 
-Just use the `PoliciesGuard` on any controller or route. Since policies depend on the user object, using it also requires using `AuthGuard` or other mechanism that guarantees log-in.
+Just add the `PoliciesGuard` to any controller or route. Since policies depend on the user object, using this guard also requires using `AuthGuard` or other mechanism that guarantees log-in.
 
 ```ts
 @UseGuards(AuthGuard('jwt'), PoliciesGuard)
