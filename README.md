@@ -34,7 +34,7 @@
   - Global IP request rate limiting
   - Account creation rate limiting
 - Configurable
-  - Config module parses and validates .env variables buring bootstrap
+  - Config module parses and validates .env variables during bootstrap
   - Config service makes them available app-wide with proper type definitions
 - Deployable
   - Docker compose environmets for dev and e2e testing
