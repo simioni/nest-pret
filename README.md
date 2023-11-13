@@ -96,7 +96,7 @@ Make sure to edit ```/src/config.ts``` file to add the connection information fo
 
 Policies are defined using [Casl](https://github.com/stalniy/casl).
 
-## Protect routes
+## Protecting routes
 
 Just use the `PoliciesGuard` on any controller or route. Since policies depend on the user object, using it also requires using `AuthGuard` or other mechanism that guarantees log-in.
 
