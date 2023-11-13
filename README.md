@@ -88,7 +88,7 @@ To run e2e tests:
 npm run e2e
 ```
 
-> This command will lift a full docker compose configuration with the testing environment, run all the tests against it, print the output, then immediatly exit and prune all docker resources created.
+> This command will lift a full docker compose configuration with the testing environment, run all the tests against it, print the output, then immediately exit and prune all docker resources created.
 
 You can also run e2e tests in watch mode:
 
