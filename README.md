@@ -96,7 +96,7 @@ You can also run e2e tests in watch mode:
 npm run e2e:watch
 ```
 
-Note that running in this mode will keep the entire docker testing environment up. Once youre done with testing, you can take it down and clear everything by running:
+Note that running in this mode will keep the entire docker testing environment up. Once you're done with testing, you can take it down and clear everything by running:
 
 ```
 npm run e2e:down
