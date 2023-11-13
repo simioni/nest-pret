@@ -49,28 +49,28 @@
 
 <br />
 
-## Start using Docker
+## 🐳 &nbsp; Start using Docker
 To start using Docker, run:
 
     npm run dev
 
-It will use docker-compose to lift a Mongo DB, a Mongo-Express visual DB admin page on port 8081, and the NestJS app in watch mode.
+It will use docker compose to lift a Mongo DB, a Mongo-Express visual DB admin page on port 8081, and the NestJS app in watch mode.
 
 > If running in Docker, you're not required to run ```npm install``` locally, but you still might want to do so in order to get features such as auto-import and auto-complete in your code editor.
 
 <br />
 <br />
 
-## Start without docker
+## 🖥️ &nbsp; Start without docker
 
-Make sure to edit ```/src/config.ts``` file to add the connection information for your mongo database, then run:
+Make sure to edit ```.env``` file to add the connection information for your mongo database, then run:
 
     npm install
     npm run start:dev
 
 <br />
 
-## Running tests
+## 🧐 &nbsp; Running tests
 
 To run unit and integration tests (locally):
 
