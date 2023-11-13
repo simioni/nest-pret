@@ -178,6 +178,8 @@ In Typescript, data Models and their property types are usually defined as an `I
 
 Policies are defined using [Casl](https://github.com/stalniy/casl).
 
+<br />
+
 ## Protecting routes
 
 Just add the `PoliciesGuard` to any controller or route. Since policies depend on the user object, using this guard also requires using `AuthGuard` or other mechanism that guarantees log-in.
@@ -193,6 +195,8 @@ Once this guard is in place, you can add the `@CheckPolicies()` decorator to any
 ```
 
 Checking policies in this way is very efficient, since requests can be denied at the Guard level, without even executing the route handler. But it is also limited: it cannot check for *constraint queries* since no document has been retrieved from the DB yet. If the logged-in user has access to ***at least one document*** for a given Model, it will be granted access by the guard, and you should check for constraints during the route handling.
+
+<br />
 
 ## Protecting access per-document
 
