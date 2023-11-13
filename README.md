@@ -104,13 +104,13 @@ Just add the `PoliciesGuard` to any controller or route. Since policies depend o
 @UseGuards(AuthGuard('jwt'), PoliciesGuard)
 ```
 
-Once this guard is in place, you can add the `@CheckPolicies()` decorator to any route, and choose the claims that are required by this route. `@CheckPolicies()` expects a simple function that is called with the `userAbility` object, so you can use `can` or `cannot` methods on it to define which Actions this route requires on which Models.
+Once this guard is in place, you can add the `@CheckPolicies()` decorator to any route, and choose the claims that are required to access this route. `@CheckPolicies()` expects a simple function that is called with the `userAbility` object, so you can use `can` or `cannot` methods on it to define which Actions this route requires on which Models.
 
 ```ts
 @CheckPolicies((ability: UserAbility) => ability.can(Action.List, User))
 ```
 
-Checking policies in this way is very efficient, since requests can be dennied at the Guard level, without even executing the route handler. But it is also limited: it cannot check for *constraint queries* since no document has been retrieved from the DB yet. If the logged-in user has access to ***at least one document*** for a given Model, it will be granted access by the guard, and you should check for constraints during the route handling.
+Checking policies in this way is very efficient, since requests can be denied at the Guard level, without even executing the route handler. But it is also limited: it cannot check for *constraint queries* since no document has been retrieved from the DB yet. If the logged-in user has access to ***at least one document*** for a given Model, it will be granted access by the guard, and you should check for constraints during the route handling.
 
 ## Protect access per-document
 
