@@ -23,6 +23,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "e2e": "docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from api --attach api --no-log-prefix",
     "e2e:watch": "TEST_ARG=--watch npm run e2e",
+    "e2e:down": "docker-compose -f docker-compose.test.yml down --rmi local -v",
     "poste2e": "docker-compose -f docker-compose.test.yml down --rmi local -v",
     "test:e2e": "jest --config jest.config.e2e.ts"
   },

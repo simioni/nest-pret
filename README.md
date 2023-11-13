@@ -1,17 +1,24 @@
 # A fully-decorated nest ready to fly
 
+<a href="https://www.npmjs.com/package/nest-pret" target="_blank"><img src="https://img.shields.io/npm/v/nest-pret" alt="NPM Version" /></a>
+<a href="https://github.com/simioni/nest-pret/blob/main/LICENSE" target="_blank"><img src="https://img.shields.io/npm/l/nest-pret" alt="Package License" /></a>
+<a href="https://www.npmjs.com/package/nest-pret" target="_blank"><img alt="npm" src="https://img.shields.io/npm/dt/nest-pret?logo=npm&label=installs"></a>
+<a href="https://www.npmjs.com/package/nest-pret" target="_blank"><img alt="npm peer dependency version (scoped)" src="https://img.shields.io/npm/dependency-version/nest-pret/%40nestjs%2Fcore?logo=nestjs"></a>
+<a href="https://www.npmjs.com/package/nest-pret" target="_blank"><img alt="npm" src="https://img.shields.io/github/languages/top/simioni/nest-pret?logo=typescript"></a>
+<!-- <a href="https://app.circleci.com/pipelines/github/simioni/nest-pret" target="_blank"><img alt="CircleCI" src="https://img.shields.io/circleci/build/github/simioni/nest-pret/main?logo=circleci"></a> -->
+
+
+### Tested, documented, and production-ready.
 </br>
 
-Tested, documented, and production-ready.
-
-Nest Pret is replicable NestJS project that solves much of the functionality required from a modern web app.
+**Nest Pret** is a replicable NestJS project that solves much of the functionality required from a modern web app.
 
 - User registration
 - Password recovery<!-- - User consent for TOS, Cookies, Policies, etc -->
 - E-mail verification, configurable between:
-  - *required* before login;
-  - *delayed* until a route with `@EmailVerifiedGuard()` enforces it;
-  - or *off*;
+  - ***required*** before login;
+  - ***delayed*** until a route with `@EmailVerifiedGuard()` enforces it;
+  - or ***off***;
 - Claims-based access control, including:
   - Restricted access to routes via policies;
   - Restricted access to specific documents by ownership or other conditional constraints;
@@ -38,9 +45,9 @@ Nest Pret is replicable NestJS project that solves much of the functionality req
 # Getting started
 
 * Clone this repo
-* Edit the ```/src/config.ts``` file and add your mailer service information.
+* Edit the ```.env``` file and add at least your mailer service information.
 
-
+<br />
 
 ## Start using Docker
 To start using Docker, run:
@@ -51,12 +58,87 @@ It will use docker-compose to lift a Mongo DB, a Mongo-Express visual DB admin p
 
 > If running in Docker, you're not required to run ```npm install``` locally, but you still might want to do so in order to get features such as auto-import and auto-complete in your code editor.
 
+<br />
+<br />
+
 ## Start without docker
 
 Make sure to edit ```/src/config.ts``` file to add the connection information for your mongo database, then run:
 
     npm install
     npm run start:dev
+
+<br />
+
+## Running tests
+
+To run unit and integration tests (locally):
+
+```
+npm run test
+```
+or 
+```
+npm run test:watch
+```
+
+To run e2e tests:
+
+```
+npm run e2e
+```
+
+> This command will lift a full docker compose configuration with the testing environment, run all the tests against it, print the output, then immediatly exit and prune all docker resources created.
+
+You can also run e2e tests in watch mode:
+
+```
+npm run e2e:watch
+```
+
+Note that running in this mode will keep the entire docker testing environment up. Once youre done with testing, you can take it down and clear everything by running:
+
+```
+npm run e2e:down
+```
+
+<br />
+
+---------------------------------------------------------------------------
+<!-- # Motivation
+
+NestJS achieves a great balance between performance, development speed and developer experience. By using TS/JS, it can tap on a vast ecosystem of libraries and tools
+
+This project:
+- enforces automatic linting and code formatting;
+- is fully tested and encourages test-driven development;
+- provides a "single source of truth" architecture for data Models that grant security in operations while avoiding code duplication;
+
+<br />
+
+## Model Classes as a "single source of truth" for data entities
+
+In Typescript, data Models and their property types are usually defined as an `Interface` that is implemented by a schema or entity class 
+
+- A schema, used by mongoose to provide type safety (and code completion, easier refactoring, etc...)
+  - The schema contains all properties from the model, and represents the data exactly as it is saved in the DB
+- Data validation on input
+  - Contain only the fields that are acceptable for a given operation -->
+
+# Tech stack
+
+* Docker [compose](https://github.com/docker/compose) for development and testing, and [swarm](https://dockerswarm.rocks/) for deployment;
+* Typescript
+* MongoDB
+* NestJS <sup>[source](https://github.com/nestjs/nest)</sup>
+* Mongoose <sup>[source](https://github.com/Automattic/mongoose)</sup>
+* PassportJS <sup>[source](https://github.com/jaredhanson/passport)</sup>
+* Casl <sup>[source](https://github.com/stalniy/casl)</sup>
+* Nodemailer <sup>[source](https://github.com/nodemailer/nodemailer)</sup>
+* Nest Standard Response <sup>[source](https://github.com/simioni/nest-standard-response)</sup>
+* Jest <sup>[source](https://github.com/jestjs/jest)</sup>
+* PactumJS <sup>[source](https://github.com/pactumjs/pactum)</sup>
+* Swagger / OpenAPI <sup>[source](https://github.com/swagger-api)</sup>
 
 <br />
 
@@ -134,7 +216,23 @@ function findOne(
 
 # User Module <a name="UserModule"></a> 👤
 
+- Defines the User model and the services required to CRUD it;
+- Also define services for listing users, reseting their password, and verifing their email;
+- Most services from this module are consumed by the Auth module for managing accounts;
+- Some routes from the user controller can be used by users to view or update their own profile;
+- Other routes are only available to admins for managing any user from a backend.
 
+</br>
+
+# Mailer Module <a name="ConfigModule"></a> 📤
+
+- Automatically creates and configures a nodemailer instance using info from the .env file injected by the config module;
+- Defines services for sending emails;
+- Currently this module can send the following emails:
+  - Welcome
+  - Please confirm yout email
+  - Forgot your password?
+  - Your password was reset
 
 </br>
 
