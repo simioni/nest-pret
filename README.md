@@ -112,7 +112,7 @@ Once this guard is in place, you can add the `@CheckPolicies()` decorator to any
 
 Checking policies in this way is very efficient, since requests can be denied at the Guard level, without even executing the route handler. But it is also limited: it cannot check for *constraint queries* since no document has been retrieved from the DB yet. If the logged-in user has access to ***at least one document*** for a given Model, it will be granted access by the guard, and you should check for constraints during the route handling.
 
-## Protect access per-document
+## Protecting access per-document
 
 - The `userAbility` object is also injected in the request object, and you can retrieve it by using `req.userAbility`;
 - If this is all you're using from the request object, it can be cleaner to inject it directly using the custom param decorator `@UserAbilityParam()`;
@@ -133,6 +133,8 @@ function findOne(
 </br>
 
 # User Module <a name="UserModule"></a> 👤
+
+
 
 </br>
 
