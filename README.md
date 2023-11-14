@@ -137,7 +137,7 @@ npm run publish
 1. Start one or more servers or VPSs on your cloud provider of choice and install Docker on them;
 2. Start docker in swarm mode; If running multiple servers, add them to the swarm;
 3. SSH into the swarms *manager node* and copy the following files onto it: `.env`, `docker-swarm.yml`, `package.json`;
-4. Then run:
+4. Still on the manager node, run:
 
 ```
 npm run prod
