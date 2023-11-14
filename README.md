@@ -56,8 +56,8 @@ To start using Docker, run:
 
 This will start a docker compose with:
 - the dev database;<!-- - a redis instance; -->
-- a mongo-express visual DB admin page at *http://localhost:8081*;<!-- - a custom swagger UI documentation explorer at [localhost:8082](localhost:8082); -->
-- the NestJS app in watch mode at *http://localhost:3000*;
+- a mongo-express visual DB admin page at *localhost:8081*;<!-- - a custom swagger UI documentation explorer at [localhost:8082](localhost:8082); -->
+- the NestJS app in watch mode at *localhost:3000*;
 
 > If running in Docker, you're not required to run ```npm install``` locally, but you still might want to do so in order to get features such as auto-import and auto-complete in your code editor.
 
