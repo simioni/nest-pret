@@ -82,6 +82,7 @@ Make sure to edit ```.env``` file to add the connection information for your mon
     npm run start:dev
 
 <br />
+<br />
 
 ## 🧐 &nbsp; Running tests
 
@@ -114,6 +115,45 @@ Note that running in this mode will keep the entire docker testing environment u
 ```
 npm run e2e:down
 ```
+
+<br />
+<br />
+
+## 🚀 &nbsp; Running in production
+
+Make sure to edit the `.env` file to add the correct production information for your domain, mailer service, and a private container registry where the application container will be published to.
+
+### On your local machine:
+
+Test, build and publish the container
+
+```
+npm run e2e
+npm run build
+npm run publish
+```
+
+### Prepare the server:
+1. Start a server or a VPS on your cloud provider of choice and install Docker on it;
+2. Start docker in swarm mode;
+3. SSH into your server and copy the following files onto it: `.env`, `docker-swarm.yml`, `package.json`;
+4. Then run:
+
+```
+npm run prod
+```
+
+The will start the following containers into the swarm:
+
+- nginx as a reverse proxy
+- the production database
+- redis
+- the NestJS app
+
+When running in `production` env, the app will not provide the same tools it does in development (documentation and dependency graph). It does, however, provide some other tools:
+
+- mgob for periodic database backups
+- metrics & monitoring
 
 <br />
 
