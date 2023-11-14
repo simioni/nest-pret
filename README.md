@@ -159,7 +159,13 @@ When running in `production` env, the app will not provide the same tools it doe
 
 Once you've changed your code and are ready to update the production version, make sure to test, build and publish your updated container.
 
-SSH into your server and run:
+```
+npm run e2e
+npm run build
+npm run publish
+```
+
+Then SSH into your server and run:
 
 ```
 npm run update
