@@ -116,7 +116,7 @@ Note that running in this mode will keep the entire docker testing environment u
 npm run e2e:down
 ```
 
-<br />
+<!-- <br />
 <br />
 
 ## 🚀 &nbsp; Running in production
@@ -175,7 +175,7 @@ The swarm will start new updated containers to replace the current ones with zer
 
 ```
 npm run rollback
-```
+``` -->
 
 <br />
 
