@@ -281,9 +281,9 @@ In Typescript, data Models and their property types are usually defined as an `I
 * [Auth Module](#AuthModule) 🚪
 * [Policies Module](#PoliciesModule) 🏛️
   * CaslAbilityFactory
-  * PoliciesGuard <sup>guard</sup>
-  * @CheckPolicies() <sup>decorator</sup>
-  * @UserAbilityParam() <sup>parameter decorator</sup>
+  * [PoliciesGuard](#PoliciesGuard) <sup>guard</sup>
+  * [@CheckPolicies()](#CheckPoliciesDecorator) <sup>decorator</sup>
+  * [@UserAbilityParam()](#UserAbilityParamDecorator) <sup>parameter decorator</sup>
 * [User Module](#UserModule) 👤
 * [Mailer Module](#MailerModule) 📮
 * [Config Module](#ConfigModule) ⚙️
@@ -319,7 +319,7 @@ Policies are defined using [Casl](https://github.com/stalniy/casl).
 
 <br />
 
-## Protecting routes
+## Protecting routes <a name="PoliciesGuard"></a><a name="CheckPoliciesDecorator"></a>
 
 Just add the `PoliciesGuard` to any controller or route. Since policies depend on the user object, using this guard also requires using `AuthGuard` or other mechanism that guarantees log-in.
 
@@ -337,7 +337,7 @@ Checking policies in this way is very efficient, since requests can be denied at
 
 <br />
 
-## Protecting access per-document
+## Protecting access per-document <a name="UserAbilityParamDecorator"></a>
 
 - The `userAbility` object is also injected in the request object, and you can retrieve it by using `req.userAbility`;
 - If this is all you're using from the request object, it can be cleaner to inject it directly using the custom param decorator `@UserAbilityParam()`;
