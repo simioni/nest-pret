@@ -280,7 +280,7 @@ In Typescript, data Models and their property types are usually defined as an `I
 
 * [Auth Module](#AuthModule) 🚪
 * [Policies Module](#PoliciesModule) 🏛️
-  * CaslAbilityFactory
+  * [CaslAbilityFactory](#CaslAbilityFactory)
   * [PoliciesGuard](#PoliciesGuard) <sup>guard</sup>
   * [@CheckPolicies()](#CheckPoliciesDecorator) <sup>decorator</sup>
   * [@UserAbilityParam()](#UserAbilityParamDecorator) <sup>parameter decorator</sup>
@@ -316,6 +316,37 @@ In Typescript, data Models and their property types are usually defined as an `I
 > Note: There is no `Articles` module provided by this app. This is just an example on how you can define policies for any model you want.
 
 Policies are defined using [Casl](https://github.com/stalniy/casl).
+
+<br />
+
+## CaslAbilityFactory <a name="CaslAbilityFactory"></a>
+
+The `CaslAbilityFactory` provider exposes the `createForUser` function, which is called during a request with logged-in user information, and should return a casl Ability object constructed using the `can` or `cannot` methods from casl. This function is free to inspect the user object and define any custom logic it needs to limit individual access to `actions` taken on `models`.
+
+Example:
+
+```ts
+if (user.roles.includes(UserRole.USER)) {
+  // users can view and update their own info
+  // view any article
+  // and update articles authored by them
+  can([Action.Read, Action.Update], User, { _id: user._id });
+  can(Action.Read, Article);
+  can(Action.Update, Article, { authorId: user._id });
+}
+if (user.roles.includes(UserRole.MOD)) {
+  // mods can read and update any user or any article
+  can([Action.Read, Action.Update], User, { _id: user._id });
+  can([Action.Read, Action.Update], Article, { authorId: user._id });
+}
+if (user.roles.includes(UserRole.ADMIN)) {
+  // admins can do anything. Note that 'manage' in casl means all actions,
+  // and the keywork 'all' means in all models. Common actions are 'create',
+  // 'read', 'update', 'delete' and 'list', but you can extend the Actions enum
+  // with any other action you want
+  can(Action.Manage, 'all');
+}
+```
 
 <br />
 
