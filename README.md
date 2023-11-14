@@ -143,7 +143,7 @@ npm run publish
 npm run prod
 ```
 
-The will start the following containers into the swarm:
+This will start the following containers onto the swarm:
 
 - nginx as a reverse proxy
 - the production database
@@ -154,6 +154,22 @@ When running in `production` env, the app will not provide the same tools it doe
 
 - mgob for periodic database backups
 - metrics & monitoring
+
+## Rolling updates
+
+Once you've changed your code and are ready to update the production version, make sure to test, build and publish your updated container.
+
+SSH into your server and run:
+
+```
+npm run update
+```
+
+The swarm will start new updated containers to replace the current ones with zero downtime. If the update fails for some reason, you can rollback the update by running:
+
+```
+npm run rollback
+```
 
 <br />
 
