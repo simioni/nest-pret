@@ -133,10 +133,10 @@ npm run build
 npm run publish
 ```
 
-### Prepare the server:
-1. Start a server or a VPS on your cloud provider of choice and install Docker on it;
-2. Start docker in swarm mode;
-3. SSH into your server and copy the following files onto it: `.env`, `docker-swarm.yml`, `package.json`;
+### Prepare the servers:
+1. Start one or more servers or VPSs on your cloud provider of choice and install Docker on them;
+2. Start docker in swarm mode; If running multiple servers, add them to the swarm;
+3. SSH into the swarms *manager node* and copy the following files onto it: `.env`, `docker-swarm.yml`, `package.json`;
 4. Then run:
 
 ```
