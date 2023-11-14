@@ -16,29 +16,33 @@
 - User registration
 - Password recovery<!-- - User consent for TOS, Cookies, Policies, etc -->
 - E-mail verification, configurable between:
-  - ***required*** before login;
-  - ***delayed*** until a route with `@EmailVerifiedGuard()` enforces it;
-  - or ***off***;
+  - ***required*** before login
+  - ***delayed*** until a route with `@EmailVerifiedGuard()` enforces it
+  - or ***off***
 - Claims-based access control, including:
-  - Restricted access to routes via policies;
-  - Restricted access to specific documents by ownership or other conditional constraints;
-  - Serialization of response objects exposing only the fields the user has access to;
+  - Restricted access to routes via policies
+  - Restricted access to specific documents by ownership or other conditional constraints
+  - Serialization of response objects exposing only the fields the user has access to
 - Standardized API responses, including:
-  - Automatic wrapping of return objects into a StandardResponse;
-  - Metadata-based — handlers remains returning Classes compatible with interceptors;
-  - Handling of pagination, sorting and filtering;
-  - Generation of OpenAPI documentation for routes with proper response schema;
+  - Automatic wrapping of return objects into a StandardResponse
+  - Metadata-based — handlers remains returning Classes compatible with interceptors
+  - Handling of pagination, sorting and filtering
+  - Generation of OpenAPI documentation for routes with the proper combined response schema
   <!-- - Generation of OpenAPI response examples with proper serialization for each user role -->
 - Secure defaults:
   - Sets secure HTTP response headers
-  - Global IP request rate limiting
-  - Account creation rate limiting
+  - Global validation of all request inputs
+  - Global validation of response values before serialization
+  - Rate-limiting across the app with tighter limits for account creation
 - Configurable
   - Config module parses and validates .env variables during bootstrap
   - Config service makes them available app-wide with proper type definitions
 - Deployable
   - Docker compose environmets for dev and e2e testing
   - Docker swarm stack ready for continous deployment
+- Tested
+  - Complete end-to-end testing suites
+  - 100% coverage of all user interaction flows
 
 <br />
 
@@ -56,8 +60,14 @@ To start using Docker, run:
 
 This will start a docker compose with:
 - the dev database<!-- - a redis instance; -->
-- a mongo-express visual DB admin page at ***localhost:8081***<!-- - a custom swagger UI documentation explorer at [localhost:8082](localhost:8082); -->
-- the NestJS app in watch mode at ***localhost:3000***
+- a mongo-express visual DB admin page at `localhost:8081`
+- the NestJS app in watch mode at `localhost:3000`
+
+Only for the `development` env, the app will also serve documentation and a dependency graph:
+
+- Swagger UI documentation explorer: `localhost:3000/dev-tools/docs`
+- Swagger documentation JSON: `localhost:3000/dev-tools/docs-json`
+- MermaidJS graph providing a high level view of the inter-module dependencies: `localhost:3000/dev-tools/graph.mmd`
 
 > If running in Docker, you're not required to run ```npm install``` locally, but you still might want to do so in order to get features such as auto-import and auto-complete in your code editor.
 
@@ -142,6 +152,7 @@ In Typescript, data Models and their property types are usually defined as an `I
 * Jest <sup>[source](https://github.com/jestjs/jest)</sup>
 * PactumJS <sup>[source](https://github.com/pactumjs/pactum)</sup>
 * NestJS Spelunker <sup>[source](https://github.com/jmcdo29/nestjs-spelunker)</sup>
+* MermaidJS <sup>[source](https://github.com/mermaid-js/mermaid)</sup>
 * Swagger / OpenAPI <sup>[source](https://github.com/swagger-api)</sup>
 
 <br />

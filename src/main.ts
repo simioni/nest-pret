@@ -6,6 +6,7 @@ import {
   SwaggerCustomOptions,
   SwaggerModule,
 } from '@nestjs/swagger';
+import { Response } from 'express';
 import expressRateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { SpelunkerModule } from 'nestjs-spelunker';
@@ -120,8 +121,13 @@ classDef layoutGroup fill:none,stroke:none
 class appGraph,legendPadding layoutGroup
 style legend stroke-dasharray: 0 1 1,fill:none,opacity:0.75
 `;
-  console.log(`${header}\n\t${mermaidEdges.join('\n\t')}\n${footer}`);
-  // 2. Copy and paste the log content in "https://mermaid.live/"
+  const mermaidGraph = `${header}\n\t${mermaidEdges.join('\n\t')}\n${footer}`;
+  app.getHttpAdapter().get('/dev-tools/graph.mmd', (req, res: Response) => {
+    // res.set('Content-Type', 'text/markdown');
+    res.set('Content-Type', 'text/vnd.mermaid');
+    res.send(mermaidGraph);
+    // Copy and paste in "https://mermaid.live/"
+  });
 }
 
 /**
