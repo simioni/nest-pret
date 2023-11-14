@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import {
@@ -7,8 +8,10 @@ import {
 } from '@nestjs/swagger';
 import expressRateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import { SpelunkerModule } from 'nestjs-spelunker';
 import { AppModule } from './app.module';
 import { Environment } from './config/env.variables';
+import { ApiConfig } from './config/interfaces/api-config.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -30,21 +33,102 @@ async function bootstrap() {
   app.use('/auth/email/register', createAccountLimiter);
 
   if (process.env.NODE_ENV === Environment.Development) {
+    setupDependencyGraph(app);
     setupOpenApiDocs(app);
   }
 
-  await app.listen(3000);
+  const apiConfig = app.get<ConfigService>(ConfigService).get<ApiConfig>('api');
+
+  await app.listen(apiConfig.internalPort);
 }
 bootstrap();
 
-/**********************************
- *
- * Open API Auto Documentation
- *
- ******************************* */
+/**
+ * Builds a Dependency Graph to provide a high level view of the NestJS application
+ */
+function setupDependencyGraph(app: NestExpressApplication) {
+  // console.log(SpelunkerModule.explore(app));
+  const commonModules = [
+    'ConfigModule',
+    'StandardResponseModule',
+    'MongooseModule',
+    'JwtModule',
+  ];
+  // 1. Generate the tree as text
+  const tree = SpelunkerModule.explore(app);
+  const root = SpelunkerModule.graph(tree);
+  const edges = SpelunkerModule.findGraphEdges(root);
+  const apiEndpointModuleIcon = 'fa:fa-globe ';
+  const mermaidEdges = edges
+    .filter(
+      // filtering some modules out
+      ({ from, to }) =>
+        !(
+          from.module.name === 'ConfigHostModule' ||
+          to.module.name === 'ConfigHostModule' ||
+          from.module.name === 'MongooseCoreModule' ||
+          to.module.name === 'MongooseCoreModule' ||
+          from.module.name === 'LoggerModule' ||
+          to.module.name === 'LoggerModule'
+        ),
+    )
+    .map(({ from, to }) => {
+      const hasController = from.module.controllers.length > 0;
+      const classTag = hasController ? ':::restEndpoint' : '';
+      const iconTag = hasController ? apiEndpointModuleIcon : '';
+      const shapeIn = hasController ? '{{' : '(';
+      const shapeOut = hasController ? '}}' : ')';
+      let lineStyle = '===>';
+      if (
+        from.module.name !== 'AppModule' &&
+        !commonModules.includes(from.module.name) &&
+        commonModules.includes(to.module.name)
+      )
+        lineStyle = '-.-';
+      if (to.module.name === 'JwtModule' || from.module.name === 'JwtModule')
+        lineStyle = '~~~';
+      return `${from.module.name}${shapeIn}${iconTag}${from.module.name}${shapeOut}${classTag}${lineStyle}${to.module.name}`;
+    });
+  const header = `%%{ init: { 'flowchart': { 'curve': 'monotoneX' } } }%%
+flowchart LR
+  subgraph legend[ Legend ]
+  subgraph legendPadding [ ]
+    direction TB
+    ex2(Module without routes)
+    ex1{{fa:fa-globe Module exposing API endpoints}}:::restEndpoint
+  end
+  end
+  subgraph appGraph[" "]
+    direction LR
+    subgraph CM[Common modules]
+      ConfigModule
+      StandardResponseModule
+      MongooseModule
+      JwtModule
+    end
+    subgraph MM[Main modules]
+      UserModule
+      AuthModule
+      PoliciesModule
+      MailerModule
+    end`;
+  const footer = `  end
+classDef restEndpoint fill:darkgreen
+classDef groupStyles rx:10,ry:10
+class CM,MM groupStyles
+classDef layoutGroup fill:none,stroke:none
+class appGraph,legendPadding layoutGroup
+style legend stroke-dasharray: 0 1 1,fill:none,opacity:0.75
+`;
+  console.log(`${header}\n\t${mermaidEdges.join('\n\t')}\n${footer}`);
+  // 2. Copy and paste the log content in "https://mermaid.live/"
+}
+
+/**
+ * Builds the OpenAPI JSON object providing documentation for the app
+ */
 function setupOpenApiDocs(app: NestExpressApplication) {
   // app.useStaticAssets(join(__dirname, '../..', 'docs'), { prefix: '/docs' });
-
   const config = new DocumentBuilder()
     .setTitle('API Live Documentation')
     .setDescription(

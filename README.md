@@ -54,7 +54,10 @@ To start using Docker, run:
 
     npm run dev
 
-It will use docker compose to lift a Mongo DB, a Mongo-Express visual DB admin page on port 8081, and the NestJS app in watch mode.
+This will start a docker compose with:
+- the dev database;<!-- - a redis instance; -->
+- a mongo-express visual DB admin page at [localhost:8081](localhost:8081);<!-- - a custom swagger UI documentation explorer at [localhost:8082](localhost:8082); -->
+- the NestJS app in watch mode at [localhost:3000](localhost:3000);
 
 > If running in Docker, you're not required to run ```npm install``` locally, but you still might want to do so in order to get features such as auto-import and auto-complete in your code editor.
 
@@ -138,16 +141,78 @@ In Typescript, data Models and their property types are usually defined as an `I
 * Nest Standard Response <sup>[source](https://github.com/simioni/nest-standard-response)</sup>
 * Jest <sup>[source](https://github.com/jestjs/jest)</sup>
 * PactumJS <sup>[source](https://github.com/pactumjs/pactum)</sup>
+* NestJS Spelunker <sup>[source](https://github.com/jmcdo29/nestjs-spelunker)</sup>
 * Swagger / OpenAPI <sup>[source](https://github.com/swagger-api)</sup>
 
 <br />
 
+# App Graph
+
+```mermaid
+
+ flowchart LR
+   subgraph legend[ Legend ]
+   subgraph legendPadding [ ]
+     direction TB
+     ex2(Module without routes)
+     ex1{{fa:fa-globe Module exposing API endpoints}}:::restEndpoint
+   end
+   end
+   subgraph appGraph[" "]
+     direction LR
+     subgraph MM[Main modules]
+       UserModule
+       AuthModule
+       PoliciesModule
+       MailerModule
+     end
+     subgraph CM[Common modules]
+       ConfigModule
+       StandardResponseModule
+       MongooseModule
+       JwtModule
+     end
+     AppModule(AppModule)===>ConfigModule
+     JwtModule(JwtModule)~~~ConfigModule
+     ConfigModule(ConfigModule)~~~JwtModule
+     AppModule(AppModule)===>MongooseModule
+     MongooseModule(MongooseModule)~~~JwtModule
+     AppModule(AppModule)===>StandardResponseModule
+     StandardResponseModule(StandardResponseModule)~~~JwtModule
+     AppModule(AppModule)===>AuthModule
+     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint-.-ConfigModule
+     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint===>UserModule
+     UserModule{{fa:fa-globe UserModule}}:::restEndpoint-.-MongooseModule
+     UserModule{{fa:fa-globe UserModule}}:::restEndpoint===>PoliciesModule
+     PoliciesModule(PoliciesModule)~~~JwtModule
+     UserModule{{fa:fa-globe UserModule}}:::restEndpoint~~~JwtModule
+     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint===>MailerModule
+     MailerModule(MailerModule)-.-ConfigModule
+     MailerModule(MailerModule)~~~JwtModule
+     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint-.-MongooseModule
+     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint~~~JwtModule
+     AppModule(AppModule)===>UserModule
+     AppModule(AppModule)===>MailerModule
+     AppModule(AppModule)~~~JwtModule
+   end
+ classDef restEndpoint fill:darkgreen
+ classDef groupStyles rx:10,ry:10
+ class CM,MM groupStyles
+ classDef layoutGroup fill:none,stroke:none
+ class appGraph,legendPadding layoutGroup
+ style legend stroke-dasharray: 0 1 1,fill:none,opacity:0.75
+```
 ---------------------------------------------------------------------------
 # Reference
 
 * [Auth Module](#AuthModule) 🚪
 * [Policies Module](#PoliciesModule) 🏛️
+  * CaslAbilityFactory
+  * PoliciesGuard <sup>guard</sup>
+  * @CheckPolicies() <sup>decorator</sup>
+  * @UserAbilityParam() <sup>parameter decorator</sup>
 * [User Module](#UserModule) 👤
+* [Mailer Module](#MailerModule) 📮
 * [Config Module](#ConfigModule) ⚙️
 * [StandardResponse Module](#StandardResponseModule) 📦
   * [@StandardResponse()](#StandardResponseDecorator) <sup>decorator</sup>
@@ -155,6 +220,7 @@ In Typescript, data Models and their property types are usually defined as an `I
     * [@StandardParam()](#StandardParamDecorator) <sup>parameter decorator</sup>
   * [@RawResponse()](#RawResponseDecorator) <sup>decorator</sup>
   * [Advanced Configuration](#StandardResponseConfiguration)
+* [Test Module](#TestModule) 🧪
 
 </br>
 
@@ -228,7 +294,7 @@ function findOne(
 
 </br>
 
-# Mailer Module <a name="ConfigModule"></a> 📤
+# Mailer Module <a name="MailerModule"></a> 📮
 
 - Automatically creates and configures a nodemailer instance using info from the .env file injected by the config module;
 - Defines services for sending emails;
@@ -361,6 +427,12 @@ async listBooks(
 - How to use the decorators: [@StandardResponse()](https://github.com/simioni/nest-standard-response#--standardresponseoptions-standardresponseoptions-) and [@StandardParam()](https://github.com/simioni/nest-standard-response#--standardparam-);
 - and other options.
 
+
+</br>
+
+# Test Module <a name="TestModule"></a> 🧪
+
+</br>
 
 <br />
 <br />

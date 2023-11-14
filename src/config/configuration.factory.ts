@@ -42,19 +42,13 @@ export default (): {
     password: process.env.MAILER_PASSWORD,
     fromName: process.env.MAILER_FROM_NAME,
     fromEmail: process.env.MAILER_FROM_EMAIL,
-    // Setting secure to false does not mean that you would use an unencrypted connection. Most SMTP servers
-    // allow connection upgrade via STARTTLS command, but to use this you have to connect using plaintext first
     secure: process.env.MAILER_SECURE === 'true',
-    // if requireTLS is true and secure is false then Nodemailer will required a connection upgrade via STARTTLS.
-    // If the connection can not be encrypted the message is not sent.
     requireTLS: process.env.MAILER_REQUIRE_TLS === 'true',
     ...(!process.env.MAILER_REQUIRE_TLS
       ? {}
       : {
           tls: {
             ciphers: process.env.MAILER_TLS_CIPHERS || 'SSLv3',
-            // Node.js TLSSocket options to be passed to the socket constructor. For a list of options, see:
-            // https://nodejs.org/api/tls.html#tlscreatesecurecontextoptions
           },
         }),
   },
@@ -72,7 +66,7 @@ export default (): {
     internalPort: parseInt(process.env.API_INTERNAL_PORT),
   },
   host: {
-    // System external (public) URL. This is used to create links back to the service in the emails sent (eg: for email confirmation)
+    // System external (public) URL. This is used to create links back to the app in the emails sent (eg: for email confirmation)
     url: process.env.HOST_URL,
     port: parseInt(process.env.HOST_PORT),
   },
