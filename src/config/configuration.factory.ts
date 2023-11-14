@@ -7,13 +7,15 @@ import { HostConfig } from './interfaces/host-config.interface';
 import { JwtConfig } from './interfaces/jwt-config.interface';
 import { MailerConfig } from './interfaces/mailer-config.interface';
 
-export default (): {
+export type AppConfig = {
   db: DbConfig;
   mailer: MailerConfig;
   jwt: JwtConfig;
   api: ApiConfig;
   host: HostConfig;
-} => ({
+};
+
+export default (): AppConfig => ({
   db: {
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,

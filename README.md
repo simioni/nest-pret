@@ -293,7 +293,9 @@ In Typescript, data Models and their property types are usually defined as an `I
     * [@StandardParam()](#StandardParamDecorator) <sup>parameter decorator</sup>
   * [@RawResponse()](#RawResponseDecorator) <sup>decorator</sup>
   * [Advanced Configuration](#StandardResponseConfiguration)
-* [Test Module](#TestModule) 🧪
+* [Testing Factories](#TestModule) 🧪
+  * [TestingServerFactory](#TestingServerFactory)
+  * [UserStubFactory](#UserStubFactory)
 
 </br>
 
@@ -410,6 +412,27 @@ function findOne(
 </br>
 
 # Config Module <a name="ConfigModule"></a> ⚙️
+
+- Prevents runtime errors by validating environment variables during app startup;
+- Provides helpful console messages when envorinment variables are missing or invalid;
+- Parses `.env` vars into a strongly typed Configuration object that can be dependency injected;
+- Exposes interfaces that can be used to provide types when calling the `configService.get<>()` generic method;
+
+Example:
+```ts
+@Controller('books')
+export class BooksController {
+  constructor(private readonly configService: ConfigService) {}
+
+  @Get()
+  public async listBooks() {
+    const apiConfig = this.configService.get<ApiConfig>('api'); 
+    // equivalent to process.env.API_INTERNAL_URL,
+    // but parsed, typed, and guarateed to exist
+    console.log(apiConfig.internalUrl);
+  }
+}
+```
 
 </br>
 
@@ -534,6 +557,54 @@ async listBooks(
 </br>
 
 # Test Module <a name="TestModule"></a> 🧪
+
+- Provides end-to-end testing of all user interaction flows;
+- e2e tests run in docker, always on a freshly created environment;
+- Jest runs tests in parallel, so each test file needs to instantiate the app in it's own thread;
+- The DB is shared between all threads. To avoid racing conditions, the DB should never be dropped during testing. Use the provided factories to create and destroy resources instead.
+
+To facilitate creating and destroing instances of the NestJS application, as well as creating and destroing all kinds of different users, this project provides two utility factories:
+
+<br />
+
+## *TestingServerFactory* & *UserStubFactory* <a name="TestingServerFactory"></a><a name="UserStubFactory"></a>
+
+<br />
+
+When adding new modules to the app, create a related `yourmodule.e2e-spec.ts` test file in the `/tests` folder, and inside the `beforeAll` hook from jest, instantiate a new app by calling `await new TestingServerFactory().create()`.
+
+This method will create a new nest TestingModule, mock the mailer service, start the app, auto-increment the port number to avoid conflicts, and return a class instance with methods to retrieve all the created resources, like the `getModule()`, `getApp()` and `getBaseUrl()`.
+
+Since this gives you access to the underlying NestJS TestingModule, you can get reach any part of the nest app by using the `get()` and `resolve()` methods on the module.
+
+To create stub users for testing access control and serialization features, use the ***UserStubFactory***. It provides methods for creating regular users, users with verified emails, admin users, etc. And also methods to login those users and get their access tokens, as well as deleting them when no longer needed.
+
+Remember to delete any created stub user in the `afterAll` hook, as well as calling `app.close()`.
+
+Example:
+
+```ts
+describe('BooksController (e2e)', () => {
+  let app: INestApplication;
+  let stub: UserStubFactory;
+  let verifiedUser: FakeUser;
+  let verifiedUserToken: string;
+  beforeAll(async () => {
+    const testingServer = await new TestingServerFactory().create();
+    const testingModule = testingServer.getModule();
+    app = testingServer.getApp();
+    booksService = await testingModule.resolve(BooksService);
+
+    stub = new UserStubFactory(testingServer);
+    verifiedUser = await stub.registerNewVerifiedUser({ firstName: 'Martha' });
+    verifiedUserToken = await stub.getLoginTokenForUser(verifiedUser);
+  });
+  afterAll(async () => {
+    await stub.deleteUser(verifiedUser.email);
+    await app.close();
+  });
+}
+```
 
 </br>
 
