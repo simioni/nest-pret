@@ -515,6 +515,7 @@ export class BooksController {
 # Standard Response Module <a name="StandardResponseModule"></a> 📦
 <p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
 <br />
+
 > [StandardReponse](https://github.com/simioni/nest-standard-response) has been exported into a separate package. The full documentation now resides in [it's own repo](https://github.com/simioni/nest-standard-response).
 
 </br>
