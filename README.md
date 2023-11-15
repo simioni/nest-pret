@@ -298,7 +298,7 @@ When sending data back in responses, it's important to always send instances of 
 When receving data in requests, use a Model Class or a DTO mapped from a Model. This way the data gets auto validation from the global `ValidationPipe`, plus the route gets auto documentation in Open API.
 
 ---------------------------------------------------------------------------
-# Reference
+# Reference <a name="RefIndex"></a>
 
 * [Auth Module](#AuthModule) 🚪
 * [Policies Module](#PoliciesModule) 🏛️
@@ -322,6 +322,8 @@ When receving data in requests, use a Model Class or a DTO mapped from a Model. 
   * [UserStubFactory](#UserStubFactory)
 
 </br>
+
+<div style="text-align: right;"><a href="#RefIndex">Back to index ⤴️</a></div>
 
 # Auth Module <a name="AuthModule"></a> 🚪
 
@@ -444,7 +446,7 @@ To protect access to certain routes only to users who have verified their email,
 
 ## EmailOrIdPipe <a name="EmailOrIdPipe"></a>
 
-Both `email` and `id` are unique keys in the user schema. An `id` provides consistency since it should never be changed, and also provides some privacy if you need to include a user reference in a public link and don't wat to expose their `email`. However, sometimes using an email can be more convenient.
+Both `email` and `id` are unique keys in the user schema. An `id` provides consistency since it should never be changed, and also provides some privacy if you need to include a user reference in a public link without exposing their `email`. However, sometimes using an email can be more convenient.
 
 That's why routes and services from the `User` module accept **both** an `id` or an `email` as the target for their operations. To validate the input parameters in those cases, the app provides the `EmailOrIdPipe` pipe.
 
