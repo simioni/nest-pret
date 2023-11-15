@@ -325,7 +325,7 @@ When receving data in requests, use a Model Class or a DTO mapped from a Model. 
 
 
 # Auth Module <a name="AuthModule"></a> 🚪
-<p align="right"><a href="#RefIndex"><small>Back to index<small></a></p>
+<p align="right"><a href="#RefIndex"><small>Back to index ⬆<small></a></p>
 
 - Allows account creation;
 - Sends e-mail verification and keeps track of confirmation status;
