@@ -337,7 +337,7 @@ When receving data in requests, use a Model Class or a DTO mapped from a Model. 
 </br>
 
 # Policies Module <a name="PoliciesModule"></a> 🏛️
-<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⬆<small></a></p>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
 
 - Defines policies limiting any individual user to access only resources they can claim;
 - Claims define which `Actions` (create, read, update, etc...) any user `Role` can take on each `Model`;
@@ -418,6 +418,7 @@ function findOne(
 </br>
 
 # User Module <a name="UserModule"></a> 👤
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
 
 - Defines the User model, schema and DTOs;
 - Defines the services required to create, read, update, delete, list, reset password, and verify email;
@@ -473,6 +474,7 @@ When used, it makes sure the piped data is either a syntactically valid `email` 
 </br>
 
 # Mailer Module <a name="MailerModule"></a> 📮
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
 
 - Automatically creates and configures a nodemailer instance using info from the .env file injected by the config module;
 - Defines services for sending emails;
@@ -485,6 +487,7 @@ When used, it makes sure the piped data is either a syntactically valid `email` 
 </br>
 
 # Config Module <a name="ConfigModule"></a> ⚙️
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
 
 - Prevents runtime errors by validating environment variables during app startup;
 - Provides helpful console messages when envorinment variables are missing or invalid;
@@ -510,6 +513,7 @@ export class BooksController {
 </br>
 
 # Standard Response Module <a name="StandardResponseModule"></a> 📦
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
 
 > [StandardReponse](https://github.com/simioni/nest-standard-response) has been exported into a separate package. The full documentation now resides in [it's own repo](https://github.com/simioni/nest-standard-response).
 
@@ -630,6 +634,7 @@ async listBooks(
 </br>
 
 # Test Module <a name="TestModule"></a> 🧪
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
 
 - Provides end-to-end testing of all user interaction flows;
 - e2e tests run in docker, always on a freshly created environment;
@@ -684,6 +689,7 @@ describe('BooksController (e2e)', () => {
 <br />
 <br />
 <br />
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
 
 ---------------------------------------------------
 
