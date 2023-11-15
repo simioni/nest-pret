@@ -17,7 +17,7 @@
 - Password recovery<!-- - User consent for TOS, Cookies, Policies, etc -->
 - E-mail verification, configurable between:
   - ***required*** before login
-  - ***delayed*** until a route with `@EmailVerifiedGuard()` enforces it
+  - ***delayed*** until a route with `EmailVerifiedGuard` enforces it
   - or ***off***
 - Claims-based access control, including:
   - Restricted access to routes via policies
@@ -307,7 +307,7 @@ When receving data in requests, use a Model Class or a DTO mapped from a Model. 
   * [@CheckPolicies()](#CheckPoliciesDecorator) <sup>decorator</sup>
   * [@UserAbilityParam()](#UserAbilityParamDecorator) <sup>parameter decorator</sup>
 * [User Module](#UserModule) 👤
-  * [@EmailVerifiedGuard()](#EmailVerifiedGuard) <sup>guard</sup>
+  * [EmailVerifiedGuard](#EmailVerifiedGuard) <sup>guard</sup>
   * [EmailOrIdPipe](#EmailOrIdPipe) <sup>pipe</sup>
 * [Mailer Module](#MailerModule) 📮
 * [Config Module](#ConfigModule) ⚙️
@@ -415,12 +415,59 @@ function findOne(
 
 # User Module <a name="UserModule"></a> 👤
 
-- Defines the User model and the services required to CRUD it;
-- Also define services for listing users, reseting their password, and verifing their email;
+- Defines the User model, schema and DTOs;
+- Defines the services required to create, read, update, delete, list, reset password, and verify email;
 - Most services from this module are consumed by the Auth module for managing accounts;
-- Some routes from the user controller can be used by users to view or update their own profile;
-- Other routes are only available to admins for managing any user from a backend.
+- The user controller provides routes that can be used by admins to manage users from a backend outside of the auth flow;
+- Some routes can also be used by users to view or update their own profile;
 
+<br />
+<br />
+
+## EmailVerifiedGuard <a name="EmailVerifiedGuard"></a>
+
+If the app is configured to use ***delayed*** email verification, users will be logged in automatically after account creation, and will be allowed to login anytime without clicking the verification link.
+
+To protect access to certain routes only to users who have verified their email, you can add the ```EmailVerifiedGuard``` to any controller or route.
+
+
+```ts
+@UseGuards(EmailVerifiedGuard)
+```
+
+>- If the app is configured to use ***required*** email verification, users will be asked to verified their email before being allowed to log-in. In that case, this guard is redundant.
+>
+>- If the app is configured with email verification ***off***, this guard shoud not be used, since it will never allow access to the routes under it.
+>
+>- The routes from the `User Controller` that allow users to view and edit their own information use this guard. If you're setting this setting to ***off***, you should also remove this guard from that controller.
+
+<br />
+<br />
+
+## EmailOrIdPipe <a name="EmailOrIdPipe"></a>
+
+Both `email` and `id` are unique keys in the user schema. An `id` provides consistency since it should never be changed, and also provides some privacy if you need to include a user reference in a public link and don't wat to expose their `email`. However, sometimes using an email can be more convenient.
+
+That's why routes and services from the `User` module accept **both** an `id` or an `email` as the target for their operations. To validate the input parameters in those cases, the app provides the `EmailOrIdPipe` pipe.
+
+```ts
+@Controller('user')
+export class UserController {
+  constructor(private readonly userService: UserService) {}
+
+  @Get(':idOrEmail')
+  public async findOne(
+    @Param('idOrEmail', EmailOrIdPipe) idOrEmail: string
+  ): Promise<User> {
+    const user = await this.userService.findOne(idOrEmail);
+    ...
+  }
+}
+```
+
+When used, it makes sure the piped data is either a syntactically valid `email` or a syntactically valid `ObjectId`. Note that a pipe can only check for syntax. It will throw a HTTP 400 BadRequestException if the provided information is malformatted, but it's possible that the information is valid yet still doesn't match any known user from the DB.
+
+</br>
 </br>
 
 # Mailer Module <a name="MailerModule"></a> 📮
