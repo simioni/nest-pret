@@ -275,6 +275,28 @@ In Typescript, data Models and their property types are usually defined as an `I
  class appGraph,legendPadding layoutGroup
  style legend stroke-dasharray: 0 1 1,fill:none,opacity:0.75
 ```
+
+# Models
+
+Model Classes serve as a 'single source of truth' for all modeled data. They are are used as the base for creating mongoose [schemas](https://mongoosejs.com/docs/typescript/schemas.html), but they are also used to create DTOs using [Mapped Types](https://docs.nestjs.com/openapi/mapped-types).
+
+The information on Model properties also define input validation rules enforced when the model is expected in requests, and to define serialization rules when the model is send in responses.
+
+Finally, model properties can also provide OpenAPI documentation information, like descriptions and usage examples.
+
+Having all this information present in a central Model Class avoids code duplication, since derivative classes only need to define what properties of the Model they want, without worrying about providing documentation, examples, validation rules, etc.
+
+This means that properties on Model Classes can have up to ***4 types*** of decorators on them:
+
+1. ***Schema*** - `@Prop()` from '@nestjs/mongoose' to add the property to the schema;
+2. ***Docs*** - `@ApiProperty()` from '@nestjs/swagger' to add documentation and examples;
+3. ***Serialization*** - `@Exclude()`, `@Expose()`, and `@Transform()` from 'class-transformer' to define serialization rules;
+4. ***Validation*** - `@IsString()`, `@IsEmail()`, `@Min()`, etc... from 'class-validator' to perform input validation;
+ 
+When sending data back in responses, it's important to always send instances of a Model Class. Never send documents retrieved from the database directly as reponses! The serialization rules (and all other benefits from the model) only apply to instances of the Model, not instances of a schema.
+
+When receving data in requests, use a Model Class or a DTO mapped from a Model. This way the data gets auto validation from the global `ValidationPipe`, plus the route gets auto documentation in Open API.
+
 ---------------------------------------------------------------------------
 # Reference
 
@@ -285,6 +307,8 @@ In Typescript, data Models and their property types are usually defined as an `I
   * [@CheckPolicies()](#CheckPoliciesDecorator) <sup>decorator</sup>
   * [@UserAbilityParam()](#UserAbilityParamDecorator) <sup>parameter decorator</sup>
 * [User Module](#UserModule) 👤
+  * [@EmailVerifiedGuard()](#EmailVerifiedGuard) <sup>guard</sup>
+  * [EmailOrIdPipe](#EmailOrIdPipe) <sup>pipe</sup>
 * [Mailer Module](#MailerModule) 📮
 * [Config Module](#ConfigModule) ⚙️
 * [StandardResponse Module](#StandardResponseModule) 📦
