@@ -325,7 +325,7 @@ When receving data in requests, use a Model Class or a DTO mapped from a Model. 
 
 
 # Auth Module <a name="AuthModule"></a> 🚪
-<p align="right"><a href="#RefIndex"><small>Back to index ⬆<small></a></p>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp; ⬆<small></a></p>
 
 - Allows account creation;
 - Sends e-mail verification and keeps track of confirmation status;
@@ -337,7 +337,7 @@ When receving data in requests, use a Model Class or a DTO mapped from a Model. 
 </br>
 
 # Policies Module <a name="PoliciesModule"></a> 🏛️
-<div align="right"><a href="#RefIndex"><sup>Back to index &nbsp; ⤴️<sup></a></div>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp; ⬆<small></a></p>
 
 - Defines policies limiting any individual user to access only resources they can claim;
 - Claims define which `Actions` (create, read, update, etc...) any user `Role` can take on each `Model`;
