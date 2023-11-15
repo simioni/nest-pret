@@ -422,7 +422,6 @@ function findOne(
 - Some routes can also be used by users to view or update their own profile;
 
 <br />
-<br />
 
 ## EmailVerifiedGuard <a name="EmailVerifiedGuard"></a>
 
@@ -441,7 +440,6 @@ To protect access to certain routes only to users who have verified their email,
 >
 >- The routes from the `User Controller` that allow users to view and edit their own information use this guard. If you're setting this setting to ***off***, you should also remove this guard from that controller.
 
-<br />
 <br />
 
 ## EmailOrIdPipe <a name="EmailOrIdPipe"></a>
