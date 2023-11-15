@@ -248,21 +248,21 @@ In Typescript, data Models and their property types are usually defined as an `I
      AppModule(AppModule)===>ConfigModule
      JwtModule(JwtModule)~~~ConfigModule
      ConfigModule(ConfigModule)~~~JwtModule
-     AppModule(AppModule)===>MongooseModule
-     MongooseModule(MongooseModule)~~~JwtModule
      AppModule(AppModule)===>StandardResponseModule
+     MongooseModule(MongooseModule)~~~JwtModule
+     AppModule(AppModule)===>MongooseModule
      StandardResponseModule(StandardResponseModule)~~~JwtModule
      AppModule(AppModule)===>AuthModule
-     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint-.-ConfigModule
+     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint-.->ConfigModule
      AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint===>UserModule
-     UserModule{{fa:fa-globe UserModule}}:::restEndpoint-.-MongooseModule
+     UserModule{{fa:fa-globe UserModule}}:::restEndpoint-.->MongooseModule
      UserModule{{fa:fa-globe UserModule}}:::restEndpoint===>PoliciesModule
      PoliciesModule(PoliciesModule)~~~JwtModule
      UserModule{{fa:fa-globe UserModule}}:::restEndpoint~~~JwtModule
      AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint===>MailerModule
-     MailerModule(MailerModule)-.-ConfigModule
+     MailerModule(MailerModule)-.->ConfigModule
      MailerModule(MailerModule)~~~JwtModule
-     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint-.-MongooseModule
+     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint-.->MongooseModule
      AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint~~~JwtModule
      AppModule(AppModule)===>UserModule
      AppModule(AppModule)===>MailerModule
@@ -293,7 +293,7 @@ This means that properties on Model Classes can have up to ***4 types*** of deco
 3. ***Serialization*** - `@Exclude()`, `@Expose()`, and `@Transform()` from 'class-transformer' to define serialization rules;
 4. ***Validation*** - `@IsString()`, `@IsEmail()`, `@Min()`, etc... from 'class-validator' to perform input validation;
  
-When sending data back in responses, it's important to always send instances of a Model Class. Never send documents retrieved from the database directly as reponses! The serialization rules (and all other benefits from the model) only apply to instances of the Model, not instances of a schema.
+When sending data back in responses, it's important to always send instances of a Model Class. Never send documents retrieved from the database directly as reponses! The serialization rules (and all other benefits from the model) only apply to instances of the Model, not documents from of a schema.
 
 When receving data in requests, use a Model Class or a DTO mapped from a Model. This way the data gets auto validation from the global `ValidationPipe`, plus the route gets auto documentation in Open API.
 
@@ -325,7 +325,7 @@ When receving data in requests, use a Model Class or a DTO mapped from a Model. 
 
 
 # Auth Module <a name="AuthModule"></a> 🚪
-<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
 - Allows account creation;
 - Sends e-mail verification and keeps track of confirmation status;
@@ -337,7 +337,7 @@ When receving data in requests, use a Model Class or a DTO mapped from a Model. 
 </br>
 
 # Policies Module <a name="PoliciesModule"></a> 🏛️
-<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
 - Defines policies limiting any individual user to access only resources they can claim;
 - Claims define which `Actions` (create, read, update, etc...) any user `Role` can take on each `Model`;
@@ -418,7 +418,7 @@ function findOne(
 </br>
 
 # User Module <a name="UserModule"></a> 👤
-<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
 - Defines the User model, schema and DTOs;
 - Defines the services required to create, read, update, delete, list, reset password, and verify email;
@@ -474,7 +474,7 @@ When used, it makes sure the piped data is either a syntactically valid `email` 
 </br>
 
 # Mailer Module <a name="MailerModule"></a> 📮
-<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
 - Automatically creates and configures a nodemailer instance using info from the .env file injected by the config module;
 - Defines services for sending emails;
@@ -487,7 +487,7 @@ When used, it makes sure the piped data is either a syntactically valid `email` 
 </br>
 
 # Config Module <a name="ConfigModule"></a> ⚙️
-<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
 - Prevents runtime errors by validating environment variables during app startup;
 - Provides helpful console messages when envorinment variables are missing or invalid;
@@ -513,7 +513,7 @@ export class BooksController {
 </br>
 
 # Standard Response Module <a name="StandardResponseModule"></a> 📦
-<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 <br />
 
 > [StandardReponse](https://github.com/simioni/nest-standard-response) has been exported into a separate package. The full documentation now resides in [it's own repo](https://github.com/simioni/nest-standard-response).
@@ -635,7 +635,7 @@ async listBooks(
 </br>
 
 # Test Module <a name="TestModule"></a> 🧪
-<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
 - Provides end-to-end testing of all user interaction flows;
 - e2e tests run in docker, always on a freshly created environment;
@@ -690,7 +690,7 @@ describe('BooksController (e2e)', () => {
 <br />
 <br />
 <br />
-<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴<small></a></p>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
 ---------------------------------------------------
 
