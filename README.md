@@ -67,7 +67,7 @@ Only for the `development` env, the app will also serve documentation and a depe
 
 - Swagger UI documentation explorer: `localhost:3000/dev-tools/docs`
 - Swagger documentation JSON: `localhost:3000/dev-tools/docs-json`
-- MermaidJS graph providing a high level view of the inter-module dependencies: `localhost:3000/dev-tools/graph.mmd`
+- MermaidJS graph providing a high level view of the inter-module dependencies: `localhost:3000/dev-tools/graph`
 
 > If running in Docker, you're not required to run ```npm install``` locally, but you still might want to do so in order to get features such as auto-import and auto-complete in your code editor.
 
@@ -222,58 +222,44 @@ In Typescript, data Models and their property types are usually defined as an `I
 # App Graph
 
 ```mermaid
-
- flowchart LR
-   subgraph legend[ Legend ]
-   subgraph legendPadding [ ]
-     direction TB
-     ex2(Module without routes)
-     ex1{{fa:fa-globe Module exposing API endpoints}}:::restEndpoint
-   end
-   end
-   subgraph appGraph[" "]
-     direction LR
-     subgraph MM[Main modules]
-       UserModule
-       AuthModule
-       PoliciesModule
-       MailerModule
-     end
-     subgraph CM[Common modules]
-       ConfigModule
-       StandardResponseModule
-       MongooseModule
-       JwtModule
-     end
-     AppModule(AppModule)===>ConfigModule
-     JwtModule(JwtModule)~~~ConfigModule
-     ConfigModule(ConfigModule)~~~JwtModule
-     AppModule(AppModule)===>StandardResponseModule
-     MongooseModule(MongooseModule)~~~JwtModule
-     AppModule(AppModule)===>MongooseModule
-     StandardResponseModule(StandardResponseModule)~~~JwtModule
-     AppModule(AppModule)===>AuthModule
-     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint-.->ConfigModule
-     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint===>UserModule
-     UserModule{{fa:fa-globe UserModule}}:::restEndpoint-.->MongooseModule
-     UserModule{{fa:fa-globe UserModule}}:::restEndpoint===>PoliciesModule
-     PoliciesModule(PoliciesModule)~~~JwtModule
-     UserModule{{fa:fa-globe UserModule}}:::restEndpoint~~~JwtModule
-     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint===>MailerModule
-     MailerModule(MailerModule)-.->ConfigModule
-     MailerModule(MailerModule)~~~JwtModule
-     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint-.->MongooseModule
-     AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint~~~JwtModule
-     AppModule(AppModule)===>UserModule
-     AppModule(AppModule)===>MailerModule
-     AppModule(AppModule)~~~JwtModule
-   end
- classDef restEndpoint fill:darkgreen
- classDef groupStyles rx:10,ry:10
- class CM,MM groupStyles
- classDef layoutGroup fill:none,stroke:none
- class appGraph,legendPadding layoutGroup
- style legend stroke-dasharray: 0 1 1,fill:none,opacity:0.75
+%%{ init: { 'flowchart': { 'curve': 'monotoneX' } } }%%
+flowchart LR
+  subgraph legend[ Legend ]
+    subgraph legendPadding [ ]
+      direction TB
+      ex2(Module)
+      ex1{{fa:fa-globe Module exposing API endpoints}}:::restEndpoint
+      ex3([Global Module]):::globalModule
+    end
+  end
+  subgraph globalModules[ ]
+  	JwtModule([JwtModule]):::globalModule
+	ConfigHostModule([ConfigHostModule]):::globalModule
+	MongooseCoreModule([MongooseCoreModule]):::globalModule
+  end
+  subgraph appGraph[" "]
+    direction LR
+	AppModule(AppModule)===>ConfigModule(ConfigModule)
+	AppModule(AppModule)===>MongooseModule(MongooseModule)
+	AppModule(AppModule)===>StandardResponseModule(StandardResponseModule)
+	AppModule(AppModule)===>AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint
+	AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint-.->ConfigModule(ConfigModule)
+	AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint===>UserModule{{fa:fa-globe UserModule}}:::restEndpoint
+	UserModule{{fa:fa-globe UserModule}}:::restEndpoint-.->MongooseModule(MongooseModule)
+	UserModule{{fa:fa-globe UserModule}}:::restEndpoint===>PoliciesModule(PoliciesModule)
+	AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint===>MailerModule(MailerModule)
+	MailerModule(MailerModule)-.->ConfigModule(ConfigModule)
+	AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint-.->MongooseModule(MongooseModule)
+	AppModule(AppModule)===>UserModule{{fa:fa-globe UserModule}}:::restEndpoint
+	AppModule(AppModule)===>MailerModule(MailerModule)
+  end
+classDef restEndpoint fill:darkgreen
+classDef globalModule fill:indigo
+classDef groupStyles rx:10,ry:10
+class legend groupStyles
+classDef layoutGroup fill:none,stroke:none
+class appGraph,legendPadding,globalModules layoutGroup
+style legend stroke-dasharray: 0 1 1,fill:none,opacity:0.95
 ```
 
 # Models

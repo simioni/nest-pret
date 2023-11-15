@@ -45,15 +45,17 @@ async function bootstrap() {
 bootstrap();
 
 /**
+ *
  * Builds a Dependency Graph to provide a high level view of the NestJS application
+ *
  */
 function setupDependencyGraph(app: NestExpressApplication) {
   // console.log(SpelunkerModule.explore(app));
+  const globalModules = ['JwtModule', 'ConfigHostModule', 'MongooseCoreModule'];
   const commonModules = [
     'ConfigModule',
     'StandardResponseModule',
     'MongooseModule',
-    'JwtModule',
   ];
   // 1. Generate the tree as text
   const tree = SpelunkerModule.explore(app);
@@ -62,67 +64,66 @@ function setupDependencyGraph(app: NestExpressApplication) {
   const apiEndpointModuleIcon = 'fa:fa-globe ';
   const mermaidEdges = edges
     .filter(
-      // filtering some modules out
       ({ from, to }) =>
         !(
-          from.module.name === 'ConfigHostModule' ||
-          to.module.name === 'ConfigHostModule' ||
-          from.module.name === 'MongooseCoreModule' ||
-          to.module.name === 'MongooseCoreModule' ||
-          from.module.name === 'LoggerModule' ||
-          to.module.name === 'LoggerModule'
+          globalModules.includes(from.module.name) ||
+          globalModules.includes(to.module.name)
         ),
     )
     .map(({ from, to }) => {
-      const hasController = from.module.controllers.length > 0;
-      const classTag = hasController ? ':::restEndpoint' : '';
-      const iconTag = hasController ? apiEndpointModuleIcon : '';
-      const shapeIn = hasController ? '{{' : '(';
-      const shapeOut = hasController ? '}}' : ')';
+      const fromHasController = from.module.controllers.length > 0;
+      const fromClassTag = fromHasController ? ':::restEndpoint' : '';
+      const fromIconTag = fromHasController ? apiEndpointModuleIcon : '';
+      const fromShapeIn = fromHasController ? '{{' : '(';
+      const fromShapeOut = fromHasController ? '}}' : ')';
+
+      const toHasController = to.module.controllers.length > 0;
+      const toClassTag = toHasController ? ':::restEndpoint' : '';
+      const toIconTag = toHasController ? apiEndpointModuleIcon : '';
+      const toShapeIn = toHasController ? '{{' : '(';
+      const toShapeOut = toHasController ? '}}' : ')';
+
       let lineStyle = '===>';
       if (
         from.module.name !== 'AppModule' &&
         !commonModules.includes(from.module.name) &&
         commonModules.includes(to.module.name)
       )
-        lineStyle = '-.-';
+        lineStyle = '-.->';
+
       if (to.module.name === 'JwtModule' || from.module.name === 'JwtModule')
         lineStyle = '~~~';
-      return `${from.module.name}${shapeIn}${iconTag}${from.module.name}${shapeOut}${classTag}${lineStyle}${to.module.name}`;
+
+      return `${from.module.name}${fromShapeIn}${fromIconTag}${from.module.name}${fromShapeOut}${fromClassTag}${lineStyle}${to.module.name}${toShapeIn}${toIconTag}${to.module.name}${toShapeOut}${toClassTag}`;
     });
   const header = `%%{ init: { 'flowchart': { 'curve': 'monotoneX' } } }%%
 flowchart LR
   subgraph legend[ Legend ]
-  subgraph legendPadding [ ]
-    direction TB
-    ex2(Module without routes)
-    ex1{{fa:fa-globe Module exposing API endpoints}}:::restEndpoint
+    subgraph legendPadding [ ]
+      direction TB
+      ex2(Module)
+      ex1{{fa:fa-globe Module exposing API endpoints}}:::restEndpoint
+      ex3([Global Module]):::globalModule
+    end
   end
+  subgraph globalModules[ ]
+  ${globalModules
+    .map((module) => `\t${module}([${module}]):::globalModule`)
+    .join('\n')}
   end
   subgraph appGraph[" "]
-    direction LR
-    subgraph CM[Common modules]
-      ConfigModule
-      StandardResponseModule
-      MongooseModule
-      JwtModule
-    end
-    subgraph MM[Main modules]
-      UserModule
-      AuthModule
-      PoliciesModule
-      MailerModule
-    end`;
+    direction LR`;
   const footer = `  end
 classDef restEndpoint fill:darkgreen
+classDef globalModule fill:indigo
 classDef groupStyles rx:10,ry:10
-class CM,MM groupStyles
+class legend groupStyles
 classDef layoutGroup fill:none,stroke:none
-class appGraph,legendPadding layoutGroup
-style legend stroke-dasharray: 0 1 1,fill:none,opacity:0.75
+class appGraph,legendPadding,globalModules layoutGroup
+style legend stroke-dasharray: 0 1 1,fill:none,opacity:0.95
 `;
   const mermaidGraph = `${header}\n\t${mermaidEdges.join('\n\t')}\n${footer}`;
-  app.getHttpAdapter().get('/dev-tools/graph.mmd', (req, res: Response) => {
+  app.getHttpAdapter().get('/dev-tools/graph', (req, res: Response) => {
     // res.set('Content-Type', 'text/markdown');
     res.set('Content-Type', 'text/vnd.mermaid');
     res.send(mermaidGraph);
@@ -130,8 +131,22 @@ style legend stroke-dasharray: 0 1 1,fill:none,opacity:0.75
   });
 }
 
+// subgraph CM[Common modules]
+//       ConfigModule
+//       StandardResponseModule
+//       MongooseModule
+//     end
+//     subgraph MM[Main modules]
+//       UserModule
+//       AuthModule
+//       PoliciesModule
+//       MailerModule
+//     end
+
 /**
+ *
  * Builds the OpenAPI JSON object providing documentation for the app
+ *
  */
 function setupOpenApiDocs(app: NestExpressApplication) {
   // app.useStaticAssets(join(__dirname, '../..', 'docs'), { prefix: '/docs' });
@@ -154,5 +169,5 @@ function setupOpenApiDocs(app: NestExpressApplication) {
     },
   };
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document, swaggerUiOptions);
+  SwaggerModule.setup('dev-tools/docs', app, document, swaggerUiOptions);
 }
