@@ -438,7 +438,7 @@ To protect access to certain routes only to users who have verified their email,
 >
 >- If the app is configured with email verification ***off***, this guard shoud not be used, since it will never allow access to the routes under it.
 >
->- The routes from the `User Controller` that allow users to view and edit their own information use this guard. If you're setting this setting to ***off***, you should also remove this guard from that controller.
+>- The routes from the `UserController` that allow users to view and edit their own information use this guard. If you're setting this setting to ***off***, you should also remove this guard from that controller.
 
 <br />
 
