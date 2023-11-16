@@ -222,43 +222,102 @@ In Typescript, data Models and their property types are usually defined as an `I
 # App Graph
 
 ```mermaid
-%%{ init: { 'flowchart': { 'curve': 'monotoneX' } } }%%
+%%{ init: { 'flowchart': { 'curve': 'monotoneX' }, 'theme':'dark' } }%%
 flowchart LR
-  subgraph legend[ Legend ]
-    subgraph legendPadding [ ]
-      direction TB
-      ex2(Module)
-      ex1{{fa:fa-globe Module exposing API endpoints}}:::restEndpoint
-      ex3([Global Module]):::globalModule
-    end
-  end
-  subgraph globalModules[ ]
-  	JwtModule([JwtModule]):::globalModule
-	ConfigHostModule([ConfigHostModule]):::globalModule
-	MongooseCoreModule([MongooseCoreModule]):::globalModule
-  end
-  subgraph appGraph[" "]
-    direction LR
-	AppModule(AppModule)===>ConfigModule(ConfigModule)
-	AppModule(AppModule)===>MongooseModule(MongooseModule)
-	AppModule(AppModule)===>StandardResponseModule(StandardResponseModule)
-	AppModule(AppModule)===>AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint
-	AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint-.->ConfigModule(ConfigModule)
-	AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint===>UserModule{{fa:fa-globe UserModule}}:::restEndpoint
-	UserModule{{fa:fa-globe UserModule}}:::restEndpoint-.->MongooseModule(MongooseModule)
-	UserModule{{fa:fa-globe UserModule}}:::restEndpoint===>PoliciesModule(PoliciesModule)
-	AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint===>MailerModule(MailerModule)
-	MailerModule(MailerModule)-.->ConfigModule(ConfigModule)
-	AuthModule{{fa:fa-globe AuthModule}}:::restEndpoint-.->MongooseModule(MongooseModule)
-	AppModule(AppModule)===>UserModule{{fa:fa-globe UserModule}}:::restEndpoint
-	AppModule(AppModule)===>MailerModule(MailerModule)
-  end
-classDef restEndpoint fill:darkgreen
+	subgraph legend[ Legend ]
+		direction LR
+		subgraph legendLine1 [ ]
+			direction TB
+			ex1(Module)
+			ex2([Global Module]):::globalModule
+			ex3{{fa:fa-globe Controller}}:::controller
+			ex9([fa:fa-bell-concierge Service]):::service
+			ex4([fa:fa-briefcase Provider]):::provider
+		end
+		subgraph legendLine2 [ ]
+			direction TB
+			ex6{{fa:fa-fish-fins Global Pipe}}:::pipe
+			ex7{{fa:fa-bullseye Global Interceptor}}:::interceptor
+			ex8{{fa:fa-shield-halved Global Guard}}:::guard
+			ex5([fa:fa-database Model]):::model
+		end
+	end
+	subgraph globalModules[ ]
+		ConfigModule([ConfigModule]):::globalModule
+		JwtModule([JwtModule]):::globalModule
+		ConfigHostModule([ConfigHostModule]):::globalModule
+		MongooseCoreModule([MongooseCoreModule]):::globalModule
+	end
+	subgraph modules[" "]
+		direction LR
+		subgraph AppModule
+			direction LR
+			Pipe{{fa:fa-fish-fins Pipe}}:::pipe
+			AppService([fa:fa-bell-concierge AppService]):::service
+		end
+		subgraph ConfigModule
+		end
+		subgraph ConfigHostModule
+		end
+		subgraph MongooseModule
+			direction LR
+			UserModel([fa:fa-database UserModel]):::model
+			EmailVerificationModel([fa:fa-database EmailVerificationModel]):::model
+			ForgottenPasswordModel([fa:fa-database ForgottenPasswordModel]):::model
+		end
+		subgraph MongooseCoreModule
+		end
+		subgraph StandardResponseModule
+			direction LR
+			Interceptor{{fa:fa-bullseye Interceptor}}:::interceptor
+		end
+		subgraph AuthModule
+			direction LR
+			AuthController{{fa:fa-globe AuthController}}:::controller
+			AuthService([fa:fa-bell-concierge AuthService]):::service
+			JwtStrategy(["fa:fa-briefcase JwtStrategy"]):::provider
+		end
+		subgraph UserModule
+			direction LR
+			UserController{{fa:fa-globe UserController}}:::controller
+			UserService([fa:fa-bell-concierge UserService]):::service
+		end
+		subgraph PoliciesModule
+			direction LR
+			CaslAbilityFactory(["fa:fa-briefcase CaslAbilityFactory"]):::provider
+		end
+		subgraph MailerModule
+			direction LR
+			MailerService([fa:fa-bell-concierge MailerService]):::service
+		end
+		subgraph JwtModule
+		end
+		
+		AppModule===>MongooseModule
+		AppModule===>StandardResponseModule
+		AppModule===>AuthModule
+		AuthModule===>UserModule
+		UserModule-.->MongooseModule
+		UserModule===>PoliciesModule
+		AuthModule===>MailerModule
+		AuthModule-.->MongooseModule
+		AppModule===>UserModule
+		AppModule===>MailerModule
+	end
+classDef controller fill:darkgreen
+classDef provider fill:#1f2020
+classDef service fill:#1f2020
+classDef pipe fill:#8b0e5d
+classDef guard fill:#8b0e5d
+classDef interceptor fill:#8b0e5d
+classDef model fill:#b83100
+classDef globalModule,moduleSubgraph fill:#1f2020,stroke:#81B1DB,rx:5,ry:5
 classDef globalModule fill:indigo
+classDef layoutGroup fill:none,stroke:none
 classDef groupStyles rx:10,ry:10
 class legend groupStyles
-classDef layoutGroup fill:none,stroke:none
-class appGraph,legendPadding,globalModules layoutGroup
+class modules,globalModules,legendLine1,legendLine2 layoutGroup
+class AppModule,MongooseModule,StandardResponseModule,AuthModule,UserModule,PoliciesModule,MailerModule moduleSubgraph
 style legend stroke-dasharray: 0 1 1,fill:none,opacity:0.95
 ```
 
@@ -266,13 +325,13 @@ style legend stroke-dasharray: 0 1 1,fill:none,opacity:0.95
 
 Model Classes serve as a 'single source of truth' for all modeled data. They are are used as the base for creating mongoose [schemas](https://mongoosejs.com/docs/typescript/schemas.html), but they are also used to create DTOs using [Mapped Types](https://docs.nestjs.com/openapi/mapped-types).
 
-The information on Model properties also define input validation rules enforced when the model is expected in requests, and to define serialization rules when the model is send in responses.
+The information on Model properties also defines input validation rules enforced when the model is expected in requests, and defines serialization rules when the model is send in responses.
 
 Finally, model properties can also provide OpenAPI documentation information, like descriptions and usage examples.
 
-Having all this information present in a central Model Class avoids code duplication, since derivative classes only need to define what properties of the Model they want, without worrying about providing documentation, examples, validation rules, etc.
+Having all this information present in a central Model Class avoids code duplication, since derivative classes only need to pick what properties of the Model they want, without worrying about providing documentation, examples, validation rules, etc.
 
-This means that properties on Model Classes can have up to ***4 types*** of decorators on them:
+This means that properties on a Model Class can have up to ***4 types*** of decorators on them:
 
 1. ***Schema*** - `@Prop()` from '@nestjs/mongoose' to add the property to the schema;
 2. ***Docs*** - `@ApiProperty()` from '@nestjs/swagger' to add documentation and examples;
