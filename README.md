@@ -255,9 +255,13 @@ flowchart LR
 			Pipe{{fa:fa-fish-fins ValidationPipe}}:::pipe
 			AppService([fa:fa-bell-concierge AppService]):::service
 		end
-		subgraph ConfigModule
+		subgraph ConfigModule[ ]
+      subgraph ConfigModulePadding[ConfigModule]
+      end
 		end
-		subgraph ConfigHostModule
+		subgraph ConfigHostModule[ ]
+      subgraph ConfigHostModulePadding[ConfigHostModule]
+      end
 		end
 		subgraph MongooseModule
 			direction LR
@@ -265,7 +269,9 @@ flowchart LR
 			EmailVerificationModel([fa:fa-database EmailVerificationModel]):::model
 			ForgottenPasswordModel([fa:fa-database ForgottenPasswordModel]):::model
 		end
-		subgraph MongooseCoreModule
+		subgraph MongooseCoreModule[ ]
+      subgraph MongooseCoreModulePadding[MongooseCoreModule]
+      end
 		end
 		subgraph StandardResponseModule
 			direction LR
@@ -290,7 +296,9 @@ flowchart LR
 			direction LR
 			MailerService([fa:fa-bell-concierge MailerService]):::service
 		end
-		subgraph JwtModule
+		subgraph JwtModule[ ]
+      subgraph JwtModulePadding[JwtModule]
+		  end
 		end
 		
 		AppModule===>MongooseModule
@@ -316,9 +324,9 @@ classDef globalModule fill:indigo,stroke:#81B1DB,rx:5,ry:5
 classDef layoutGroup fill:none,stroke:none
 classDef groupStyles rx:10,ry:10
 class legend groupStyles
-class modules,globalModules,legendLine1,legendLine2 layoutGroup
+class modules,globalModules,legendLine1,legendLine2,JwtModulePadding,MongooseCoreModulePadding,ConfigModulePadding,ConfigHostModulePadding layoutGroup
 class AppModule,MongooseModule,StandardResponseModule,AuthModule,UserModule,PoliciesModule,MailerModule moduleSubgraph
-style legend stroke-dasharray: 0 1 1,fill:none,opacity:0.95
+style legend stroke-dasharray: 0 1 1,fill:white,fill-opacity:0.02,opacity:0.95
 ```
 
 # Models
