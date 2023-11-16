@@ -252,7 +252,7 @@ flowchart LR
 		direction LR
 		subgraph AppModule
 			direction LR
-			Pipe{{fa:fa-fish-fins Pipe}}:::pipe
+			Pipe{{fa:fa-fish-fins ValidationPipe}}:::pipe
 			AppService([fa:fa-bell-concierge AppService]):::service
 		end
 		subgraph ConfigModule
@@ -269,7 +269,7 @@ flowchart LR
 		end
 		subgraph StandardResponseModule
 			direction LR
-			Interceptor{{fa:fa-bullseye Interceptor}}:::interceptor
+			Interceptor{{fa:fa-bullseye ResponseInterceptor}}:::interceptor
 		end
 		subgraph AuthModule
 			direction LR
@@ -311,8 +311,8 @@ classDef pipe fill:#8b0e5d
 classDef guard fill:#8b0e5d
 classDef interceptor fill:#8b0e5d
 classDef model fill:#b83100
-classDef globalModule,moduleSubgraph fill:#1f2020,stroke:#81B1DB,rx:5,ry:5
-classDef globalModule fill:indigo
+classDef moduleSubgraph fill:#1f2020,stroke:#81B1DB,rx:5,ry:5
+classDef globalModule fill:indigo,stroke:#81B1DB,rx:5,ry:5
 classDef layoutGroup fill:none,stroke:none
 classDef groupStyles rx:10,ry:10
 class legend groupStyles
