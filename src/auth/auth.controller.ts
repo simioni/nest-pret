@@ -23,6 +23,11 @@ import { EmailDto } from './dto/email.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { LoginResponse } from './responses/login.response';
+
+type EmptyObject = Record<string, never>;
+
+// TODO add open api documentation for the StandardResponse of all these routes
 
 @Controller('auth')
 @ApiTags('auth')
@@ -34,7 +39,7 @@ export class AuthController {
   public async login(
     @Body() loginDto: LoginDto,
     @StandardParam() params: StandardParams,
-  ) {
+  ): Promise<LoginResponse> {
     const login = await this.authService.login(
       loginDto.email,
       loginDto.password,
@@ -52,7 +57,7 @@ export class AuthController {
   public async register(
     @Body() registerDto: RegisterDto,
     @StandardParam() params: StandardParams,
-  ) {
+  ): Promise<LoginResponse | EmptyObject> {
     try {
       const registrationMessage = await this.authService.register(
         registerDto.email,
@@ -88,7 +93,7 @@ export class AuthController {
   public async verifyEmail(
     @Param('token') token: string,
     @StandardParam() params: StandardParams,
-  ) {
+  ): Promise<EmptyObject> {
     await this.authService.verifyEmail(token);
     params.setMessage(EMAIL_VERIFICATION_SUCCESS.SUCCESS);
     return {};
@@ -102,7 +107,7 @@ export class AuthController {
   public async sendEmailVerification(
     @Param() { email }: EmailDto,
     @StandardParam() params: StandardParams,
-  ) {
+  ): Promise<EmptyObject> {
     await this.authService.sendEmailVerification(email);
     params.setMessage(EMAIL_VERIFICATION_SUCCESS.EMAIL_RESENT);
     return {};
@@ -115,7 +120,7 @@ export class AuthController {
   public async sendEmailForgotPassword(
     @Param() { email }: EmailDto,
     @StandardParam() params: StandardParams,
-  ) {
+  ): Promise<EmptyObject> {
     await this.authService.sendEmailForgotPassword(email);
     params.setMessage(FORGOT_PASSWORD_SUCCESS.EMAIL_SENT);
     return {};
@@ -130,7 +135,7 @@ export class AuthController {
   public async setNewPassord(
     @Body() resetPassword: ResetPasswordDto,
     @StandardParam() params: StandardParams,
-  ) {
+  ): Promise<EmptyObject> {
     if (resetPassword.resetPasswordToken) {
       await this.authService.resetPasswordFromToken(
         resetPassword.resetPasswordToken,
