@@ -10,10 +10,10 @@ export class LoginResponse {
 }
 
 export class JwtToken {
-  constructor(expires_in: number, access_token: string) {
-    this.expires_in = expires_in;
-    this.access_token = access_token;
+  constructor(accessToken: string, expiresIn?: number) {
+    this.accessToken = accessToken;
+    this.expiresIn = expiresIn;
   }
-  expires_in: number;
-  access_token: string;
+  accessToken: string;
+  expiresIn: number;
 }
