@@ -36,6 +36,7 @@ import {
   ForgottenPassword,
   ForgottenPasswordDocument,
 } from './schemas/forgotten-password.schema';
+import { JwtToken, LoginResponse } from './responses/login.response';
 
 @Injectable()
 export class AuthService {
@@ -54,7 +55,7 @@ export class AuthService {
     this.apiConfig = this.configService.get<ApiConfig>('api');
   }
 
-  async login(email, password) {
+  async login(email, password): Promise<LoginResponse> {
     const user: Partial<UserDocument> = await this.userService
       .findOne(email, {
         returnRawMongooseObject: true,
@@ -75,10 +76,10 @@ export class AuthService {
       throw new ForbiddenException(LOGIN_ERROR.EMAIL_NOT_VERIFIED);
 
     const payload = { _id: user._id.toString(), name: user.name };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-      user: new User(user.toJSON()),
-    };
+    return new LoginResponse(
+      new JwtToken(await this.jwtService.signAsync(payload)),
+      new User(user.toJSON()),
+    );
   }
 
   async register(email, password): Promise<REGISTRATION_SUCCESS> {
