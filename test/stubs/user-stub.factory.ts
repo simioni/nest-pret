@@ -96,7 +96,7 @@ export class UserStubFactory {
       .post(`${this.baseUrl}/auth/email/login`)
       .withBody(user)
       .expectStatus(201)
-      .returns('data.access_token');
+      .returns('data.token.accessToken');
     return token;
   }
 }
