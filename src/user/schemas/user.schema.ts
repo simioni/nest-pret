@@ -2,7 +2,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Transform } from 'class-transformer';
-import { IsDateString, IsEmail, IsInt, Min } from 'class-validator';
+import { IsDateString, IsEmail, IsInt, Min, MinLength } from 'class-validator';
 import { HydratedDocument, Types } from 'mongoose';
 import { UserRole } from '../user.constants';
 import { UserAuth } from './user-auth.schema';
@@ -18,21 +18,27 @@ const removePassword = function (doc: UserDocument, ret: Record<string, any>) {
 
 @Schema({
   timestamps: true,
-  toJSON: { transform: removePassword },
-  toObject: { transform: removePassword },
+  // TODO uncomment these!
+  // toJSON: { transform: removePassword },
+  // toObject: { transform: removePassword },
 })
 export class User {
   // _id should NOT be declared explicitly to mongoose (with the @Prop() decorator)
   @ApiProperty({ type: 'string' })
-  @Transform(({ value }) => value.toString())
+  @Transform(({ value }) => {
+    console.log(`transforming _id into a string: ${value.toString()}`);
+    return value.toString();
+  })
   _id: Types.ObjectId;
 
   @Prop()
-  @Exclude()
+  @ApiProperty({ required: true, example: 'PASSWORD' })
+  @MinLength(8)
+  @Exclude({ toPlainOnly: true }) // exclude only when serializing (classToPlain), but keep when creating a new User from a POJO (plainToClass)
   password: string;
 
   @Prop({ index: { unique: true } })
-  @ApiProperty({ example: 'chasehiggens3310@gmail.com' })
+  @ApiProperty({ example: 'markhiggens3310@gmail.com' })
   @IsEmail()
   email: string;
 
@@ -41,7 +47,7 @@ export class User {
   date: Date;
 
   @Prop()
-  @ApiProperty({ example: 'Chase' })
+  @ApiProperty({ example: 'Mark' })
   name: string;
 
   @Prop()
@@ -62,7 +68,7 @@ export class User {
 
   @Prop({ type: [String], enum: UserRole, default: [UserRole.USER] })
   @ApiProperty({ enum: UserRole, enumName: 'UserRole', isArray: true })
-  @Expose({ groups: ['Admin'] })
+  @Expose({ groups: [UserRole.ADMIN] })
   roles: UserRole[];
 
   @Prop({ type: UserAuth, _id: false, default: {} })
