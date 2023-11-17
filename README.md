@@ -253,6 +253,7 @@ flowchart LR
 		subgraph AppModule
 			direction LR
 			Pipe{{fa:fa-fish-fins ValidationPipe}}:::pipe
+			Serializer{{fa:fa-fish-fins RolesSerializerInterceptor}}:::interceptor
 			AppService([fa:fa-bell-concierge AppService]):::service
 		end
 		subgraph ConfigModule[ ]
@@ -275,7 +276,7 @@ flowchart LR
 		end
 		subgraph StandardResponseModule
 			direction LR
-			Interceptor{{fa:fa-bullseye ResponseInterceptor}}:::interceptor
+			Interceptor{{fa:fa-bullseye StandardResponseInterceptor}}:::interceptor
 		end
 		subgraph AuthModule
 			direction LR
@@ -331,7 +332,7 @@ style legend stroke-dasharray: 0 1 1,fill:white,fill-opacity:0.02,opacity:0.95
 
 # Models
 
-Model Classes serve as a 'single source of truth' for all modeled data. They are are used as the base for creating mongoose [schemas](https://mongoosejs.com/docs/typescript/schemas.html), but they are also used to create DTOs using [Mapped Types](https://docs.nestjs.com/openapi/mapped-types).
+Model Classes serve as a 'single source of truth' for all modeled data. They are used as an `Interface` to create the mongoose [schemas](https://mongoosejs.com/docs/typescript/schemas.html), but they are also used to create DTOs using [Mapped Types](https://docs.nestjs.com/openapi/mapped-types).
 
 The information on Model properties also defines input validation rules enforced when the model is expected in requests, and defines serialization rules when the model is send in responses.
 
@@ -345,10 +346,203 @@ This means that properties on a Model Class can have up to ***4 types*** of deco
 2. ***Docs*** - `@ApiProperty()` from '@nestjs/swagger' to add documentation and examples;
 3. ***Serialization*** - `@Exclude()`, `@Expose()`, and `@Transform()` from 'class-transformer' to define serialization rules;
 4. ***Validation*** - `@IsString()`, `@IsEmail()`, `@Min()`, etc... from 'class-validator' to perform input validation;
- 
-When sending data back in responses, it's important to always send instances of a Model Class. Never send documents retrieved from the database directly as reponses! The serialization rules (and all other benefits from the model) only apply to instances of the Model, not documents from of a schema.
 
-When receving data in requests, use a Model Class or a DTO mapped from a Model. This way the data gets auto validation from the global `ValidationPipe`, plus the route gets auto documentation in Open API.
+
+<details>
+<summary>
+<h3>📚 Example:</h3>
+</summary>
+
+```ts
+@Schema() // ⬅ marks a class to be used as the Interface for the mongoose schema
+class User {
+  @Prop() // ⬅ marks this property to appear in the mongoose schema
+  @ApiProperty({ example: 'Mark' }) // ⬅ provides OpenAPI documentation for this property
+  name: string;
+
+  @Prop({ index: { unique: true } }) // ⬅ accepts the same options as a 'new Mongoose.Schema()'
+  @ApiProperty({ example: 'markhiggens3310@gmail.com' })
+  @IsEmail() // ⬅ provides validation when this property is required as an input
+  email: string;
+
+  // ⬇ will exclude this property on 'output', i.e. from the serialized object sent in responses (but allow it on input)
+  @Exclude({ toPlainOnly: true })
+  @Prop()
+  password: string;
+  
+  // ⬇ will exclude this property on 'input', i.e. from request DTOs and validation (but allow it in responses)
+  @Exclude({ toClassOnly: true })
+  @Prop()
+  lastSeenAt: Date;
+
+  @Exclude() // ⬅ will exclude this property in both directions
+  @Prop()
+  chatAccessKey: string;
+
+  // ⬇ only admins will see this property in the serialized response, it's excluded for everyone else
+  @Expose({ groups: ['Admin'] })
+  @Prop({ type: Date, default: Date.now })
+  @IsDateString()
+  registeredAt: Date;
+
+  // ⬇ allows you to easily create instances of this model from a document from the DB
+  constructor(partial: Partial<User> = {}) {
+    Object.assign(this, partial);
+  }
+
+  // ⬇ you can add other props and utility methods on the model class
+  hasCake() {
+    const registeredDaysAgo = (new Date().getTime() - this.registeredAt.getTime()) / 1000 / 60 / 60 / 24;
+    return registeredDaysAgo > 365; // 🍰 account is at least one year old!
+  }
+}
+```
+
+</details>
+
+<br />
+
+## Sending data
+
+When sending data in responses, it's important to always send instances of a Model Class, or instances of DTOs created from it. You can either send a single one, or an array of them. But never send documents retrieved from the database directly in reponses! The serialization rules (and all other benefits from the model) only apply to instances of the Model or derived classes, not documents from the DB.
+
+This also means you **should not** wrap the returned model in any other javascript object. If you need to add more data to the response (like pagination, filtering, additional messages, etc), you should add them using the metadata decorators provided by `nest-standard-response`.
+
+<details>
+<summary>
+<h3>📚 Example:</h3>
+</summary>
+
+```ts
+@Controller('user')
+export class UserController {
+  @Get()
+  @StandardResponse({ // ⬅ setup a StandardResponse wrapper
+    isPaginated: true,
+  })
+  public async findAll(
+    // ⬇ injects a StandardParam providing methods to manipulate the wrapper
+    @StandardParam() params: StandardParams
+  ): Promise<User[]> { // ⬅ route return type must always resolve to Model or Model[]
+    const users: UserDocument[] = await this.userModel
+      .find()
+      .limit(params.paginationInfo.limit) // ⬅ we get pagination query params for free
+      .skip(params.paginationInfo.offset) //    by using the isPaginated option above
+      .exec();
+
+    params.setMessage('Custom message...') // ⬅ adds a custom message to the response
+    params.setExtra('myCustomProperty', { // ⬅ add some extra field in the response
+      customObjProp1: 'any serializable value',
+      customObjProp2: { nested: true },
+    });
+    // ⬇ Use the document from the DB to construct a new Model() before returning
+    return users.map((userDoc) => new User(userDoc.toJSON()));
+  }
+}
+```
+
+### The response from this route would look like this:
+
+Note the smart serialization in the response! The field `registeredAt` is only present when an `admin` is making the request. It would be hidden from other users because of the serialization rules in the model.
+
+```ts
+{
+  success: true,
+  message: "Custom message...",
+  isArray: true,
+  isPaginated: true,
+  pagination: {
+    limit: 10,
+    offset: 0,
+    defaultLimit: 10,
+  },
+  myCustomProperty: {
+    customObjProp1: 'any serializable value',
+    customObjProp2: { nested: true },
+  }
+  data: [{
+    name: "Mark",
+    email: 'mark8829@gmail.com',
+    registeredAt: '2023-11-09T13:06:37.384Z'
+  }, {
+    name: "Jane",
+    email: 'itsmejane@gmail.com',
+    registeredAt: '2023-11-09T13:06:37.384Z'
+  }, {
+    name: "Eva",
+    email: 'evanance@hotmail.com' },
+    registeredAt: '2023-11-09T13:06:37.384Z'
+  }]
+}
+```
+
+</details>
+
+<br />
+
+## Receving data
+
+The same is true for receving data in the request params or body. Always strongly type the expected data as the Model Class or a DTO derived from it. This way the data gets auto validation from the global `ValidationPipe`, plus the route gets auto documentation in Open API.
+
+<details>
+<summary>
+<h3>📚 Example:</h3>
+</summary>
+
+```ts
+// CreateUserDto.ts
+
+// ⬇ We choose the properties we want from the model with MappedTypes, so this DTO will inherit all
+// the validation and serialization logic we defined there, without having to duplicate anything
+
+const requiredFields = ['email', 'password'] as const;
+const optionalFields = ['name', 'surname', 'phone', 'birthdaydate'] as const;
+
+export class CreateUserDto extends IntersectionType(
+  PartialType(PickType(User, optionalFields)),
+  PickType(User, requiredFields),
+) {}
+
+```
+
+```ts
+@Controller('user')
+export class UserController {
+  @Post())
+  public async create(
+    // ⬇ Setting our DTO as the Type for the request body means it will be automatically validated
+    // by the global ValidationPipe.
+    @Body() createUserDto: CreateUserDto
+  ): Promise<User> {
+    // Any request to this route with a body that's missing required fields, or that contains fields
+    // with values that fail the model validation rules will result in a HTTP 400 Bad Request exception,
+    // and this handler will never be executed.
+    // This means it's safe to use body here without any further validation
+    return await this.userService.create(createUserDto);
+  }
+}
+}
+```
+</details>
+
+
+---------------------------------------------------
+
+
+<br />
+<br />
+
+## 🔮 Use concrete JS classes as types, not typescript interfaces
+
+Typescript interfaces are completely removed from compiled code. Since we want to perform data validation and transformation at runtime, all models and DTOs must use Classes instead. TS Classes can also be used as ***types*** when needed, but they are persisted as JS Classes in the compiled code.
+
+Most decorators work by using the JS [Reflect API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect) to store metadata inside of those classes. This often includes the ***type*** that those values had in Typescript, but can also include any other value the decorator thinks the app might need at runtime.
+
+At any point during the app execution, other parts of the app might use [Reflection](https://en.wikipedia.org/wiki/Reflective_programming) to inspect this metadata before deciding on an action. That's how the `ValidationPipe` can inspect a Model or DTO instance and validate the ***type*** of its properties, or how the `RoleSerializerInterceptor` can retrieve the rules used serialize a value.
+
+
+<br />
+<br />
 
 ---------------------------------------------------------------------------
 # Reference <a name="RefIndex"></a>
@@ -745,25 +939,6 @@ describe('BooksController (e2e)', () => {
 <br />
 <p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
----------------------------------------------------
-
-# Tips
-
-## 🔮 You should return class instances from route handlers, not plain objects or DB documents <a name="HandlersMustReturnClassInstances"></a>
-NestJS' request pipeline greatly benefits from receiving DTOs or Model class instances as responses from request handlers. This allows interceptors to perform serialization, caching, and other data transformations to the document before sending it to the client.
-
-StandardResponse also rely on an interceptor that uses reflection to read the metadata set by its decorators. Since the typing information and other metadata for Models or DTOs is set on the class that represents them, you need to return instances of these classes from route handlers.
-
-<br />
-<br />
-
-## 🔮 Use concrete JS classes as types, not typescript interfaces
-
-Typescript interfaces are completely removed from compiled code. Since we want to perform data validation and transformation during execution, we need the typing information to be available at runtime. NestJS (as well as this library) achieve this by storing type, validation constrainsts and other metadata as properties in the classes that describe the data objects. These can be Models, Entities, Schemas, DTOs or any other class that was anotated with the proper decorators.
-
-<br />
-<br />
-<br />
 
 ---------------------------------------------------
 
