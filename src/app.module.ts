@@ -13,9 +13,10 @@ import configurationFactory from './config/configuration.factory';
 import { DbConfig } from './config/interfaces/db-config.interface';
 import { AuthModule } from './auth/auth.module';
 import { validateEnvironmentVariables } from './config/env.validation';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { MailerModule } from './mailer/mailer.module';
 import { VALIDATION_ERROR } from './app.constants';
+import { RolesSerializerInterceptor } from './user/interceptors/roles-serializer.interceptor';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { VALIDATION_ERROR } from './app.constants';
     }),
     StandardResponseModule.forRoot({
       interceptAll: true,
+      // TODO StandardError options... like 429 Too Many Requests (from the global rate limiter)
       validateResponse: (data) => {
         if (data.thisIsAMongooseObject) return false;
         return true;
@@ -49,6 +51,7 @@ import { VALIDATION_ERROR } from './app.constants';
       useValue: new ValidationPipe({
         whitelist: true,
         forbidNonWhitelisted: true,
+        transform: true,
         exceptionFactory: (errors: ValidationError[]) =>
           new BadRequestException({
             statusCode: 400,
@@ -60,6 +63,10 @@ import { VALIDATION_ERROR } from './app.constants';
             })),
           }),
       }),
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RolesSerializerInterceptor,
     },
     AppService,
   ],
