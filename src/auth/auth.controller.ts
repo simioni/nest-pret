@@ -7,12 +7,9 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StandardParam, StandardParams } from 'nest-standard-response';
-import { ApiConfig } from '../config/interfaces/api-config.interface';
 import { USER_REGISTRATION_ERROR } from '../user/user.constants';
-import { UserService } from '../user/user.service';
 import {
   EMAIL_VERIFICATION_SUCCESS,
   FORGOT_PASSWORD_SUCCESS,
@@ -30,15 +27,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  private apiConfig: ApiConfig;
-
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly authService: AuthService,
-    private readonly userService: UserService,
-  ) {
-    this.apiConfig = this.configService.get<ApiConfig>('api');
-  }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('email/login')
   @ApiOperation({ summary: 'Log a user in' })
