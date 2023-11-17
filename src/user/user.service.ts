@@ -1,13 +1,12 @@
 import {
   ConflictException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { hash } from 'bcryptjs';
 import { isEmail } from 'class-validator';
-import { Document, Model } from 'mongoose';
+import { Model } from 'mongoose';
 
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
@@ -15,14 +14,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegistrationValidationError } from './errors/registration-validation.error';
 import { User, UserDocument } from './schemas/user.schema';
-import { USER_REGISTRATION_ERROR, USER_ERROR } from './user.constants';
+import { USER_ERROR, USER_REGISTRATION_ERROR } from './user.constants';
 
 const saltRounds = 10;
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel('User') private readonly userModel: Model<UserDocument>,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
   async findAll({ limit = 100, offset = 0 }) {
