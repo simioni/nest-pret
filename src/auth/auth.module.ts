@@ -48,10 +48,10 @@ import { MailerModule } from '../mailer/mailer.module';
   providers: [AuthService, JwtStrategy],
 })
 export class AuthModule {
-  constructor(private readonly configService: ConfigService) {
+  constructor(readonly configService: ConfigService) {
     const apiConfig = configService.get<ApiConfig>('api');
     const mailerConfig = configService.get<MailerConfig>('mailer');
-    if (!mailerConfig.host && apiConfig.emailVerification !== 'off') {
+    if (apiConfig.emailVerificationIsOn() && !mailerConfig.host) {
       throw new MissingMailerConfigError(AuthModule.name);
     }
   }
