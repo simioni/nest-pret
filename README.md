@@ -532,7 +532,7 @@ export class UserController {
 <br />
 <br />
 
-## 🔮 Use concrete JS classes as types, not typescript interfaces
+## 🔮 Use concrete JS classes as types, not Typescript interfaces
 
 Typescript interfaces are completely removed from compiled code. Since we want to perform data validation and transformation at runtime, all models and DTOs must use Classes instead. TS Classes can also be used as ***types*** when needed, but they are persisted as JS Classes in the compiled code.
 
@@ -946,18 +946,54 @@ describe('BooksController (e2e)', () => {
 
 ## 🚀 &nbsp; TODO Milestones
 
-- Add a Redis instance in docker-compose, and:
+<!-- - Add a Redis instance in docker-compose, and:
   - expose it's config via .env and the config module;
   - Cache the user from login tokens so we don't need to hit the DB in every request to retrieve it;
-  - Cache the abilities created by casl for a given user so it don't need to be recreated inside the policies every on every request;
+  - Cache the abilities created by casl for a given user so it don't need to be recreated inside the policies every on every request; -->
 - Replace express-rate-limit with nestjs' built-in throttler, exposing it's config via .env, and sharing storage in Redis
-- Add a [mgob](https://github.com/maxisam/mgob) instance to docker-compose for automated mongo backups (and add its configurations via .env)
+- Add a [mgob](https://github.com/maxisam/mgob) instance to the production docker swarm for automated mongo backups (and add its configurations via .env)
+- Add some tool to the production docker swarm to expose server metric
 - Add user consent forms with versioned policies
 - Add option for log-in using social media accounts
 
-</br>
+<br />
 
+# Origins
 
+A lot of the code in this repo came from my own projects, and it's a culmination of features that I had to implement frequently for different systems.
+
+Modern web apps tend to have similar initial demands, so the fastest way to go about starting a new project was copying code around and modifying it a bit. An easy but repetitive task that removes all the joy out of building software.
+
+This generator provides a way to bootstrap a modern Typescript web app in a way that is not only ***fast***, but more importantly, ***fun***. It covers the basics to let me focus on building the good stuff, the actual features unique to each system.
+
+I hope you can find some fun in it as well. 😊
+
+<br />
+
+# Refs
+
+For consistency, I tried to keep the code as much as posible close to NestJS' code style. This meant taking references from other NestJS open source projects, including:
+
+- [The NestJS source itself](https://github.com/nestjs/nest);
+- [This NestJS' example library](https://github.com/nestjs/nest/tree/master/sample);
+- [golevelup's NestJS collections](https://github.com/golevelup/nestjs);
+- [This NestJS curated list of things](https://github.com/nestjs/awesome-nestjs);
+- [marcomelilli/nestjs-email-authentication](https://github.com/marcomelilli/nestjs-email-authentication);
+- [NarHakobyan/awesome-nest-boilerplate](https://github.com/NarHakobyan/awesome-nest-boilerplate);
+- [nestjsx/crud](https://github.com/nestjsx/crud);
+
+<br />
+
+# License
+
+MIT License
+
+Copyright (c) 2022 Ricardo Simioni
+
+<br />
+
+<!-- 
 🏭 ⭐️ 🕹️ 💡 💎 🔩 ⚙️ 🧱 🔮 💈 🛍️ 🎁 🪭 ⚜️ ❇️ 🚩
 📦 🏷️ 📮 
 🟠 🟧 🔶 🔸
+-->
