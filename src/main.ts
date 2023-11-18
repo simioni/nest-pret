@@ -33,8 +33,7 @@ async function bootstrap() {
     max: 3, // start blocking after 3 requests
     message: 'Too many accounts created from this IP, please try again later',
   });
-  // TODO uncomment this
-  // app.use('/auth/email/register', createAccountLimiter);
+  app.use('/auth/email/register', createAccountLimiter);
 
   if (process.env.NODE_ENV === Environment.Development) {
     setupDependencyGraph(app);
