@@ -18,17 +18,39 @@ const removePassword = function (doc: UserDocument, ret: Record<string, any>) {
 
 @Schema({
   timestamps: true,
-  // TODO uncomment these!
+  // TODO maybe uncomment these transforms? Here's why:
+  // These are redundant since the password property is already removed from the serialized object due to
+  // the decorator @Exclude({ toPlainOnly: true }).
+  // So excluding the password property here is just a failsafe in case the document from the database is
+  // inadvertently sent in resposes without being converted to the User class first.
+  // But this failsafe comes at a cost: it's also the reason why we need the 'returnRawMongooseObject' option
+  // in the findOne method of the UserService. Sometimes we need to access the password from the user object,
+  // and removing it here means the password will never the present in the User class, forcing us to pass
+  // raw mongoose documents around in those cases.
+  // So these are the design options we have to explore:
+  //
+  // 1. No failsafe transforms. DB documents should never be sent in responses, and the global Serializer already
+  //    prevents responses that try to send raw mongoose documents. However it can't prevent these responses if
+  //    the documents are nested in other objects. This options would allow us to removed the returnRawMongooseObject
+  //    option and just use instaneces of the User class for everything.
+  // 2. Keep failsafe transforms. This absolutly guarantess that passwords will never leak in responses, even in the
+  //    event of an extreme developer error ending up in production. Services that require the user information
+  //    including their password will have to keep explicitly ask for it with 'returnRawMongooseObject'.
+  // 3. Keep the failsafe in the toJSON method only, and use the toObject method to cast the document to an instance of
+  //    the User class. The User class should also have its toJSON method overriden to perform the same transform as the schema.
+  //    Methods from the UserService would then be changed to use toObject instead of toJSON when returning users.
+  //    This achieves the same security in reponses, while allowing the User class to carry the password field internally.
+  //    Methods from the UserService can still ask the consumer to explicitly ask for the password if they want it, but would
+  //    achieve this by using the .select('-password') mongoose method to include/exclude de password field.
+  //
   // toJSON: { transform: removePassword },
   // toObject: { transform: removePassword },
 })
 export class User {
   // _id should NOT be declared explicitly to mongoose (with the @Prop() decorator)
   @ApiProperty({ type: 'string' })
-  @Transform(({ value }) => {
-    console.log(`transforming _id into a string: ${value.toString()}`);
-    return value.toString();
-  })
+  @Transform(({ value }) => value.toString(), { toPlainOnly: true })
+  @Transform(({ value }) => new Types.ObjectId(value), { toClassOnly: true })
   _id: Types.ObjectId;
 
   @Prop()
@@ -88,8 +110,26 @@ export class User {
   @Expose({ groups: ['Admin'] })
   __v: number;
 
-  constructor(partial: Partial<User> = {}) {
-    Object.assign(this, partial);
+  constructor({
+    _id,
+    ...rest
+  }: Partial<Omit<User, '_id'> & { _id: string | Types.ObjectId }> = {}) {
+    if (_id) this._id = typeof _id === 'string' ? new Types.ObjectId(_id) : _id;
+    Object.assign(this, rest);
+  }
+
+  /**
+   * A failsafe in case this class ends up accidentally included inside a nested object in a response
+   * (where class-transformer wouldn't find it).
+   * */
+  toJSON() {
+    const ret = { ...this };
+    delete ret.password;
+    delete ret.roles;
+    delete ret.auth;
+    delete ret.birthdaydate;
+    delete ret.__v;
+    return ret;
   }
 
   isVerified() {
