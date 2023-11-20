@@ -1,6 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import * as pactum from 'pactum';
-import { EMAIL_VERIFICATION_ERROR, USER_ERROR } from 'src/user/user.constants';
+import {
+  EMAIL_VERIFICATION_ERROR,
+  UserRole,
+  USER_ERROR,
+} from 'src/user/user.constants';
 import { UserService } from '../src/user/user.service';
 import { TestingServerFactory } from './config/testing-server.factory';
 import { FakeUser, UserStubFactory } from './stubs/user-stub.factory';
@@ -143,7 +147,19 @@ describe('UserController (e2e)', () => {
       await spec()
         .withBearerToken(adminUserToken)
         .withPathParams('idOrEmail', verifiedUser.email)
-        .expectStatus(200);
+        .expectStatus(200)
+        .expectJsonLike({
+          success: true,
+          data: {
+            email: verifiedUser.email,
+            roles: [UserRole.USER],
+            auth: {
+              email: {
+                valid: true,
+              },
+            },
+          },
+        });
     });
   });
 
