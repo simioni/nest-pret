@@ -496,7 +496,7 @@ The same is true for receving data in the request params or body. Always strongl
 // the validation and serialization logic we defined there, without having to duplicate anything
 
 const requiredFields = ['email', 'password'] as const;
-const optionalFields = ['name', 'surname', 'phone', 'birthdaydate'] as const;
+const optionalFields = ['name', 'familyName', 'phone', 'birthDate'] as const;
 
 export class CreateUserDto extends IntersectionType(
   PartialType(PickType(User, optionalFields)),
