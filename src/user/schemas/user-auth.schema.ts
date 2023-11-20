@@ -21,7 +21,7 @@ class UserAuthFacebook {
 }
 
 @Schema()
-class UserAuthGmail {
+class UserAuthGoogle {
   @Prop()
   @ApiProperty()
   @Expose({ groups: ['Admin'] })
@@ -39,8 +39,8 @@ export class UserAuth {
   @Expose({ groups: ['Admin'] })
   facebook?: UserAuthFacebook;
 
-  @Prop({ type: UserAuthGmail, _id: false })
+  @Prop({ type: UserAuthGoogle, _id: false })
   @ApiProperty()
   @Expose({ groups: ['Admin'] })
-  gmail?: UserAuthGmail;
+  google?: UserAuthGoogle;
 }
