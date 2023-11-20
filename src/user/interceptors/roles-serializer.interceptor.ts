@@ -41,7 +41,6 @@ import {
   PlainLiteralObject,
 } from '@nestjs/common';
 import * as classTransformer from 'class-transformer';
-import { classToPlain } from 'class-transformer';
 import mongoose from 'mongoose';
 import { map, Observable } from 'rxjs';
 
@@ -72,7 +71,6 @@ export class RolesSerializerInterceptor extends ClassSerializerInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const userRoles = context.switchToHttp().getRequest().user?.roles ?? [];
-    // console.log(`Serializing data for role: ${userRoles}`);
     const contextOptions = this.getContextOptions(context);
     const options = {
       ...this.defaultOptions,
@@ -100,12 +98,6 @@ export class RolesSerializerInterceptor extends ClassSerializerInterceptor {
           );
           return new InternalServerErrorException(mongooseDocumentErrorMessage);
         }
-
-        console.log(res);
-        // console.log('-------------- AFTER classToPlain: ', options);
-        // console.log(classToPlain(res, options));
-        console.log('-------------- AFTER this.serialize: ');
-        console.log(this.serialize(res, options));
 
         return this.serialize(res, options);
       }),
