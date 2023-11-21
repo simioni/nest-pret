@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StandardParam, StandardParams } from 'nest-standard-response';
-import { USER_REGISTRATION_ERROR } from '../user/user.constants';
+import { USER_REGISTRATION_ERROR } from 'src/user/user.constants';
 import {
   EMAIL_VERIFICATION_SUCCESS,
   FORGOT_PASSWORD_SUCCESS,

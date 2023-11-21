@@ -15,10 +15,10 @@ import { Model } from 'mongoose';
 import {
   ApiConfig,
   EmailVerificationOptions,
-} from '../config/interfaces/api-config.interface';
-import { MailerService } from '../mailer/mailer.service';
-import { User, UserDocument } from '../user/schemas/user.schema';
-import { UserService } from '../user/user.service';
+} from 'src/config/interfaces/api-config.interface';
+import { MailerService } from 'src/mailer/mailer.service';
+import { User, UserDocument } from 'src/user/schemas/user.schema';
+import { UserService } from 'src/user/user.service';
 import * as crypto from 'node:crypto';
 
 import {
