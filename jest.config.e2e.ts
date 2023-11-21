@@ -21,6 +21,10 @@ const config: Config = {
   // testEnvironment: './jest.env.e2e.ts',
   verbose: true,
   silent: false,
+  // allows jest to load modules with absolute imports
+  moduleNameMapper: {
+    'src/(.*)': '<rootDir>/src/$1',
+  },
 };
 
 export default config;
