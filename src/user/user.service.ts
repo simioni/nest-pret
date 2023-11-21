@@ -37,18 +37,16 @@ export class UserService {
 
   async findOne(
     idOrEmail: string,
-    options: {
-      // intended only for internal use by the auth module (a raw return includes passwords)
-      returnRawMongooseObject?: boolean;
-    } = {},
-  ): Promise<User | UserDocument> {
-    const query = isEmail(idOrEmail)
+    options: { includePassword?: boolean } = {},
+  ): Promise<User> {
+    const filterQuery = isEmail(idOrEmail)
       ? { email: idOrEmail }
       : { _id: idOrEmail };
-    const user = await this.userModel.findOne(query).exec();
+    let query = this.userModel.findOne(filterQuery);
+    if (options.includePassword !== true) query = query.select('-password');
+    const user = await query.exec();
     if (!user) throw new NotFoundException(USER_ERROR.USER_NOT_FOUND);
-    if (options?.returnRawMongooseObject) return user;
-    return new User(user.toJSON());
+    return new User(user.toObject());
   }
 
   async create(newUserData: CreateUserDto): Promise<User> {
@@ -82,9 +80,6 @@ export class UserService {
   }
 
   async setPassword(email: string, newPassword: string): Promise<boolean> {
-    // if (!this.isStrongPassword(newPassword)) {
-    //   throw new ForbiddenException(REGISTRATION_ERROR.PASSWORD_TOO_WEAK);
-    // }
     const user = await this.userModel.findOne({ email: email }).exec();
     if (!user) {
       throw new NotFoundException(USER_ERROR.USER_NOT_FOUND);
@@ -116,6 +111,5 @@ export class UserService {
       throw new NotFoundException(USER_ERROR.USER_NOT_FOUND);
     }
     await this.userModel.deleteOne(query).exec();
-    // return true;
   }
 }
