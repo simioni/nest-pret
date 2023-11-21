@@ -56,9 +56,9 @@ export class AuthService {
   }
 
   async login(email, password): Promise<LoginResponse> {
-    const user: Partial<UserDocument> = await this.userService
+    const user = await this.userService
       .findOne(email, {
-        returnRawMongooseObject: true,
+        includePassword: true,
       })
       .catch((userError) => {
         throw new NotFoundException(LOGIN_ERROR.EMAIL_NOT_FOUND, {
@@ -216,7 +216,7 @@ export class AuthService {
   ): Promise<boolean> {
     const user = await this.userService
       .findOne(email, {
-        returnRawMongooseObject: true,
+        includePassword: true,
       })
       .catch(() => {
         throw new NotFoundException(RESET_PASSWORD_ERROR.USER_NOT_FOUND);
