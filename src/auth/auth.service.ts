@@ -17,7 +17,7 @@ import {
   EmailVerificationOptions,
 } from 'src/config/interfaces/api-config.interface';
 import { MailerService } from 'src/mailer/mailer.service';
-import { User, UserDocument } from 'src/user/schemas/user.schema';
+import { User } from 'src/user/schemas/user.schema';
 import { UserService } from 'src/user/user.service';
 import * as crypto from 'node:crypto';
 
