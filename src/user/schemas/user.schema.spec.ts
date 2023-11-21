@@ -239,7 +239,6 @@ describe('The User Document from the database', () => {
         expect(result.auth).toEqual(instanceUser.auth);
       });
     });
-
     describe('When the document is cast using .toJSON()', () => {
       it("should succeed, but should NOT include the password since it's excluded from json", async () => {
         const doc = await UserModel.findOne({
