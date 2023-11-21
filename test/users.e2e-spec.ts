@@ -1,17 +1,17 @@
 import { INestApplication } from '@nestjs/common';
 import * as pactum from 'pactum';
+import { User } from 'src/user/schemas/user.schema';
 import {
   EMAIL_VERIFICATION_ERROR,
   UserRole,
   USER_ERROR,
 } from 'src/user/user.constants';
-import { UserService } from '../src/user/user.service';
 import { TestingServerFactory } from './config/testing-server.factory';
 import { FakeUser, UserStubFactory } from './stubs/user-stub.factory';
 
 describe('UserController (e2e)', () => {
   let app: INestApplication;
-  let userService: UserService;
+
   let baseUrl: string;
   let stub: UserStubFactory;
 
@@ -28,10 +28,9 @@ describe('UserController (e2e)', () => {
     process.env.API_EMAIL_VERIFICATION = 'delayed';
 
     const testingServer = await new TestingServerFactory().create();
-    const testingModule = testingServer.getModule();
+    // const testingModule = testingServer.getModule();
     app = testingServer.getApp();
     baseUrl = testingServer.getBaseUrl();
-    userService = await testingModule.resolve(UserService);
 
     stub = new UserStubFactory(testingServer);
     unverifiedUser = await stub.registerNewUser({ firstName: 'Debra' });
@@ -52,7 +51,6 @@ describe('UserController (e2e)', () => {
 
   it('should be defined', () => {
     expect(app).toBeDefined();
-    expect(userService).toBeDefined();
   });
 
   describe('/ (GET)', () => {
@@ -131,35 +129,57 @@ describe('UserController (e2e)', () => {
         .expectStatus(404)
         .expectJsonLike({ message: USER_ERROR.USER_NOT_FOUND });
     });
-    it('Should succeed for a user reading their own info', async () => {
-      await spec()
-        .withBearerToken(verifiedUserToken)
-        .withPathParams('idOrEmail', verifiedUser.email)
-        .expectStatus(200);
-    });
     it('Should fail for a user reading someone elses info', async () => {
       await spec()
         .withBearerToken(verifiedUserToken)
         .withPathParams('idOrEmail', adminUser.email)
         .expectStatus(403);
     });
-    it('Should succeed in reading someone else info IF the asking user has a blank READ USER policy claim', async () => {
-      await spec()
-        .withBearerToken(adminUserToken)
-        .withPathParams('idOrEmail', verifiedUser.email)
-        .expectStatus(200)
-        .expectJsonLike({
-          success: true,
-          data: {
-            email: verifiedUser.email,
-            roles: [UserRole.USER],
-            auth: {
-              email: {
-                valid: true,
+    describe('Should succeed for a user reading their own info', () => {
+      let user: User;
+      it('...and return the user object properties that a User has access to', async () => {
+        user = await spec()
+          .withBearerToken(verifiedUserToken)
+          .withPathParams('idOrEmail', verifiedUser.email)
+          .expectStatus(200)
+          .expectJsonLike({
+            success: true,
+            data: {
+              email: verifiedUser.email,
+            },
+          })
+          .returns(({ res }) => res.body.data);
+      });
+      it('while hiding other properties', () => {
+        expect(user.password).toBeUndefined();
+        expect(user.roles).toBeUndefined();
+        expect(user.auth).toBeUndefined();
+      });
+    });
+    describe('Should succeed in reading someone else info IF the asking user has a blank READ USER policy claim', () => {
+      let user: User;
+      it('...and return the user object properties that an Admin has access to', async () => {
+        user = await spec()
+          .withBearerToken(adminUserToken)
+          .withPathParams('idOrEmail', verifiedUser.email)
+          .expectStatus(200)
+          .expectJsonLike({
+            success: true,
+            data: {
+              email: verifiedUser.email,
+              roles: [UserRole.USER],
+              auth: {
+                email: {
+                  valid: true,
+                },
               },
             },
-          },
-        });
+          })
+          .returns(({ res }) => res.body.data);
+      });
+      it('while hiding other properties', async () => {
+        expect(user.password).toBeUndefined();
+      });
     });
   });
 
