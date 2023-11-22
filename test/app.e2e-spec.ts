@@ -20,6 +20,8 @@ describe('App (e2e)', () => {
     // API_EMAIL_VERIFICATION=delayed allows loggin-in without verifing an email first.
     // This makes it easier to test for optional DTO fields.
     process.env.API_EMAIL_VERIFICATION = 'delayed';
+    // increases the throttler account creation limit
+    process.env.API_THROTTLE_LIMIT_ACCOUNTS = '20';
 
     const testingServer = await new TestingServerFactory().create();
     // const testingModule = testingServer.getModule();
@@ -191,14 +193,5 @@ describe('App (e2e)', () => {
         expect(data.password).toBeUndefined();
       });
     });
-  });
-
-  describe('The global rate limiter ThrottlerGuard', () => {
-    it.todo(
-      'Should deny access to account creation if a single IP has created too many accounts in a short period',
-    );
-    it.todo(
-      'Should deny API access entirely if a single IP has made too many requests in a short period',
-    );
   });
 });
