@@ -16,6 +16,7 @@ export type FakeUserOptions = {
   lastName?: string;
   provider?: string;
   allowSpecialCharacters?: boolean;
+  includeNameInReturn?: boolean;
 };
 
 export class UserStubFactory {
@@ -29,23 +30,29 @@ export class UserStubFactory {
     this.baseUrl = this.testingServer.getBaseUrl();
   }
 
-  public createFakeUser(options?: FakeUserOptions): FakeUser {
-    // const name = options.firstName || faker.person.firstName();
-    return {
-      // name: name,
-      email: faker.internet.email(options),
-      // email: faker.internet.email({ ...options, firstName: name }),
+  public createFakeUser(options: FakeUserOptions = {}): FakeUser {
+    const name = options.firstName ?? faker.person.firstName();
+    const user = {
+      name: name,
+      // email: faker.internet.email(options),
+      email: faker.internet.email({ ...options, firstName: name }),
       password: faker.internet.password({ length: 8 }),
     };
+    if (options.includeNameInReturn) return user;
+    delete user.name;
+    return user;
   }
 
-  public async registerNewUser(options?: FakeUserOptions) {
+  public async registerNewUser(options: FakeUserOptions = {}) {
     const stubUser = this.createFakeUser(options);
     await pactum
       .spec()
       .post(`${this.baseUrl}/auth/email/register`)
       .withRequestTimeout(6000)
-      .withBody(stubUser)
+      .withBody({
+        email: stubUser.email,
+        password: stubUser.password,
+      })
       .expectStatus(201);
     return stubUser;
   }

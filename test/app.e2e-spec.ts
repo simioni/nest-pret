@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import * as pactum from 'pactum';
+import { VALIDATION_ERROR } from 'src/app.constants';
 import { UserAuth } from 'src/user/schemas/user-auth.schema';
 import { User } from 'src/user/schemas/user.schema';
 import { UserRole } from 'src/user/user.constants';
@@ -8,11 +9,6 @@ import { FakeUser, UserStubFactory } from './stubs/user-stub.factory';
 
 describe('App (e2e)', () => {
   let app: INestApplication;
-  // let authService: AuthService;
-  // let userService: UserService;
-  // let getEmailVerificationTokenFor: (email: string) => Promise<string>;
-  // let emailVerificationModel: Model<EmailVerificationDocument>;
-  // let forgottenPasswordModel: Model<ForgottenPasswordDocument>;
   let baseUrl: string;
   let verifiedUser: FakeUser;
   let adminUser: FakeUser;
@@ -21,22 +17,15 @@ describe('App (e2e)', () => {
   let stub: UserStubFactory;
 
   beforeAll(async () => {
+    // API_EMAIL_VERIFICATION=delayed allows loggin-in without verifing an email first.
+    // This makes it easier to test for optional DTO fields.
+    process.env.API_EMAIL_VERIFICATION = 'delayed';
+
     const testingServer = await new TestingServerFactory().create();
     // const testingModule = testingServer.getModule();
     app = testingServer.getApp();
     baseUrl = testingServer.getBaseUrl();
-    // userService = await testingModule.resolve(UserService);
-    // authService = await testingModule.resolve(AuthService);
-    // emailVerificationModel = await testingModule.resolve(
-    //   getModelToken(EmailVerification.name),
-    // );
-    // forgottenPasswordModel = await testingModule.resolve(
-    //   getModelToken(ForgottenPassword.name),
-    // );
-    // getEmailVerificationTokenFor = async (email) => {
-    //   const verification = await emailVerificationModel.findOne({ email });
-    //   return verification.token;
-    // };
+
     stub = new UserStubFactory(testingServer);
     verifiedUser = await stub.registerNewVerifiedUser({ firstName: 'Thabata' });
     adminUser = await stub.registerNewAdmin({ firstName: 'Oliver' });
@@ -51,21 +40,111 @@ describe('App (e2e)', () => {
 
   it('should be defined', () => {
     expect(app).toBeDefined();
-    // expect(userService).toBeDefined();
-    // expect(authService).toBeDefined();
   });
 
   describe('The global ValidationPipe', () => {
-    it.todo(
-      'Should throw an exception if a request is missing some property required by the expected DTO',
-    );
-    it.todo(
-      'Should throw an exception if a request contains extra properties unknown to the expected DTO',
-    );
-    it.todo('Should accept properties that are optional on the expected DTO');
-    it.todo(
-      'Should not complain if optional properties of the expected DTO are missing from the request',
-    );
+    const spec = () => pactum.spec().post(`${baseUrl}/auth/email/register`);
+
+    it('Should throw an exception if a request is missing some REQUIRED property from the DTO', async () => {
+      const res = await spec().withBody({}).expectStatus(400).toss();
+      expect(res.body.message).toEqual(VALIDATION_ERROR.ERROR);
+      expect(Array.isArray(res.body.errors)).toEqual(true);
+      expect(
+        res.body.errors.find((elem) => elem.field === 'email').errors.isEmail,
+      ).toBeDefined();
+      expect(
+        res.body.errors.find((elem) => elem.field === 'password').errors
+          .minLength,
+      ).toBeDefined();
+    });
+
+    it('Should throw an exception if a request contains extra properties UNKNOWN to the expected DTO', async () => {
+      const user = stub.createFakeUser({ firstName: 'Martin' });
+      const res = await spec()
+        .withBody({
+          email: user.email,
+          password: '12345678',
+          extraProperty: 'Should Not Be Here',
+        })
+        .expectStatus(400)
+        .toss();
+      expect(res.body.message).toEqual(VALIDATION_ERROR.ERROR);
+      expect(Array.isArray(res.body.errors)).toEqual(true);
+      expect(
+        res.body.errors.find((elem) => elem.field === 'extraProperty').errors
+          .whitelistValidation,
+      ).toBeDefined();
+      await stub.deleteUser(user.email);
+    });
+
+    it('Should accept properties that are OPTIONAL on the expected DTO', async () => {
+      const user = stub.createFakeUser({
+        firstName: 'Jason',
+        includeNameInReturn: true,
+      });
+      const body = await spec()
+        .withBody({
+          name: user.name,
+          familyName: 'Mayer',
+          phone: 1234567,
+          birthDate: new Date().toISOString(),
+          email: user.email,
+          password: '12345678',
+        })
+        .expectStatus(201)
+        .returns((ctx) => ctx.res.body);
+      expect(body.success).toEqual(true);
+      expect(body.data.user.name).toEqual(user.name);
+      expect(body.data.user.familyName).toEqual('Mayer');
+      expect(body.data.user.email).toEqual(user.email);
+      expect(body.data.user.phone).toEqual('1234567');
+      // use an admin account to verify that the birthDate was created (since that field is only visible to admins)
+      const createdUser: User = await pactum
+        .spec()
+        .get(`${baseUrl}/user/{idOrEmail}`)
+        .withBearerToken(adminUserToken)
+        .withPathParams('idOrEmail', user.email)
+        .expectStatus(200)
+        .returns(({ res }) => res.body.data);
+      expect(createdUser.birthDate).toBeDefined();
+      await stub.deleteUser(user.email);
+    });
+
+    it('Should validate OPTIONAL properties if they are present', async () => {
+      const user = stub.createFakeUser({
+        firstName: 'Lily',
+        includeNameInReturn: true,
+      });
+      const result = await spec()
+        .withBody({
+          phone: '1234',
+          birthDate: 999,
+          email: user.email,
+          password: '12345678',
+        })
+        .expectStatus(400)
+        .toss();
+      const findError = (property) =>
+        result.body.errors.find((elem) => elem.field === property);
+      expect(findError('phone').errors.min).toBeDefined();
+      expect(findError('phone').errors.isInt).toBeDefined();
+      expect(findError('birthDate').errors.isDate).toBeDefined();
+      await stub.deleteUser(user.email);
+    });
+
+    it('Should not complain if OPTIONAL properties are missing entirely', async () => {
+      const user = stub.createFakeUser({ firstName: 'Luna' });
+      const res = await spec()
+        .withBody({
+          email: user.email,
+          password: '12345678',
+        })
+        .expectStatus(201)
+        .toss();
+      expect(res.body.success).toEqual(true);
+      expect(res.body.data.user.email).toEqual(user.email);
+      await stub.deleteUser(user.email);
+    });
   });
 
   describe('The global RoleSerializerInterceptor', () => {
@@ -77,7 +156,6 @@ describe('App (e2e)', () => {
           .withBearerToken(verifiedUserToken)
           .withPathParams('idOrEmail', verifiedUser.email)
           .expectStatus(200)
-          .inspect()
           .returns('data');
       });
       it('Should include model properties that the User role has access to', async () => {
