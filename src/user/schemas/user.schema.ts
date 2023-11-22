@@ -8,35 +8,35 @@ import {
   Transform,
   TransformationType,
 } from 'class-transformer';
-import { IsDate, IsEmail, IsInt, Min, MinLength } from 'class-validator';
+import {
+  IsDate,
+  IsEmail,
+  IsInt,
+  isISO8601,
+  Min,
+  MinLength,
+} from 'class-validator';
 import { HydratedDocument, Model, Types } from 'mongoose';
 import { UserRole } from '../user.constants';
 import { UserAuth } from './user-auth.schema';
 import { UserPhotos } from './user-photos.schema';
 import { UserSettings } from './user-settings.schema';
-
 export type UserDocument = HydratedDocument<User>;
-
-export function isUserDocument(object) {
-  const proto = Object.getPrototypeOf(object);
-  return proto instanceof Model && proto.collection.modelName === User.name;
-}
-
-const removePassword = function (doc: UserDocument, ret: Record<string, any>) {
-  delete ret.password;
-  return ret;
-};
 
 @Schema({
   timestamps: true,
-  toJSON: { transform: removePassword },
+  toJSON: {
+    transform: function (doc: UserDocument, ret: Record<string, any>) {
+      delete ret.password;
+      return ret;
+    },
+  },
 })
 export class User {
-  // _id should NOT be declared explicitly to mongoose (with the @Prop() decorator)
   @ApiProperty({ type: 'string' })
   @Transform(({ value }) => value.toString(), { toPlainOnly: true })
   @Transform(({ value }) => new Types.ObjectId(value), { toClassOnly: true })
-  _id: Types.ObjectId;
+  _id: Types.ObjectId; // _id should NOT be declared explicitly to mongoose (skip the @Prop() decorator)
 
   @Prop()
   @ApiProperty({ required: true, example: 'PASSWORD' })
@@ -64,18 +64,15 @@ export class User {
   phone?: string;
 
   @Prop()
-  @ApiProperty({ example: '07-23-1992' })
+  @ApiProperty({ type: 'string', example: '07-23-1992' }) // birthDate is exposed as string in the API
   @Transform(({ value, type, options }) => {
-    if (
-      type === TransformationType.PLAIN_TO_CLASS ||
-      options.groups?.includes(UserRole.ADMIN)
-    )
-      return value;
+    if (type === TransformationType.PLAIN_TO_CLASS)
+      return isISO8601(value) ? new Date(value) : value; // but transformed during plainToClass, into a proper Date() but only if the string is a valid ISO 8601 date string
+    if (options.groups?.includes(UserRole.ADMIN)) return value; // also allowed during classToPlain (serialization), but only for ADMINs
     return undefined;
   })
-  // @IsDateString()
-  @IsDate()
-  birthDate?: Date;
+  @IsDate({ message: 'birthDate must be a valid ISO 8601 date string' }) // validation requires a Date object, so it'll fail if our Transform also failed due an invalid date
+  birthDate?: Date; // as a class instance (and in mongoose / mongoDB) it's an actual Date object
 
   @Prop({ type: [String], enum: UserRole, default: [UserRole.USER] })
   @ApiProperty({ enum: UserRole, enumName: 'UserRole', isArray: true })
@@ -105,7 +102,7 @@ export class User {
   constructor(
     partial: Partial<Omit<User, '_id'> & { _id: string | Types.ObjectId }> = {},
   ) {
-    if (isUserDocument(partial)) {
+    if (User.isUserDocument(partial)) {
       Object.assign(this, (partial as UserDocument).toObject());
       return;
     }
@@ -125,6 +122,11 @@ export class User {
 
   isVerified() {
     return this.auth?.email?.valid ?? false;
+  }
+
+  static isUserDocument(object) {
+    const proto = Object.getPrototypeOf(object);
+    return proto instanceof Model && proto.collection.modelName === User.name;
   }
 }
 
