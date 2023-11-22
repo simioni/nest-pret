@@ -39,6 +39,9 @@ describe('AuthController (e2e)', () => {
   let stub: UserStubFactory;
 
   beforeAll(async () => {
+    // increases the throttler account creation limit
+    process.env.API_THROTTLE_LIMIT_ACCOUNTS = '20';
+
     const testingServer = await new TestingServerFactory().create();
     const testingModule = testingServer.getModule();
     app = testingServer.getApp();
