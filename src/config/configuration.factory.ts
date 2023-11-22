@@ -66,6 +66,9 @@ export default (): AppConfig => ({
     // Docker internal URL and port for the api server
     internalUrl: process.env.API_INTERNAL_URL,
     internalPort: parseInt(process.env.API_INTERNAL_PORT),
+    throttleLimit: parseInt(process.env.API_THROTTLE_LIMIT),
+    throttleLimitAccounts: parseInt(process.env.API_THROTTLE_LIMIT_ACCOUNTS),
+    throttleTtl: parseInt(process.env.API_THROTTLE_TTL),
   },
   host: {
     // System external (public) URL. This is used to create links back to the app in the emails sent (eg: for email confirmation)

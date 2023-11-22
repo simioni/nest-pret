@@ -36,6 +36,15 @@ export class EnvironmentVariables {
   @IsNumber()
   API_INTERNAL_PORT: number;
 
+  @IsNumber()
+  API_THROTTLE_LIMIT: number;
+
+  @IsNumber()
+  API_THROTTLE_LIMIT_ACCOUNTS: number;
+
+  @IsNumber()
+  API_THROTTLE_TTL: number;
+
   /**
    * DB
    */

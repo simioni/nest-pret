@@ -7,11 +7,9 @@ import {
   SwaggerModule,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import expressRateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { SpelunkedTree, SpelunkerModule } from 'nestjs-spelunker';
 import * as _ from 'lodash';
-
 import { AppModule } from './app.module';
 import { Environment } from './config/env.variables';
 import { ApiConfig } from './config/interfaces/api-config.interface';
@@ -20,28 +18,11 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   // app.enable('trust proxy'); // See: https://github.com/express-rate-limit/express-rate-limit/wiki/Troubleshooting-Proxy-Issues
   app.use(helmet());
-
-  app.use(
-    expressRateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      max: 100, // limit each IP to 100 requests per windowMs
-      message: 'Too many requests from this IP, please try again later',
-    }),
-  );
-  const createAccountLimiter = expressRateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour window
-    max: 3, // start blocking after 3 requests
-    message: 'Too many accounts created from this IP, please try again later',
-  });
-  app.use('/auth/email/register', createAccountLimiter);
-
   if (process.env.NODE_ENV === Environment.Development) {
     setupDependencyGraph(app);
     setupOpenApiDocs(app);
   }
-
   const apiConfig = app.get<ConfigService>(ConfigService).get<ApiConfig>('api');
-
   await app.listen(apiConfig.internalPort);
 }
 bootstrap();
@@ -106,6 +87,7 @@ function setupDependencyGraph(app: NestExpressApplication) {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function buildSimpleDepencyGraph(edges, globalModules, commonModules) {
   const apiEndpointModuleIcon = 'fa:fa-globe ';
   const mermaidEdges = edges

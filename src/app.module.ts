@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ExecutionContext,
   Module,
   ValidationError,
   ValidationPipe,
@@ -13,10 +14,13 @@ import configurationFactory from './config/configuration.factory';
 import { DbConfig } from './config/interfaces/db-config.interface';
 import { AuthModule } from './auth/auth.module';
 import { validateEnvironmentVariables } from './config/env.validation';
-import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { MailerModule } from './mailer/mailer.module';
 import { VALIDATION_ERROR } from './app.constants';
 import { RolesSerializerInterceptor } from './user/interceptors/roles-serializer.interceptor';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ApiConfig } from './config/interfaces/api-config.interface';
+import { AuthController } from './auth/auth.controller';
 
 @Module({
   imports: [
@@ -32,6 +36,25 @@ import { RolesSerializerInterceptor } from './user/interceptors/roles-serializer
       }),
       inject: [ConfigService],
     }),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => [
+        {
+          name: 'globalThrottler',
+          ttl: configService.get<ApiConfig>('api').throttleTtl,
+          limit: configService.get<ApiConfig>('api').throttleLimit,
+        },
+        {
+          name: 'accountRegisterThrottler',
+          ttl: configService.get<ApiConfig>('api').throttleTtl,
+          limit: configService.get<ApiConfig>('api').throttleLimitAccounts,
+          skipIf: (ctx: ExecutionContext) =>
+            ctx.getClass().name !== AuthController.name ||
+            ctx.getHandler().name !== 'register',
+        },
+      ],
+    }),
     StandardResponseModule.forRoot({
       interceptAll: true,
       // TODO StandardError options... like 429 Too Many Requests (from the global rate limiter)
@@ -46,6 +69,10 @@ import { RolesSerializerInterceptor } from './user/interceptors/roles-serializer
   ],
   controllers: [],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({

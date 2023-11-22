@@ -10,4 +10,7 @@ export interface ApiConfig {
   emailVerificationIsRequired: () => boolean;
   internalUrl: string;
   internalPort: string | number;
+  throttleLimit: number;
+  throttleLimitAccounts: number;
+  throttleTtl: number;
 }
