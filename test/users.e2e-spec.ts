@@ -26,6 +26,8 @@ describe('UserController (e2e)', () => {
     // API_EMAIL_VERIFICATION=delayed allows loggin-in without verifing an email first.
     // This makes it possible to test the EmailVerifiedGuard.
     process.env.API_EMAIL_VERIFICATION = 'delayed';
+    // increases the throttler account creation limit
+    process.env.API_THROTTLE_LIMIT_ACCOUNTS = '20';
 
     const testingServer = await new TestingServerFactory().create();
     // const testingModule = testingServer.getModule();
