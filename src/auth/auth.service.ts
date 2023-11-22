@@ -37,6 +37,8 @@ import {
   ForgottenPasswordDocument,
 } from './schemas/forgotten-password.schema';
 import { JwtToken, LoginResponse } from './responses/login.response';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -82,8 +84,8 @@ export class AuthService {
     );
   }
 
-  async register(email, password): Promise<REGISTRATION_SUCCESS> {
-    const newUser = await this.userService.create({ email, password });
+  async register(newUserData: RegisterDto): Promise<REGISTRATION_SUCCESS> {
+    const newUser = await this.userService.create(newUserData);
     //await this.authService.saveUserConsent(newUser.email); //[GDPR user content]
     if (this.apiConfig.emailVerificationIsOn())
       await this.sendEmailVerification(newUser.email);

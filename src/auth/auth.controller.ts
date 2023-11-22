@@ -59,10 +59,7 @@ export class AuthController {
     @StandardParam() params: StandardParams,
   ): Promise<LoginResponse | EmptyObject> {
     try {
-      const registrationMessage = await this.authService.register(
-        registerDto.email,
-        registerDto.password,
-      );
+      const registrationMessage = await this.authService.register(registerDto);
       params.setMessage(registrationMessage);
       if (registrationMessage === REGISTRATION_SUCCESS.VERIFY_EMAIL_TO_PROCEED)
         return {};
