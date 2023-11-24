@@ -48,6 +48,8 @@ printf "\n${BPurple}[REACHING THE SWARM]${Color_Off} Reaching the swarm manager 
 # re-deploy the stack into the swarm
 printf "\n${BPurple}[DEPLOYING]${Color_Off} Starting the rolling-update of the containers inside the docker swarm for the new ones\n"
 
-printf "\n${BGreen}------------------------------------------------------------------------"
-printf "\n${BGreen}| 🚀 ${BGreen}[SUCCESS]${Color_Off} A new version of the app have been deployed to the swarm! ${BGreen}|\n"
-printf "\n${BGreen}------------------------------------------------------------------------"
+printf "\n${BGreen}------------------------------------------------------------------------\n"
+printf "${BGreen}|                                                                      |\n"
+printf "${BGreen}| 🚀 ${BGreen}[SUCCESS]${Color_Off} A new version of the app have been deployed to the swarm! ${BGreen}|\n"
+printf "${BGreen}|                                                                      |\n"
+printf "${BGreen}------------------------------------------------------------------------\n\n"
