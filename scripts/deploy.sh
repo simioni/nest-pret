@@ -75,6 +75,7 @@ docker stack deploy -c docker-compose.yml pret
 
 printf "\n${Purple}[ROLLING CONTINUOUS DEPLOYMENT]${Color_Off} \n"
 docker stack ps pret
+sleep 2
 
 printf "\n${Purple}[DONE]${Color_Off} \n"
 
@@ -162,6 +163,7 @@ printWhales() {
   printf "\n              |  O        \___/  |           ,'          \`.    \\  /       ${BBlue}  "
   printf "\n${BBlue}            ~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^   ${Color_Off}|  O          \___/  | ${BBlue}~^~^~^~^ "
   printf "\n${BBlue}      ~^~^~^~^       ~^~^~^~^       ~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~     ^~^~ "
+  printf "\n"
   printf "\n"
   printf "\n"
 }
