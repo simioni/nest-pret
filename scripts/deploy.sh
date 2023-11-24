@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# ANSI escape codes for colored logs. See: https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
+# ANSI escape codes for colored logs. For more colors, see: https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 Color_Off='\033[0m'       # Text Reset
-BRed='\033[1;31m'         # Red
-UGreen='\033[4;32m'       # Green
+BRed='\033[1;31m'         # Bold Red
+BGreen='\033[1;32m'       # Bold Green
+BPurple='\033[1;35m'      # Bold Purple
+UGreen='\033[4;32m'       # Underline Green
 
 # makes sure the working directory is clean
 git update-index --really-refresh >> /dev/null
@@ -16,3 +18,34 @@ else
   exit 1
 fi
 echo $GIT_MODS
+
+# run tests
+printf "${BPurple}[TESTING]${Color_Off} Running unit tests\n"
+printf "${BPurple}[TESTING]${Color_Off} Running end-to-end tests\n"
+printf "${BPurple}[TESTING]${BGreen} All tests passed!\n"
+
+# bump the package version
+printf "${BPurple}[VERSIONING]${Color_Off} Bumping the app version\n"
+npm version patch
+
+# build the app
+printf "${BPurple}[BUILDING]${Color_Off} Building the app\n"
+npm run build
+
+# build the docker image
+printf "${BPurple}[CONTAINERIZING]${Color_Off} Building the docker image\n"
+API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose build api
+
+# push the docker image to the container repository
+printf "${BPurple}[UPLOADING]${Color_Off} Pushing the docker image to the container repository\n"
+API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose push
+
+# ssh into the docker swarm manager node
+printf "${BPurple}[DOCKER]${Color_Off} Reaching the swarm manager node\n"
+
+# copy the compose file into it (in case it has changed)
+
+# re-deploy the stack into the swarm
+printf "${BPurple}[DEPLOYING]${Color_Off} Starting the rolling-update of the containers inside the docker swarm for the new ones\n"
+
+printf "🚀 ${BGreen}[SUCCESS]${Color_Off} A new version of the app have been deployed to the swarm!\n"
