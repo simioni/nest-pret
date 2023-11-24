@@ -29,9 +29,7 @@ services:
       - mongo
 
   api:
-    image: 127.0.0.1:5000/nest-pret:${API_VERSION}
-    tags:
-     - 127.0.0.1:5000/nest-pret:latest
+    image: 127.0.0.1:5000/nest-pret:${API_VERSION}:latest
     build: .
     restart: always
     command: npm run start:prod
