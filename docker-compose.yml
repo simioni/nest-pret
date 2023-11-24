@@ -18,7 +18,7 @@ services:
     networks:
       - internal-network
     environment:
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_SERVER: mongo
@@ -29,7 +29,7 @@ services:
       - mongo
 
   api:
-    image: api
+    image: 127.0.0.1:5000/nest-pret
     build: .
     restart: always
     command: npm run start:prod

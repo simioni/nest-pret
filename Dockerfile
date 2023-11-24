@@ -7,7 +7,8 @@ COPY package*.json ./
 RUN npm install
 
 # Bundle app source
-COPY . .
+COPY ./dist ./dist
+COPY .env .env
 
 EXPOSE 3000
 CMD [ "npm", "run", "start:prod" ]
