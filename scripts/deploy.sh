@@ -5,6 +5,7 @@ Color_Off='\033[0m'       # Text Reset
 Yellow='\033[0;33m'       # Yellow
 Green='\033[0;32m'        # Light Green
 Blue='\033[0;34m'         # Light Blue
+Purple='\033[0;35m'       # Purple
 BRed='\033[1;31m'         # Bold Red
 BGreen='\033[1;32m'       # Bold Green
 BPurple='\033[1;35m'      # Bold Purple
@@ -26,33 +27,33 @@ fi
 echo $GIT_MODS
 
 # run tests
-printf "\n${BPurple}[TESTING]${Color_Off} Running unit tests...\n"
-printf "\n${BPurple}[TESTING]${Color_Off} Running end-to-end tests...\n"
+printf "\n${Purple}[TESTING]${Color_Off} Running unit tests...\n"
+printf "\n${Purple}[TESTING]${Color_Off} Running end-to-end tests...\n"
 printf "\n${Green} All tests passed!\n"
 
 # bump the package version
-printf "\n${BPurple}[VERSIONING]${Color_Off} Bumping the app version...\n"
+printf "\n${Purple}[VERSIONING]${Color_Off} Bumping the app version...\n"
 npm version patch
 
 # build the app
-printf "\n${BPurple}[BUILDING]${Color_Off} Building the app...\n"
+printf "\n${Purple}[BUILDING]${Color_Off} Building the app...\n"
 npm run build
 
 # build the docker image
-printf "\n${BPurple}[CONTAINERIZING]${Color_Off} Building the docker image...\n"
+printf "\n${Purple}[CONTAINERIZING]${Color_Off} Building the docker image...\n"
 API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose build api
 
 # push the docker image to the container repository
-printf "\n${BPurple}[UPLOADING]${Color_Off} Pushing the docker image to the container repository...\n"
+printf "\n${Purple}[UPLOADING]${Color_Off} Pushing the docker image to the container repository...\n"
 API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose push
 
 # ssh into the docker swarm manager node
-printf "\n${BPurple}[REACHING THE SWARM]${Color_Off} Reaching the swarm manager node...\n"
+printf "\n${Purple}[REACHING THE SWARM]${Color_Off} Reaching the swarm manager node...\n"
 
 # copy the compose file into it (in case it has changed)
 
 # re-deploy the stack into the swarm
-printf "\n${BPurple}[DEPLOYING]${Color_Off} Starting the rolling-update of the containers inside the docker swarm...\n"
+printf "\n${Purple}[DEPLOYING]${Color_Off} Starting the rolling-update of the containers inside the docker swarm...\n"
 
 # printf "\n${BGreen}  --------------------------------------------------------------------------\n"
 # printf "${BGreen}  |                                                                        |\n"
