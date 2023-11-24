@@ -1,23 +1,23 @@
 version: '3.1'
-name: 'nest-pret'
+name: 'nest-pret-dev'
 
 services:
   mongo:
     image: mongo
     volumes:
-      - mongo-data:/data/db
+      - nest-pret-dev-mongo-data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     networks:
-      - internal-network
+      - nest-pret-dev-internal-network
 
   mongo-express:
     image: mongo-express
     ports:
-      - 8081:8081
+      - 8081:8082
     networks:
-      - internal-network
+      - nest-pret-dev-internal-network
     environment:
       ME_CONFIG_MONGODB_ENABLE_ADMIN: true
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
@@ -34,10 +34,11 @@ services:
     build: .
     restart: always
     command: npm run start:dev
+    env_file: .env
     environment:
       - NODE_ENV=development
     ports:
-      - 3000:3000
+      - 3000:3001
     # volumes:
     #   - nestjsdata:/usr/src/app
     volumes:
@@ -45,12 +46,12 @@ services:
       source: .
       target: /usr/src/app
     networks:
-      - internal-network
+      - nest-pret-dev-internal-network
     depends_on:
       - mongo
 
 volumes:
-  mongo-data:
+  nest-pret-dev-mongo-data:
 
 networks:
-  internal-network:
+  nest-pret-dev-internal-network:

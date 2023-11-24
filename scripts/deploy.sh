@@ -51,15 +51,10 @@ API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compos
 printf "\n${Purple}[REACHING THE SWARM]${Color_Off} Reaching the swarm manager node...\n"
 
 # copy the compose file into it (in case it has changed)
+# copy the .env file into it? (in case it has changed)
 
 # re-deploy the stack into the swarm
-printf "\n${Purple}[DEPLOYING]${Color_Off} Starting the rolling-update of the containers inside the docker swarm...\n"
-
-# printf "\n${BGreen}  --------------------------------------------------------------------------\n"
-# printf "${BGreen}  |                                                                        |\n"
-# printf "${BGreen}  | 🚀 ${BGreen}[SUCCESS]${Color_Off} A new version of the app have been deployed to the swarm! ${BGreen}|\n"
-# printf "${BGreen}  |                                                                        |\n"
-# printf "${BGreen}  --------------------------------------------------------------------------\n"
+printf "\n${Purple}[DEPLOYING]${Color_Off} Starting the rolling update of containers...\n"
 
 # Centers a given text into a given width, creating padding around it with spaces.
 # arg1  The string of text to be centered

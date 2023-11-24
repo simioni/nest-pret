@@ -33,6 +33,7 @@ services:
     build: .
     restart: always
     command: npm run start:prod
+    env_file: .env
     environment:
       - NODE_ENV=production
     ports:
@@ -44,7 +45,7 @@ services:
     depends_on:
       - mongo
     deploy:
-      replicas: 3
+      replicas: 1
       placement:
         max_replicas_per_node: 3
       update_config:
