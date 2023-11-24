@@ -33,7 +33,8 @@ services:
     build: .
     restart: always
     # command: echo $DATABASE_NAME
-    command: npm run start:prod
+    command: node dist/main
+    # command: npm run start:prod
     env_file: .env
     environment:
       - NODE_ENV=production
