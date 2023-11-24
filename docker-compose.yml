@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.8'
 
 services:
   mongo:
@@ -43,6 +43,15 @@ services:
       - internal-network
     depends_on:
       - mongo
+    deploy:
+      replicas: 3
+      placement:
+        max_replicas_per_node: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
 
 volumes:
   mongo-data:
