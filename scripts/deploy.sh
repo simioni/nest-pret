@@ -27,7 +27,9 @@ then
   GIT_MODS="clean"
 else
   printf " \e${Flag_Red}[ERROR]${Color_Off}${Bold} Working directory is not clean!\n\n" >&2
-  printf "${Color_Off} Make sure to ${Red}commit any changes${Color_Off} before pushing a new deployment.\n\n" >&2
+  printf "${Color_Off} All commits intended to go into this release need to be merged and and the repo needs to be in a clean state before deploying.\n\n" >&2
+  printf "${Color_Off} This script will build and test the code, integrate and bump the version number, containerize and push the images, then start the continous deployment of each container in the swarm. \n\n" >&2
+  printf "${Color_Off} Make sure to ${Red}commit any changes${Color_Off} or stash them before continuing.\n\n" >&2
   exit 1
 fi
 echo $GIT_MODS
@@ -51,27 +53,30 @@ npm run build
 
 # build the docker image
 printf "\n${Purple}[CONTAINERIZING]${Color_Off} Building the docker image...\n"
-# API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose build api
-API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\")
 docker compose build
-docker tag 127.0.0.1:5000/nest-pret:latest 127.0.0.1:5000/nest-pret:$API_VERSION
-docker push 127.0.0.1:5000/nest-pret:latest
-docker push 127.0.0.1:5000/nest-pret:$API_VERSION
 
 # push the docker image to the container repository
-printf "\n${Purple}[UPLOADING]${Color_Off} Pushing the docker image to the container repository...\n"
-API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose push
+printf "\n${Purple}[UPLOADING]${Color_Off} Pushing the docker image into the container repository...\n"
+export API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\")
+docker tag 127.0.0.1:5000/nest-pret:latest 127.0.0.1:5000/nest-pret:$API_VERSION
+docker push 127.0.0.1:5000/nest-pret:$API_VERSION
+docker push 127.0.0.1:5000/nest-pret:latest
 
 # ssh into the docker swarm manager node
 printf "\n${Purple}[REACHING THE SWARM]${Color_Off} Reaching the swarm manager node...\n"
 
 # copy the compose file into it (in case it has changed)
 # copy the .env file into it? (in case it has changed)
+printf "\n${Purple}[UPDATING CONFIG]${Color_Off} Copying the new compose file and configs for the environment...\n"
 
 # re-deploy the stack into the swarm
 printf "\n${Purple}[DEPLOYING]${Color_Off} Starting the rolling update of containers...\n"
-
 docker stack deploy -c docker-compose.yml pret
+
+printf "\n${Purple}[ROLLING CONTINUOUS DEPLOYMENT]${Color_Off} \n"
+docker stack ps pret
+
+printf "\n${Purple}[DONE]${Color_Off} \n"
 
 # Centers a given text into a given width, creating padding around it with spaces.
 # arg1  The string of text to be centered
