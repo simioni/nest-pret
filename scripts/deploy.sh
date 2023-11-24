@@ -20,32 +20,34 @@ fi
 echo $GIT_MODS
 
 # run tests
-printf "${BPurple}[TESTING]${Color_Off} Running unit tests\n"
-printf "${BPurple}[TESTING]${Color_Off} Running end-to-end tests\n"
-printf "${BPurple}[TESTING]${BGreen} All tests passed!\n"
+printf "\n${BPurple}[TESTING]${Color_Off} Running unit tests...\n"
+printf "\n${BPurple}[TESTING]${Color_Off} Running end-to-end tests...\n"
+printf "\n${BGreen}[TESTING]${BGreen} All tests passed!\n"
 
 # bump the package version
-printf "${BPurple}[VERSIONING]${Color_Off} Bumping the app version\n"
+printf "\n${BPurple}[VERSIONING]${Color_Off} Bumping the app version...\n"
 npm version patch
 
 # build the app
-printf "${BPurple}[BUILDING]${Color_Off} Building the app\n"
+printf "\n${BPurple}[BUILDING]${Color_Off} Building the app\n"
 npm run build
 
 # build the docker image
-printf "${BPurple}[CONTAINERIZING]${Color_Off} Building the docker image\n"
+printf "\n${BPurple}[CONTAINERIZING]${Color_Off} Building the docker image\n"
 API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose build api
 
 # push the docker image to the container repository
-printf "${BPurple}[UPLOADING]${Color_Off} Pushing the docker image to the container repository\n"
+printf "\n${BPurple}[UPLOADING]${Color_Off} Pushing the docker image to the container repository\n"
 API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose push
 
 # ssh into the docker swarm manager node
-printf "${BPurple}[DOCKER]${Color_Off} Reaching the swarm manager node\n"
+printf "\n${BPurple}[REACHING THE SWARM]${Color_Off} Reaching the swarm manager node\n"
 
 # copy the compose file into it (in case it has changed)
 
 # re-deploy the stack into the swarm
-printf "${BPurple}[DEPLOYING]${Color_Off} Starting the rolling-update of the containers inside the docker swarm for the new ones\n"
+printf "\n${BPurple}[DEPLOYING]${Color_Off} Starting the rolling-update of the containers inside the docker swarm for the new ones\n"
 
-printf "🚀 ${BGreen}[SUCCESS]${Color_Off} A new version of the app have been deployed to the swarm!\n"
+printf "\n${BGreen}------------------------------------------------------------------------"
+printf "\n${BGreen}| 🚀 ${BGreen}[SUCCESS]${Color_Off} A new version of the app have been deployed to the swarm! ${BGreen}|\n"
+printf "\n${BGreen}------------------------------------------------------------------------"
