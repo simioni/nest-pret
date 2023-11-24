@@ -27,7 +27,7 @@ import { LoginResponse } from './responses/login.response';
 
 type EmptyObject = Record<string, never>;
 
-// TODO add open api documentation for the StandardResponse of all these routes
+// TODO add open api documentation for the StandardResponse of all these routes!
 
 @Controller('auth')
 @ApiTags('auth')

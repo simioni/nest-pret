@@ -11,7 +11,10 @@
   "scripts": {
     "dev": "docker-compose -f docker-compose.dev.yml up --build -d",
     "build": "nest build",
-    "deploy": "npm run build && docker compose build api && docker compose push",
+    "deploy": "scripts/deploy.sh",
+    "__predeploy": "npm run build",
+    "__deploy": "API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose build api",
+    "__postdeploy": "API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose push",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
