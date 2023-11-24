@@ -32,8 +32,9 @@ services:
     image: 127.0.0.1:5000/nest-pret:${API_VERSION}
     build: .
     restart: always
+    # command: echo $DATABASE_NAME
     command: npm run start:prod
-    # env_file: .env
+    env_file: .env
     environment:
       - NODE_ENV=production
     ports:

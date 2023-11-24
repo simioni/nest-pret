@@ -15,6 +15,7 @@ import { Environment } from './config/env.variables';
 import { ApiConfig } from './config/interfaces/api-config.interface';
 
 async function bootstrap() {
+  console.log(process.env.DATABASE_NAME);
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   // app.enable('trust proxy'); // See: https://github.com/express-rate-limit/express-rate-limit/wiki/Troubleshooting-Proxy-Issues
   app.use(helmet());
