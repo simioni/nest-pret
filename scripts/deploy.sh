@@ -53,12 +53,12 @@ npm run build
 
 # build the docker image
 printf "\n${Purple}[CONTAINERIZING]${Color_Off} Building the docker image...\n"
+export API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\")
 docker compose build
 
 # push the docker image to the container repository
 printf "\n${Purple}[UPLOADING]${Color_Off} Pushing the docker image into the container repository...\n"
-export API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\")
-docker tag 127.0.0.1:5000/nest-pret:latest 127.0.0.1:5000/nest-pret:$API_VERSION
+docker tag 127.0.0.1:5000/nest-pret:$API_VERSION 127.0.0.1:5000/nest-pret:latest
 docker push 127.0.0.1:5000/nest-pret:$API_VERSION
 docker push 127.0.0.1:5000/nest-pret:latest
 
