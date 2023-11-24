@@ -51,7 +51,12 @@ npm run build
 
 # build the docker image
 printf "\n${Purple}[CONTAINERIZING]${Color_Off} Building the docker image...\n"
-API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose build api
+# API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose build api
+API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\")
+docker compose build
+docker tag 127.0.0.1:5000/nest-pret:latest 127.0.0.1:5000/nest-pret:$API_VERSION
+docker push 127.0.0.1:5000/nest-pret:latest
+docker push 127.0.0.1:5000/nest-pret:$API_VERSION
 
 # push the docker image to the container repository
 printf "\n${Purple}[UPLOADING]${Color_Off} Pushing the docker image to the container repository...\n"
@@ -65,6 +70,8 @@ printf "\n${Purple}[REACHING THE SWARM]${Color_Off} Reaching the swarm manager n
 
 # re-deploy the stack into the swarm
 printf "\n${Purple}[DEPLOYING]${Color_Off} Starting the rolling update of containers...\n"
+
+docker stack deploy -c docker-compose.yml pret
 
 # Centers a given text into a given width, creating padding around it with spaces.
 # arg1  The string of text to be centered

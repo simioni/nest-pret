@@ -30,25 +30,28 @@ services:
 
   api:
     # image: 127.0.0.1:5000/nest-pret:${API_VERSION}
-    image: 127.0.0.1:5000/nest-pret
+    image: 127.0.0.1:5000/nest-pret:latest
     build: .
     restart: always
     # command: echo $DATABASE_NAME
     command: node dist/main
     # command: npm run start:prod
-    env_file: .env
+    # env_file: .env
+    secrets:
+      - source: env_secrets
+        target: /usr/src/app/.env
     environment:
       - NODE_ENV=production
     ports:
       - 3000:3000
-    volumes:
-      - api-server-data:/usr/src/app
+    # volumes:
+      # - api-server-data:/usr/src/app
     networks:
       - internal-network
     depends_on:
       - mongo
     deploy:
-      replicas: 1
+      replicas: 3
       placement:
         max_replicas_per_node: 3
       update_config:
@@ -63,3 +66,7 @@ volumes:
 
 networks:
   internal-network:
+
+secrets:
+  env_secrets:
+    file: ./.env
