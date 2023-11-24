@@ -949,10 +949,11 @@ describe('BooksController (e2e)', () => {
 <!-- - Add a Redis instance in docker-compose, and:
   - expose it's config via .env and the config module;
   - Cache the user from login tokens so we don't need to hit the DB in every request to retrieve it;
-  - Cache the abilities created by casl for a given user so it don't need to be recreated inside the policies every on every request; -->
-- Replace express-rate-limit with nestjs' built-in throttler, exposing it's config via .env, and sharing storage in Redis
+  - Cache the abilities created by casl for a given user so it don't need to be recreated inside the policies every on every request;
+  - share @nestjs/throttler storage in Redis
+-->
 - Add a [mgob](https://github.com/maxisam/mgob) instance to the production docker swarm for automated mongo backups (and add its configurations via .env)
-- Add some tool to the production docker swarm to expose server metric
+- Add some tool to the production docker swarm to expose server metrics
 - Add user consent forms with versioned policies
 - Add option for log-in using social media accounts
 
