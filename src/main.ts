@@ -1,7 +1,4 @@
-console.log('db name:');
-console.log(process.env.DATABASE_NAME);
-console.log('API_EMAIL_VERIFICATION');
-console.log(process.env.API_EMAIL_VERIFICATION);
+console.log(`Starting API container version ${process.env.API_VERSION}`);
 
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
