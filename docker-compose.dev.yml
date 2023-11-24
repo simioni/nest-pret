@@ -39,8 +39,6 @@ services:
       - NODE_ENV=development
     ports:
       - 3000:3001
-    # volumes:
-    #   - nestjsdata:/usr/src/app
     volumes:
     - type: bind
       source: .

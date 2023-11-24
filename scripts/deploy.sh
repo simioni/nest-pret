@@ -36,10 +36,10 @@ echo $GIT_MODS
 
 # run tests
 printf "\n${Purple}[TESTING]${Color_Off} Running unit tests...\n"
-# npm run test
+npm run test
 
 printf "\n${Purple}[TESTING]${Color_Off} Running end-to-end tests...\n"
-# npm run e2e
+npm run e2e
 
 printf "\n${Green}✅ All tests passed!\n"
 
