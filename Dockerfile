@@ -1,4 +1,5 @@
-FROM node:latest
+# FROM node:latest
+FROM node:21-alpine3.17
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -8,7 +9,6 @@ RUN npm install
 
 # Bundle app source
 COPY ./dist ./dist
-# COPY .env .env
 
 EXPOSE 3000
 CMD [ "npm", "run", "start:prod" ]

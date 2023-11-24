@@ -10,6 +10,7 @@
   "homepage": "https://github.com/simioni/nest-pret#readme",
   "scripts": {
     "dev": "docker-compose -f docker-compose.dev.yml up --build -d",
+    "prod": "API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\") docker compose up",
     "build": "nest build",
     "deploy": "scripts/deploy.sh",
     "__predeploy": "npm run build",
