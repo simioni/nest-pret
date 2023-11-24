@@ -135,7 +135,7 @@ printDeployFinishedBox() {
   VERSION=$(npm pkg get version --workspaces=false | tr -d \\\")
   MIDTEXT=" of the app has been "
   POSTTEXT="deployed to Docker Swarm!"
-  SECOND_LINE="It make take a few minutes to become available on all replicas."
+  SECOND_LINE="It may take a few minutes to become available on all replicas."
 
   FULL_TEXT="|${ICON}${LABEL}${PRETEXT}${VERSION}${MIDTEXT}${POSTTEXT}|"
   FULL_TEXT_WIDTH=$(($(wc -L <<< "$FULL_TEXT")))
