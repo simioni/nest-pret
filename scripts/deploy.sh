@@ -91,14 +91,16 @@ docker push 127.0.0.1:5000/nest-pret:latest
 
 # ssh into the docker swarm manager node
 printf "\n${Purple}[REACHING]${Color_Off} Reaching the swarm manager node...\n"
-sleep 1
+sleep 2
+printf "\n${Color_Off} Now running in SSH in the swarm manager\n"
 
 # copy the .env and docker-compose.yml files into it (in case they have changed)
 printf "\n${Purple}[COPYING]${Color_Off} The new compose file and .env ...\n"
 sleep 2
+printf "\n${Color_Off} Copied two files into the swarm manager\n"
 
 # re-deploy the stack into the swarm
-printf "\n${Purple}[DEPLOYING]${Color_Off} Starting the rolling update of containers...\n"
+printf "\n${Purple}[DEPLOYING]${Color_Off} Starting the rolling update...\n"
 # docker stack deploy -c docker-compose.yml pret
 docker stack deploy -c docker-compose.yml --resolve-image changed pret
 
