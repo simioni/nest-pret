@@ -57,9 +57,9 @@ describe('ThrottlerGuard (e2e)', () => {
           break;
         }
       }
-      console.log(
-        `Reached429? ${reachedStatus429} (after ${createdUsers.length} attempts)`,
-      );
+      // console.log(
+      //   `Reached429? ${reachedStatus429} (after ${createdUsers.length} attempts)`,
+      // );
       expect(reachedStatus429).toEqual(true);
       await Promise.all(
         createdUsers.map((user) => stub.deleteUser(user.email)),
@@ -91,7 +91,7 @@ describe('ThrottlerGuard (e2e)', () => {
           break;
         }
       }
-      console.log(`Reached429? ${reachedStatus429} (after ${tries} attempts)`);
+      // console.log(`Reached429? ${reachedStatus429} (after ${tries} attempts)`);
       expect(reachedStatus429).toEqual(true);
     });
   });
