@@ -2,6 +2,7 @@
 
 # ANSI escape codes for colored logs. For more colors, see: https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
 Color_Off='\033[0m'         # Text Reset
+Regular='\033[0m'           # Bold
 Bold='\033[1m'              # Bold
 Black='\033[0;30m'          # Black
 Yellow='\033[0;33m'         # Yellow
@@ -19,14 +20,41 @@ DarkGray="\033[1;30m"       # Dark gray
 Flag_Green='\033[42;30;4m'  # Black on Green underlined
 Flag_Red='\033[101;30;4m'   # Black on Red underlined
 
+function existsInList() {
+    LIST=$1
+    DELIMITER=$2
+    VALUE=$3
+    echo $LIST | tr "$DELIMITER" '\n' | grep -F -q -x "$VALUE"
+}
+validVersions="major, minor, patch"
+BUMP_VERSION='patch'
+
+# retrieve command options
+while [ True ]; do
+if [ "$1" = "--version" -o "$1" = "-v" ]; then
+    if !(existsInList "$validVersions" ", " $2); then
+        printf " ${Flag_Red}[ERROR]${Color_Off} ${Bold}$2${Regular} is not a valid option for ${Bold}--version${Regular}. ${Bold}Acceptable values are ${Green}$validVersions${Color_Off}. \n\n" >&2
+        exit 1
+    fi
+    BUMP_VERSION=$2
+    shift 2
+elif [ "$1" = "--quiet" -o "$1" = "-q" ]; then
+    IS_QUIET="true"
+    shift 1
+else
+    break
+fi
+done
+
+printf "${Purple}[PREPARING]${Color_Off} Continuous Deployment of a ${Purple}$BUMP_VERSION${Color_Off} release \n"
 
 # makes sure the working directory is clean
 git update-index --really-refresh >> /dev/null
 if git diff-index --quiet HEAD
 then
-  printf "\n${Purple}[STARTING]${Color_Off}\n"
+  printf "\n${Color_Off} Git directory is clean. Starting the CD pipeline \n"
 else
-  printf " \e${Flag_Red}[ERROR]${Color_Off}${Bold} Working directory is not clean!\n\n" >&2
+  printf "\n ${Flag_Red}[ERROR]${Color_Off}${Bold} Working directory is not clean!\n\n" >&2
   printf "${Color_Off} All commits intended to go into this release need to be merged and and the repo needs to be in a clean state before deploying.\n\n" >&2
   printf "${Color_Off} This script will build and test the code, integrate and bump the version number, containerize and push the images, then start the continous deployment of each container in the swarm. \n\n" >&2
   printf "${Color_Off} Make sure to ${Red}commit any changes${Color_Off} or stash them before continuing.\n\n" >&2
@@ -44,7 +72,7 @@ printf "\n${Green}✅ All tests passed!\n"
 
 # bump the package version
 printf "\n${Purple}[VERSIONING]${Color_Off} Bumping the app version...\n"
-npm version patch
+npm version $BUMP_VERSION
 
 # build the app
 printf "\n${Purple}[BUILDING]${Color_Off} Building the app...\n"
