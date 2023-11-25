@@ -1,6 +1,6 @@
 {
   "name": "nest-pret",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A production-ready NestJS starting project with a full auth module containing registration, email verification, password recovery, claims-based access control, standardized and paginated responses, OpenAPI auto-documentation and more.",
   "author": "Ricardo Simioni",
   "license": "MIT",
