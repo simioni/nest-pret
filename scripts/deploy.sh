@@ -103,7 +103,7 @@ printf "\n${Purple}[DEPLOYING]${Color_Off} Starting the rolling update of contai
 docker stack deploy -c docker-compose.yml --resolve-image changed pret
 
 printf "\n${Purple}[ROLLING UPDATE]${Color_Off} \n"
-docker stack ps pret
+docker stack ps pret --format "table {{.ID}}\t{{.Name}}\t{{.Image}}\t{{.Node}}"
 sleep 2
 
 printf "\n${Purple}[DONE]${Color_Off} \n"
