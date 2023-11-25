@@ -24,7 +24,7 @@ Flag_Red='\033[101;30;4m'   # Black on Red underlined
 git update-index --really-refresh >> /dev/null
 if git diff-index --quiet HEAD
 then
-  GIT_MODS="clean"
+  printf "\n${Purple}[STARTING]${Color_Off}\n"
 else
   printf " \e${Flag_Red}[ERROR]${Color_Off}${Bold} Working directory is not clean!\n\n" >&2
   printf "${Color_Off} All commits intended to go into this release need to be merged and and the repo needs to be in a clean state before deploying.\n\n" >&2
@@ -32,7 +32,6 @@ else
   printf "${Color_Off} Make sure to ${Red}commit any changes${Color_Off} or stash them before continuing.\n\n" >&2
   exit 1
 fi
-echo $GIT_MODS
 
 # run tests
 printf "\n${Purple}[TESTING]${Color_Off} Running unit tests...\n"
@@ -65,13 +64,13 @@ docker push 127.0.0.1:5000/nest-pret:latest
 # ssh into the docker swarm manager node
 printf "\n${Purple}[REACHING THE SWARM]${Color_Off} Reaching the swarm manager node...\n"
 
-# copy the compose file into it (in case it has changed)
-# copy the .env file into it? (in case it has changed)
+# copy the .env and docker-compose.yml files into it (in case they have changed)
 printf "\n${Purple}[UPDATING CONFIG]${Color_Off} Copying the new compose file and configs for the environment...\n"
 
 # re-deploy the stack into the swarm
 printf "\n${Purple}[DEPLOYING]${Color_Off} Starting the rolling update of containers...\n"
-docker stack deploy -c docker-compose.yml pret
+# docker stack deploy -c docker-compose.yml pret
+docker stack deploy -c docker-compose.yml --resolve-image changed pret
 
 printf "\n${Purple}[ROLLING CONTINUOUS DEPLOYMENT]${Color_Off} \n"
 docker stack ps pret
