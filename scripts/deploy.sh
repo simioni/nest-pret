@@ -46,13 +46,13 @@ else
 fi
 done
 
-printf "${Purple}[PREPARING]${Color_Off} Continuous Deployment of a ${Purple}$BUMP_VERSION${Color_Off} release \n"
+printf "${Purple}[PREPARING]${Color_Off}${Bold} Continuous Deployment of a ${Purple}$BUMP_VERSION${Color_Off}${Bold} release \n${Color_Off}${Regular}"
 
 # makes sure the working directory is clean
 git update-index --really-refresh >> /dev/null
 if git diff-index --quiet HEAD
 then
-  printf "\n${Color_Off} Git directory is clean. Starting the CD pipeline \n"
+  printf "\n${Color_Off} Git directory is clean. Starting CD pipeline... \n"
 else
   printf "\n ${Flag_Red}[ERROR]${Color_Off}${Bold} Working directory is not clean!\n\n" >&2
   printf "${Color_Off} All commits intended to go into this release need to be merged and and the repo needs to be in a clean state before deploying.\n\n" >&2
@@ -65,7 +65,7 @@ fi
 printf "\n${Purple}[TESTING]${Color_Off} Running unit tests...\n"
 npm run test
 
-printf "\n${Purple}[TESTING]${Color_Off} Running end-to-end tests...\n"
+printf "\n${Purple}[TESTING]${Color_Off} Running e2e tests...\n"
 npm run e2e
 
 printf "\n${Green}✅ All tests passed!\n"
@@ -75,7 +75,7 @@ printf "\n${Purple}[VERSIONING]${Color_Off} Bumping the app version...\n"
 npm version $BUMP_VERSION
 
 # build the app
-printf "\n${Purple}[BUILDING]${Color_Off} Building the app...\n"
+printf "\n${Purple}[BUILDING]${Color_Off} Building the dist...\n"
 npm run build
 
 # build the docker image
@@ -90,17 +90,19 @@ docker push 127.0.0.1:5000/nest-pret:$API_VERSION
 docker push 127.0.0.1:5000/nest-pret:latest
 
 # ssh into the docker swarm manager node
-printf "\n${Purple}[REACHING THE SWARM]${Color_Off} Reaching the swarm manager node...\n"
+printf "\n${Purple}[REACHING]${Color_Off} Reaching the swarm manager node...\n"
+sleep 1
 
 # copy the .env and docker-compose.yml files into it (in case they have changed)
-printf "\n${Purple}[UPDATING CONFIG]${Color_Off} Copying the new compose file and configs for the environment...\n"
+printf "\n${Purple}[COPYING]${Color_Off} The new compose file and .env ...\n"
+sleep 2
 
 # re-deploy the stack into the swarm
 printf "\n${Purple}[DEPLOYING]${Color_Off} Starting the rolling update of containers...\n"
 # docker stack deploy -c docker-compose.yml pret
 docker stack deploy -c docker-compose.yml --resolve-image changed pret
 
-printf "\n${Purple}[ROLLING CONTINUOUS DEPLOYMENT]${Color_Off} \n"
+printf "\n${Purple}[ROLLING UPDATE]${Color_Off} \n"
 docker stack ps pret
 sleep 2
 
