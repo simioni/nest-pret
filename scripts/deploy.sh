@@ -109,8 +109,6 @@ printf "\n${Purple}[ROLLING UPDATE]${Color_Off} \n"
 docker stack ps pret --format "table {{.ID}}\t{{.Name}}\t{{.Image}}\t{{.Node}}"
 sleep 2
 
-printf "\n${Purple}[DONE]${Color_Off} \n"
-
 # Centers a given text into a given width, creating padding around it with spaces.
 # arg1  The string of text to be centered
 # arg2  A number describing the desired final width of the string
@@ -200,5 +198,6 @@ printWhales() {
   printf "\n"
 }
 
+printf "\n${Purple}[DONE]${Color_Off} \n"
 printDeployFinishedBox
 printWhales
