@@ -103,6 +103,7 @@ printf "\n${Color_Off} Copied two files into the swarm manager\n"
 printf "\n${Purple}[DEPLOYING]${Color_Off} Starting the rolling update...\n"
 # docker stack deploy -c docker-compose.yml pret
 docker stack deploy -c docker-compose.yml --resolve-image changed pret
+sleep 2
 
 printf "\n${Purple}[ROLLING UPDATE]${Color_Off} \n"
 docker stack ps pret --format "table {{.ID}}\t{{.Name}}\t{{.Image}}\t{{.Node}}"
