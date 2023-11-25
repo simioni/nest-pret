@@ -1,7 +1,7 @@
 import type { Config } from 'jest';
 
 const config: Config = {
-  rootDir: './',
+  rootDir: '../../',
   moduleFileExtensions: ['js', 'json', 'ts'],
   moduleDirectories: ['<rootDir>', 'node_modules'],
   // modulePaths: ['./'],
@@ -10,8 +10,7 @@ const config: Config = {
     '^.+\\.(t|j)s$': [
       'ts-jest',
       {
-        tsconfig: './tsconfig.json',
-        // tsConfig: '<rootDir>/tsconfig.json',
+        tsconfig: '<rootDir>/tsconfig.json',
       },
     ],
   },

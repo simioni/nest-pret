@@ -27,7 +27,7 @@
     "e2e:watch": "TEST_ARG=--watch npm run e2e",
     "e2e:down": "docker-compose -f docker-compose.test.yml down --rmi local -v",
     "poste2e": "npm run e2e:down",
-    "test:e2e": "jest --config jest.config.e2e.ts"
+    "test:e2e": "jest --config test/config/jest.config.e2e.ts"
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
