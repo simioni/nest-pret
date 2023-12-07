@@ -9,10 +9,11 @@
   },
   "homepage": "https://github.com/simioni/nest-pret#readme",
   "scripts": {
-    "dev": "docker-compose -f docker-compose.dev.yml up --build -d",
+    "dev": "docker-compose up --build -d",
     "build": "nest build",
     "deploy": "scripts/deploy.sh",
-    "prod": "docker compose up",
+    "deploy:registry": "docker service create --name registry --publish published=5000,target=5000 registry:2",
+    "prod": "docker compose -f docker-stack.yml up",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
