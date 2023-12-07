@@ -1,4 +1,12 @@
-console.log(`Starting API container version ${process.env.API_VERSION}`);
+import * as chalk from 'chalk';
+// const regular = '\\033[0m';
+// const boldPurple = '\\033[1;35m';
+// const boldBlue = '\\033[1;34m';
+console.log(
+  `${chalk.blueBright('Starting API container version ')}${chalk.magentaBright(
+    process.env.API_VERSION,
+  )}${chalk.blueBright('.')}`,
+);
 
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
