@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "module": "commonjs",
+    "target": "ES2021",
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "strict": true,
+    "useUnknownInCatchVariables": false,
+    "outDir": "./bin",
+    "types": [
+      "node",
+      "jest"
+    ]
+  },
+  "include": ["cli"],
+  "exclude": ["node_modules", "test", "dist", "src", "scripts", "**/*spec.ts"],
+}

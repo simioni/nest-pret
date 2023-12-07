@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - internal-network
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    networks:
+      - internal-network
+    environment:
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: password
+    depends_on:
+      - mongo
+
+  api:
+    image: 127.0.0.1:5000/nest-pret:${API_VERSION:-latest}
+    build: .
+    restart: always
+    command: npm run start:prod
+    secrets:
+      - source: env_secrets
+        target: /usr/src/app/.env
+    environment:
+      - NODE_ENV=production
+      - API_VERSION=${API_VERSION}
+    ports:
+      - 3000:3000
+    networks:
+      - internal-network
+    depends_on:
+      - mongo
+    deploy:
+      replicas: 3
+      placement:
+        max_replicas_per_node: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  mongo-data:
+
+networks:
+  internal-network:
+
+secrets:
+  env_secrets:
+    file: ./.env
