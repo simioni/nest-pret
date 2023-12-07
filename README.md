@@ -885,27 +885,33 @@ async listBooks(
 <p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
 - Provides end-to-end testing of all user interaction flows;
-- e2e tests run in docker, always on a freshly created environment;
+- e2e tests run in docker, using NODE_ENV=production;
 - Jest runs tests in parallel, so each test file needs to instantiate the app in it's own thread;
 - The DB is shared between all threads. To avoid racing conditions, the DB should never be dropped during testing. Use the provided factories to create and destroy resources instead.
 
-To facilitate creating and destroing instances of the NestJS application, as well as creating and destroing all kinds of different users, this project provides two utility factories:
+To facilitate creating and destroing instances of the NestJS application, as well as registering all kinds of test users, this project provides two utility factories:
 
 <br />
 
-## *TestingServerFactory* & *UserStubFactory* <a name="TestingServerFactory"></a><a name="UserStubFactory"></a>
+## *TestingServerFactory* <a name="TestingServerFactory"></a>
 
 <br />
 
-When adding new modules to the app, create a related `yourmodule.e2e-spec.ts` test file in the `/tests` folder, and inside the `beforeAll` hook from jest, instantiate a new app by calling `await new TestingServerFactory().create()`.
+When creating new e2e test files, use the `beforeAll` hook from jest to instantiate a new NestJS app by calling `await new TestingServerFactory().create()`.
 
-This method will create a new nest TestingModule, mock the mailer service, start the app, auto-increment the port number to avoid conflicts, and return a class instance with methods to retrieve all the created resources, like the `getModule()`, `getApp()` and `getBaseUrl()`.
+This method will create a new *TestingModule*, mock the mailer service, start the app, auto-increment the port number to avoid conflicts, and return an instance with methods to retrieve all created resources, like the `getModule()`, `getApp()` and `getBaseUrl()`.
 
-Since this gives you access to the underlying NestJS TestingModule, you can get reach any part of the nest app by using the `get()` and `resolve()` methods on the module.
+Since this gives you access to the underlying NestJS *TestingModule*, you can reach any part of the nest app by using the `get()` and `resolve()` methods on the module.
 
-To create stub users for testing access control and serialization features, use the ***UserStubFactory***. It provides methods for creating regular users, users with verified emails, admin users, etc. And also methods to login those users and get their access tokens, as well as deleting them when no longer needed.
+<br />
 
-Remember to delete any created stub user in the `afterAll` hook, as well as calling `app.close()`.
+## *UserStubFactory* <a name="UserStubFactory"></a>
+
+<br />
+
+To create stub users for testing access control and serialization, use the ***UserStubFactory***. It provides methods for creating regular users, users with verified emails, admin users, etc. It also provides methods to **login** those users and get their access tokens, as well as to **delete** them.
+
+The test DB is dropped only once before starting e2e tests. It's a good idea to delete any resource you created in the DB during a test inside the `afterAll` hook.
 
 Example:
 
@@ -944,7 +950,7 @@ describe('BooksController (e2e)', () => {
 
 <br />
 
-## 🚀 &nbsp; TODO Milestones
+## 🏃 &nbsp; TODO Milestones
 
 <!-- - Add a Redis instance in docker-compose, and:
   - expose it's config via .env and the config module;
@@ -957,11 +963,14 @@ describe('BooksController (e2e)', () => {
 - Add user consent forms with versioned policies
 - Add option for log-in using social media accounts
 
+<!-- <br />
 <br />
 
-# Origins
+# Motivation
 
-A lot of the code in this repo came from my own projects, and it's a culmination of features that I had to implement frequently for different systems.
+Reduces the repetitive task I encounter frequently. It covers the basics to let me focus on building the fun stuff. -->
+
+<!-- A lot of the code in this repo came from my own projects, and it's a culmination of features that I had to implement frequently for different systems.
 
 Modern web apps tend to have similar initial demands, so the fastest way to go about starting a new project was copying code around and modifying it a bit. An easy but repetitive task that removes all the joy out of building software.
 
@@ -983,6 +992,9 @@ For consistency, I tried to keep the code as much as posible close to NestJS' co
 - [NarHakobyan/awesome-nest-boilerplate](https://github.com/NarHakobyan/awesome-nest-boilerplate);
 - [nestjsx/crud](https://github.com/nestjsx/crud);
 
+<br /> -->
+
+<br />
 <br />
 
 # License
