@@ -1,6 +1,8 @@
 # env config
 .env
 
+# only /bin and /node_modules should be commited to npm
+
 # all source
 /src
 /test
@@ -10,7 +12,6 @@
 
 # compiled output
 /dist
-/node_modules
 
 # Logs
 logs
