@@ -1,6 +1,6 @@
 {
   "name": "nest-pret",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "A production-ready NestJS starting project with a full auth module containing registration, email verification, password recovery, claims-based access control, standardized and paginated responses, OpenAPI auto-documentation and more.",
   "author": "Ricardo Simioni",
   "license": "MIT",
@@ -43,7 +43,6 @@
     "updateSchematics": "npm i nest-pret-schematics@latest",
     "postdev": "npm run --silent welcome",
     "welcome": "node -e \"console.log('App will be available in a few seconds here: \\n\\n👉 API docs: http://localhost:3000/dev-tools/docs\\n🔥 App graph: http://localhost:3000/dev-tools/graph\\n')\""
-
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
