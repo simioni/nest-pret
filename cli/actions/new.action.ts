@@ -126,6 +126,7 @@ const generateApplicationFiles = async (args: Input[], options: Input[]) => {
   const collection: AbstractCollection = CollectionFactory.create(
     (collectionName as Collection) || Collection.NESTPRET,
   );
+  console.log('collection: ', collection);
   const schematicOptions: SchematicOption[] = mapSchematicOptions(
     args.concat(options),
   );

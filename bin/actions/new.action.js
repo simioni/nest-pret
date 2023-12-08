@@ -75,6 +75,7 @@ const generateApplicationFiles = async (args, options) => {
     const collectionName = options.find((option) => option.name === 'collection' && option.value != null).value;
     console.log('collectionName: ', collectionName);
     const collection = collections_1.CollectionFactory.create(collectionName || collections_1.Collection.NESTPRET);
+    console.log('collection: ', collection);
     const schematicOptions = mapSchematicOptions(args.concat(options));
     await collection.execute('application', schematicOptions);
     console.info();

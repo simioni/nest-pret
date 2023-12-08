@@ -4,6 +4,7 @@ exports.NestPretCollection = void 0;
 const abstract_collection_1 = require("./abstract.collection");
 class NestPretCollection extends abstract_collection_1.AbstractCollection {
     constructor(runner) {
+        console.log('Building NestPretCollection');
         super('nest-pret-schematics', runner);
     }
     async execute(name, options) {

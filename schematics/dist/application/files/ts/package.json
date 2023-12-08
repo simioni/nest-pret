@@ -1,6 +1,6 @@
 {
   "name": "nest-pret",
-  "version": "0.2.4",
+  "version": "1.1.5",
   "description": "A production-ready NestJS starting project with a full auth module containing registration, email verification, password recovery, claims-based access control, standardized and paginated responses, OpenAPI auto-documentation and more.",
   "author": "Ricardo Simioni",
   "license": "MIT",
@@ -9,12 +9,19 @@
   },
   "homepage": "https://github.com/simioni/nest-pret#readme",
   "schematics": "./cli/schematics/collection.json",
+  "engines": {
+    "node": ">= 16.14"
+  },
+  "bin": {
+    "nest": "bin/nest-pret.js"
+  },
   "scripts": {
     "dev": "docker-compose up --build -d",
     "build": "nest build",
     "deploy": "scripts/deploy.sh",
-    "prod": "docker compose up",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",
+    "deploy:registry": "docker service create --name registry --publish published=5000,target=5000 registry:2",
+    "prod": "docker compose -f docker-stack.yml up",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -33,7 +40,9 @@
     "build:cli": "tsc -p tsconfig.cli.json",
     "build:cli:only": "tsc -p tsconfig.cli.json",
     "publishSchematics": "cd schematics && npm run pub",
-    "updateSchematics": "npm i nest-pret-schematics@latest"
+    "updateSchematics": "npm i nest-pret-schematics@latest",
+    "postdev": "npm run --silent welcome",
+    "welcome": "node -e \"console.log('App will be available in a few seconds here: \\n\\n👉 API docs: http://localhost:3000/dev-tools/docs\\n🔥 App graph: http://localhost:3000/dev-tools/graph\\n')\""
   },
   "dependencies": {
     "@casl/ability": "^6.5.0",
@@ -51,8 +60,11 @@
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "commander": "4.1.1",
     "helmet": "^7.0.0",
+    "inquirer": "8.2.6",
     "mongoose": "^7.6.3",
+    "nest-pret-schematics": "^0.10.13",
     "nest-standard-response": "^1.2.3",
     "nodemailer": "^6.9.7",
     "passport": "^0.6.0",
@@ -86,7 +98,6 @@
     "jest-environment-node": "^29.7.0",
     "lodash": "^4.17.21",
     "mongodb-memory-server": "^9.1.1",
-    "nest-pret-schematics": "^0.10.12",
     "nestjs-spelunker": "^1.3.0",
     "pactum": "^3.5.1",
     "prettier": "^2.8.8",

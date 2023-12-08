@@ -9,6 +9,7 @@ class AbstractCollection {
     async execute(name, options, extraFlags) {
         let command = this.buildCommandLine(name, options);
         command = extraFlags ? command.concat(` ${extraFlags}`) : command;
+        console.log('command: ', command);
         await this.runner.run(command);
     }
     buildCommandLine(name, options) {

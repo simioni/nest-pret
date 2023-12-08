@@ -91,7 +91,7 @@ printf "\n${Green}✅ All tests passed!\n"
 
 # bump the package version
 printf "\n${Purple}[VERSIONING]${Color_Off} Bumping the app version...\n"
-npm version $BUMP_VERSION
+npm version $BUMP_VERSION -m "Version %s was tested, built, and auto-deployed by the CD pipeline."
 
 # build the app
 printf "\n${Purple}[BUILDING]${Color_Off} Building the dist...\n"

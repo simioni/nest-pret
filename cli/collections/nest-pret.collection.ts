@@ -18,6 +18,7 @@ export class NestPretCollection extends AbstractCollection {
   ];
 
   constructor(runner: AbstractRunner) {
+    console.log('Building NestPretCollection');
     super('nest-pret-schematics', runner);
   }
 
