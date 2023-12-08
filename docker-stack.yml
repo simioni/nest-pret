@@ -1,25 +1,24 @@
-version: '3.1'
-name: 'nest-pret-dev'
+version: '3.8'
 
 services:
   mongo:
     image: mongo
     volumes:
-      - nest-pret-dev-mongo-data:/data/db
+      - mongo-data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     networks:
-      - nest-pret-dev-internal-network
+      - internal-network
 
   mongo-express:
     image: mongo-express
     ports:
       - 8081:8081
     networks:
-      - nest-pret-dev-internal-network
+      - internal-network
     environment:
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_SERVER: mongo
@@ -30,26 +29,38 @@ services:
       - mongo
 
   api:
-    image: api
+    image: 127.0.0.1:5000/nest-pret:${API_VERSION:-latest}
     build: .
     restart: always
-    command: npm run start:dev
-    env_file: .env
+    command: npm run start:prod
+    secrets:
+      - source: env_secrets
+        target: /usr/src/app/.env
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
+      - API_VERSION=${API_VERSION}
     ports:
       - 3000:3000
-    volumes:
-    - type: bind
-      source: .
-      target: /usr/src/app
     networks:
-      - nest-pret-dev-internal-network
+      - internal-network
     depends_on:
       - mongo
+    deploy:
+      replicas: 3
+      placement:
+        max_replicas_per_node: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
 
 volumes:
-  nest-pret-dev-mongo-data:
+  mongo-data:
 
 networks:
-  nest-pret-dev-internal-network:
+  internal-network:
+
+secrets:
+  env_secrets:
+    file: ./.env

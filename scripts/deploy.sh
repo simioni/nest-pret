@@ -20,11 +20,29 @@ DarkGray="\033[1;30m"       # Dark gray
 Flag_Green='\033[42;30;4m'  # Black on Green underlined
 Flag_Red='\033[101;30;4m'   # Black on Red underlined
 
+function printHelp() {
+  printf "${Flag_Green}${Bold}[Nest Pret]${Purple} Deployment Pipeline \n\n" >&2
+  printf "${Color_Off} ${Bold}This script will:${Regular}\n\n" >&2
+  printf "${Color_Off}   🛠️  ${Green}Build${Regular} and ${Green}test${Regular} the code;\n" >&2
+  printf "${Color_Off}   📮 Bump the package ${Green}version${Regular} number;\n" >&2
+  printf "${Color_Off}   🏷️  Create a ${Green}git tag${Regular} for the release and ${Green}commit it${Regular};\n" >&2
+  printf "${Color_Off}   📦 ${Green}Containerize${Regular} the compiled code and push the images to the registry;\n" >&2
+  printf "${Color_Off}   🚀 Start the ${Green}continous deployment${Regular} process to update all containers in the swarm one at a time.\n\n" >&2
+  printf "${Color_Off} ${Bold}Usage:${Regular} \n" >&2
+  printf "${Color_Off} npm run deploy -- [options] \n\n" >&2
+  printf "${Color_Off} ${Bold}Options:${Regular} \n" >&2
+  printf "${Color_Off} -v   --version     Sets the semversion increment to be used for this release. Acceptable values are ${Green}$validVersions${Color_Off}.\n" >&2
+  printf "${Color_Off} -q   --quiet       Supresses most logs.\n" >&2
+  printf "${Color_Off} -h   --help        Displays help information (this command).\n\n" >&2
+  printf "${Color_Off} ${Bold}Example:${Regular} \n" >&2
+  printf "${Color_Off} npm run deploy -- -v minor -q \n\n" >&2
+}
+
 function existsInList() {
-    LIST=$1
-    DELIMITER=$2
-    VALUE=$3
-    echo $LIST | tr "$DELIMITER" '\n' | grep -F -q -x "$VALUE"
+  LIST=$1
+  DELIMITER=$2
+  VALUE=$3
+  echo $LIST | tr "$DELIMITER" '\n' | grep -F -q -x "$VALUE"
 }
 validVersions="major, minor, patch"
 BUMP_VERSION='patch'
@@ -41,6 +59,9 @@ if [ "$1" = "--version" -o "$1" = "-v" ]; then
 elif [ "$1" = "--quiet" -o "$1" = "-q" ]; then
     IS_QUIET="true"
     shift 1
+elif [ "$1" = "--help" -o "$1" = "-h" ]; then
+    printHelp
+    exit 0
 else
     break
 fi
@@ -54,10 +75,8 @@ if git diff-index --quiet HEAD
 then
   printf "\n${Color_Off} Git directory is clean. Starting CD pipeline... \n"
 else
-  printf "\n ${Flag_Red}[ERROR]${Color_Off}${Bold} Working directory is not clean!\n\n" >&2
-  printf "${Color_Off} All commits intended to go into this release need to be merged and and the repo needs to be in a clean state before deploying.\n\n" >&2
-  printf "${Color_Off} This script will build and test the code, integrate and bump the version number, containerize and push the images, then start the continous deployment of each container in the swarm. \n\n" >&2
-  printf "${Color_Off} Make sure to ${Red}commit any changes${Color_Off} or stash them before continuing.\n\n" >&2
+  printf "\n ${Flag_Red}[ERROR]${Color_Off}${Bold} ${Red}Working directory is not clean!${Color_Off}\n\n" >&2
+  printf "${Color_Off} All commits intended to go into this deployment must be merged before proceeding.\n\n" >&2
   exit 1
 fi
 
@@ -72,7 +91,7 @@ printf "\n${Green}✅ All tests passed!\n"
 
 # bump the package version
 printf "\n${Purple}[VERSIONING]${Color_Off} Bumping the app version...\n"
-npm version $BUMP_VERSION
+npm version $BUMP_VERSION -m "Version %s was tested, built, and auto-deployed by the CD pipeline."
 
 # build the app
 printf "\n${Purple}[BUILDING]${Color_Off} Building the dist...\n"
@@ -81,7 +100,7 @@ npm run build
 # build the docker image
 printf "\n${Purple}[CONTAINERIZING]${Color_Off} Building the docker image...\n"
 export API_VERSION=$(npm pkg get version --workspaces=false | tr -d \\\")
-docker compose build
+docker compose -f docker-stack.yml build
 
 # push the docker image to the container repository
 printf "\n${Purple}[UPLOADING]${Color_Off} Pushing the docker image into the container repository...\n"
@@ -94,15 +113,15 @@ printf "\n${Purple}[REACHING]${Color_Off} Reaching the swarm manager node...\n"
 sleep 2
 printf "\n${Color_Off} Now running in SSH in the swarm manager\n"
 
-# copy the .env and docker-compose.yml files into it (in case they have changed)
+# copy the .env and docker-stack.yml files into it (in case they have changed)
 printf "\n${Purple}[COPYING]${Color_Off} The new compose file and .env ...\n"
 sleep 2
 printf "\n${Color_Off} Copied two files into the swarm manager\n"
 
 # re-deploy the stack into the swarm
 printf "\n${Purple}[DEPLOYING]${Color_Off} Starting the rolling update...\n"
-# docker stack deploy -c docker-compose.yml pret
-docker stack deploy -c docker-compose.yml --resolve-image changed pret
+# docker stack deploy -c docker-stack.yml pret
+docker stack deploy -c docker-stack.yml --resolve-image changed pret
 sleep 2
 
 printf "\n${Purple}[ROLLING UPDATE]${Color_Off} \n"
