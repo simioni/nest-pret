@@ -8,6 +8,7 @@ const nest_pret_collection_1 = require("./nest-pret.collection");
 const nest_collection_1 = require("./nest.collection");
 class CollectionFactory {
     static create(collection) {
+        console.log('inside CollectionFactory.create:');
         const schematicRunner = runners_1.RunnerFactory.create(runners_1.Runner.SCHEMATIC);
         console.log('schematicRunner:', schematicRunner);
         if (collection === collection_1.Collection.NESTJS) {
