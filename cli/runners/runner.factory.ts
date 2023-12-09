@@ -7,6 +7,7 @@ import { SchematicRunner } from './schematic.runner';
 
 export class RunnerFactory {
   public static create(runner: Runner) {
+    console.log('inside RunnerFactory.create', 'runner:', runner);
     switch (runner) {
       case Runner.SCHEMATIC:
         return new SchematicRunner();

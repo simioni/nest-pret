@@ -9,6 +9,7 @@ const schematic_runner_1 = require("./schematic.runner");
 // import { PnpmRunner } from './pnpm.runner';
 class RunnerFactory {
     static create(runner) {
+        console.log('inside RunnerFactory.create', 'runner:', runner);
         switch (runner) {
             case runner_1.Runner.SCHEMATIC:
                 return new schematic_runner_1.SchematicRunner();
