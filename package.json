@@ -45,6 +45,7 @@
     "welcome": "node -e \"console.log('App will be available in a few seconds here: \\n\\n👉 API docs: http://localhost:3000/dev-tools/docs\\n🔥 App graph: http://localhost:3000/dev-tools/graph\\n')\""
   },
   "dependencies": {
+    "@angular-devkit/schematics-cli": "16.2.8",
     "@casl/ability": "^6.5.0",
     "@faker-js/faker": "^8.2.0",
     "@nestjs/common": "^10.0.0",
