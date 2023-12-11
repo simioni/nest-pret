@@ -8,7 +8,7 @@
 <!-- <a href="https://app.circleci.com/pipelines/github/simioni/nest-pret" target="_blank"><img alt="CircleCI" src="https://img.shields.io/circleci/build/github/simioni/nest-pret/main?logo=circleci"></a> -->
 
 
-### Generates code that is tested, documented, and production-ready.
+### Generates code that is tested, documented, and production-ready with zero-downtime continuous deployment.
 </br>
 
 The generated app solves much of the functionality required from a modern web app:
@@ -39,7 +39,7 @@ The generated app solves much of the functionality required from a modern web ap
   - Config service makes them available app-wide with proper type definitions
 - Deployable
   - Docker compose environmets for dev and e2e testing
-  - Docker swarm stack ready for continous deployment
+  - Docker swarm stack ready for continuous deployment
 - Tested
   - Complete end-to-end testing suites
   - 100% coverage of all user interaction flows
