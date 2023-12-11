@@ -1,4 +1,4 @@
-# A fully-decorated nest ready to fly
+# A generator to bootstrap fully-featured NestJS apps
 
 <a href="https://www.npmjs.com/package/nest-pret" target="_blank"><img src="https://img.shields.io/npm/v/nest-pret" alt="NPM Version" /></a>
 <a href="https://github.com/simioni/nest-pret/blob/main/LICENSE" target="_blank"><img src="https://img.shields.io/npm/l/nest-pret" alt="Package License" /></a>
@@ -8,10 +8,10 @@
 <!-- <a href="https://app.circleci.com/pipelines/github/simioni/nest-pret" target="_blank"><img alt="CircleCI" src="https://img.shields.io/circleci/build/github/simioni/nest-pret/main?logo=circleci"></a> -->
 
 
-### Tested, documented, and production-ready.
+### Generates code that is tested, documented, and production-ready.
 </br>
 
-**Nest Pret** is a replicable NestJS project that solves much of the functionality required from a modern web app.
+The generated app solves much of the functionality required from a modern web app:
 
 - User registration
 - Password recovery<!-- - User consent for TOS, Cookies, Policies, etc -->
@@ -65,7 +65,7 @@ npm run dev
 This will start
 - the dev database<!-- - a redis instance; -->
 - the NestJS app in watch mode: `localhost:3000`
-- a mongo-express visual DB admin*: `localhost:8081`
+- Mongo-express visual DB admin*: `localhost:8081`
 - Swagger UI documentation explorer*: `localhost:3000/dev-tools/docs`
 - MermaidJS App Graph*: `localhost:3000/dev-tools/graph`
 
