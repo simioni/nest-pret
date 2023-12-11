@@ -110,7 +110,7 @@ To see how the app behaves in production, you can run the deployment `stack` on 
 <br />
 <br />
 
-# 🚀 Running in production
+# 🐳 Running in production
 
 ### Prepare the servers:
 1. Start one or more servers or VPSs on your cloud provider of choice and install Docker on them;
@@ -184,6 +184,7 @@ The Code:
 </br>
 
 # Tech stack <a name="TechStack"></a>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
 * Docker [compose](https://github.com/docker/compose) for development and testing, and [swarm](https://dockerswarm.rocks/) for deployment;
 * Typescript
@@ -201,8 +202,10 @@ The Code:
 * Swagger / OpenAPI <sup>[source](https://github.com/swagger-api)</sup>
 
 <br />
+<br />
 
 # App Graph <a name="AppGraph"></a>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
 ```mermaid
 %%{ init: { 'flowchart': { 'curve': 'monotoneX' }, 'theme':'dark' } }%%
@@ -313,7 +316,11 @@ class AppModule,MongooseModule,StandardResponseModule,AuthModule,UserModule,Poli
 style legend stroke-dasharray: 0 1 1,fill:white,fill-opacity:0.02,opacity:0.95
 ```
 
+<br />
+<br />
+
 # Models as a Single Source of Truth (SSOT) <a name="AboutModels"></a>
+<p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
 Model Classes serve as the unified entry point describing the format and all expectations for a given piece of data. They are used as an `Interface` to create the [mongoose schema](https://mongoosejs.com/docs/typescript/schemas.html), but they are also used to create both ingress and egress DTOs using [Mapped Types](https://docs.nestjs.com/openapi/mapped-types).
 
@@ -508,10 +515,6 @@ export class UserController {
 ```
 </details>
 
-
----------------------------------------------------
-
-
 <br />
 <br />
 
@@ -519,9 +522,9 @@ export class UserController {
 
 Typescript interfaces are completely removed from compiled code. Since we want to perform data validation and transformation at runtime, all models and DTOs must use Classes instead. TS Classes can also be used as ***types*** when needed, but they are persisted as JS Classes in the compiled code.
 
-Most decorators work by using the JS [Reflect API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect) to store metadata inside of those classes. This often includes the ***type*** that those values had in Typescript, but can also include any other value the decorator thinks the app might need at runtime.
+<!-- Most decorators work by using the JS [Reflect API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect) to store metadata inside of those classes. This often includes the ***type*** that those values had in Typescript, but can also include any other value the decorator thinks the app might need at runtime.
 
-At any point during the app execution, other parts of the app might use [Reflection](https://en.wikipedia.org/wiki/Reflective_programming) to inspect this metadata before deciding on an action. That's how the `ValidationPipe` can inspect a Model or DTO instance and validate the ***type*** of its properties, or how the `RoleSerializerInterceptor` can retrieve the rules used serialize a value.
+At any point during the app execution, other parts of the app might use [Reflection](https://en.wikipedia.org/wiki/Reflective_programming) to inspect this metadata before deciding on an action. That's how the `ValidationPipe` can inspect a Model or DTO instance and validate the ***type*** of its properties, or how the `RoleSerializerInterceptor` can retrieve the rules used serialize a value. -->
 
 
 <br />
