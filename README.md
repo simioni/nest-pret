@@ -46,161 +46,144 @@
 
 <br />
 
-# Getting started
+# 🚀 Getting started
 
-* Clone this repo
-* Edit the ```.env``` file and add at least your mailer service information.
+In a machine with npm installed, run:
+```sh
+npx nest-pret@latest new
+```
+
+After the generator have bootstraped your new app:
+
+```
+cd myapp
+npm run dev
+```
 
 <br />
 
-## 🐳 &nbsp; Start using Docker
-To start using Docker, run:
-
-    npm run dev
-
-This will start a docker compose with:
+This will start
 - the dev database<!-- - a redis instance; -->
-- a mongo-express visual DB admin page at `localhost:8081`
-- the NestJS app in watch mode at `localhost:3000`
+- the NestJS app in watch mode: `localhost:3000`
+- a mongo-express visual DB admin*: `localhost:8081`
+- Swagger UI documentation explorer*: `localhost:3000/dev-tools/docs`
+- MermaidJS App Graph*: `localhost:3000/dev-tools/graph`
 
-Only for the `development` env, the app will also serve documentation and a dependency graph:
+> These features are only started when running in `development` env.
 
-- Swagger UI documentation explorer: `localhost:3000/dev-tools/docs`
-- Swagger documentation JSON: `localhost:3000/dev-tools/docs-json`
-- MermaidJS graph providing a high level view of the inter-module dependencies: `localhost:3000/dev-tools/graph`
+<br />
 
-> If running in Docker, you're not required to run ```npm install``` locally, but you still might want to do so in order to get features such as auto-import and auto-complete in your code editor.
+Remember to edit the ```.env``` file and add your mailer service information to get mailer features.
 
 <br />
 <br />
 
-## 🐧 &nbsp; Start without docker
+# 🚦 Managing the app
 
-Make sure to edit ```.env``` file to add the connection information for your mongo database, then run:
+|Command|Description|
+|----|-----------|
+|<code>npm&nbsp;run&nbsp;dev</code>|Use for local development. This will start docker as `development` and keep the app in `watch mode` inside of it.|
+|<code>npm&nbsp;run&nbsp;dev:stop</code>|Stops all containers created by running the `dev` command.|
+|<code>npm&nbsp;run&nbsp;test</code>|Run tests locally.|
+|<code>npm&nbsp;run&nbsp;e2e</code>|Starts docker *as* `production` and run the `e2e` tests inside of it.|
+|<code>npm&nbsp;run&nbsp;deploy</code>|Once you're ready to publish an update, this stars the continuous-deployment pipeline. This will test, build, bump the version, commit & tag, containerize and push the new image to the registry, and start the rolling-update of new containers into the production swarm. |
 
-    npm install
-    npm run start:dev
+<br />
+
+Some of the scripts can be started in watch mode:
+
+|Command|Description|
+|----|-----------|
+|<code>npm&nbsp;run&nbsp;test:watch</code>|Run all tests locally and keep watching for changes.|
+|<code>npm&nbsp;run&nbsp;e2e:watch</code>|Starts docker *as* `production` and run all e2e tests inside of it. Keep test containers alive and will re-run changed tests.|
+|<code>npm&nbsp;run&nbsp;e2e:stop</code>|Stops all test containers keept alive by running `e2e:watch`.|
+
+<br />
+
+To see how the app behaves in production, you can run the deployment `stack` on a local `docker swarm` using the commands:
+
+|Command|Description|
+|----|-----------|
+|<code>npm&nbsp;run&nbsp;prod</code>|Will start a stack as `production` in the local machine docker engine. This requires docker to have the swarm orchestrator active. If not, you will need to run <code>docker&nbsp;swarm&nbsp;init</code> first.|
+|<code>npm&nbsp;run&nbsp;prod:stop</code>|Stops all docker swarm services created by running the `prod` command.|
 
 <br />
 <br />
 
-## 🧐 &nbsp; Running tests
-
-To run unit and integration tests (locally):
-
-```
-npm run test
-```
-or 
-```
-npm run test:watch
-```
-
-To run e2e tests:
-
-```
-npm run e2e
-```
-
-> This command will lift a full docker compose configuration with the testing environment, run all the tests against it, print the output, then immediately exit and prune all docker resources created.
-
-You can also run e2e tests in watch mode:
-
-```
-npm run e2e:watch
-```
-
-Note that running in this mode will keep the entire docker testing environment up. Once you're done with testing, you can take it down and clear everything by running:
-
-```
-npm run e2e:down
-```
-
-<!-- <br />
-<br />
-
-## 🚀 &nbsp; Running in production
-
-Make sure to edit the `.env` file to add the correct production information for your domain, mailer service, and a private container registry where the application container will be published to.
-
-### On your local machine:
-
-Test, build and publish the container
-
-```
-npm run e2e
-npm run build
-npm run publish
-```
+# 🚀 Running in production
 
 ### Prepare the servers:
 1. Start one or more servers or VPSs on your cloud provider of choice and install Docker on them;
 2. Start docker in swarm mode; If running multiple servers, add them to the swarm;
-3. SSH into the swarms *manager node* and copy the following files onto it: `.env`, `docker-swarm.yml`, `package.json`;
-4. Still on the manager node, run:
+
+<br />
+
+### On your local machine:
+
+1. Make sure to edit the `.env` file to add the correct production information for your domain, mailer service, VPS, and a private container registry where the application container will be published to.
+2. Make sure your git working directory is clean. Merge all changes that you want to be included in this release or stash them.
+3. Start the deployment pipeline by running:
 
 ```
-npm run prod
+npm run deploy
 ```
 
-This will start the following containers onto the swarm:
+The deployment pipeline will:
 
-- nginx as a reverse proxy
-- the production database
-- redis
-- the NestJS app
+- Run all tests and e2e tests;
+- Build the app;
+- Bump the npm version and create a tagged git commit;
+- Build the docker image and push it to the registry;
+- SSH into the docker swarm manager node;
+- Update the deployed stack with the new services;
 
-When running in `production` env, the app will not provide the same tools it does in development (documentation and dependency graph). It does, however, provide some other tools:
+Once the new stack is applied, the swarm will start a zero downtime rolling update of changed containers one at a time.
 
-- mgob for periodic database backups
-- metrics & monitoring
+<br />
 
-## Rolling updates
+### Rolling back failed updates
 
-Once you've changed your code and are ready to update the production version, make sure to test, build and publish your updated container:
-
-```
-npm run e2e
-npm run build
-npm run publish
-```
-
-Then SSH into your server and run:
-
-```
-npm run update
-```
-
-The swarm will start new updated containers to replace the current ones with zero downtime. If the update fails for some reason, you can rollback the update by running:
+If the deployed containers are crashing, docker will stop rolling out any new containers and will reroute traffic to the replicas that are still running the previous image. You can rollback the updated containers by running:
 
 ```
 npm run rollback
-``` -->
+```
 
 <br />
 
 ---------------------------------------------------------------------------
-<!-- # Motivation
+# Reference <a name="RefIndex"></a>
 
-NestJS achieves a great balance between performance, development speed and developer experience. By using TS/JS, it can tap on a vast ecosystem of libraries and tools
+* [Tech stack](#TechStack)
+* [App Graph](#AppGraph)
+* [Models as a Single Source of Truth (SSOT)](#AboutModels)
 
-This project:
-- enforces automatic linting and code formatting;
-- is fully tested and encourages test-driven development;
-- provides a "single source of truth" architecture for data Models that grant security in operations while avoiding code duplication;
+The Code:
 
-<br />
+* [Auth Module](#AuthModule) 🚪
+* [Policies Module](#PoliciesModule) 🏛️
+  * [CaslAbilityFactory](#CaslAbilityFactory)
+  * [PoliciesGuard](#PoliciesGuard) <sup>guard</sup>
+  * [@CheckPolicies()](#CheckPoliciesDecorator) <sup>decorator</sup>
+  * [@UserAbilityParam()](#UserAbilityParamDecorator) <sup>parameter decorator</sup>
+* [User Module](#UserModule) 👤
+  * [EmailVerifiedGuard](#EmailVerifiedGuard) <sup>guard</sup>
+  * [EmailOrIdPipe](#EmailOrIdPipe) <sup>pipe</sup>
+* [Mailer Module](#MailerModule) 📮
+* [Config Module](#ConfigModule) ⚙️
+* [StandardResponse Module](#StandardResponseModule) 📦
+  * [@StandardResponse()](#StandardResponseDecorator) <sup>decorator</sup>
+    * [StandardResponseOptions](#StandardResponseOptions)
+    * [@StandardParam()](#StandardParamDecorator) <sup>parameter decorator</sup>
+  * [@RawResponse()](#RawResponseDecorator) <sup>decorator</sup>
+  * [Advanced Configuration](#StandardResponseConfiguration)
+* [Testing Factories](#TestModule) 🧪
+  * [TestingServerFactory](#TestingServerFactory)
+  * [UserStubFactory](#UserStubFactory)
 
-## Model Classes as a "single source of truth" for data entities
+</br>
 
-In Typescript, data Models and their property types are usually defined as an `Interface` that is implemented by a schema or entity class 
-
-- A schema, used by mongoose to provide type safety (and code completion, easier refactoring, etc...)
-  - The schema contains all properties from the model, and represents the data exactly as it is saved in the DB
-- Data validation on input
-  - Contain only the fields that are acceptable for a given operation -->
-
-# Tech stack
+# Tech stack <a name="TechStack"></a>
 
 * Docker [compose](https://github.com/docker/compose) for development and testing, and [swarm](https://dockerswarm.rocks/) for deployment;
 * Typescript
@@ -219,7 +202,7 @@ In Typescript, data Models and their property types are usually defined as an `I
 
 <br />
 
-# App Graph
+# App Graph <a name="AppGraph"></a>
 
 ```mermaid
 %%{ init: { 'flowchart': { 'curve': 'monotoneX' }, 'theme':'dark' } }%%
@@ -330,11 +313,11 @@ class AppModule,MongooseModule,StandardResponseModule,AuthModule,UserModule,Poli
 style legend stroke-dasharray: 0 1 1,fill:white,fill-opacity:0.02,opacity:0.95
 ```
 
-# Models
+# Models as a Single Source of Truth (SSOT) <a name="AboutModels"></a>
 
-Model Classes serve as a 'single source of truth' for all modeled data. They are used as an `Interface` to create the mongoose [schemas](https://mongoosejs.com/docs/typescript/schemas.html), but they are also used to create DTOs using [Mapped Types](https://docs.nestjs.com/openapi/mapped-types).
+Model Classes serve as the unified entry point describing the format and all expectations for a given piece of data. They are used as an `Interface` to create the [mongoose schema](https://mongoosejs.com/docs/typescript/schemas.html), but they are also used to create both ingress and egress DTOs using [Mapped Types](https://docs.nestjs.com/openapi/mapped-types).
 
-The information on Model properties also defines input validation rules enforced when the model is expected in requests, and defines serialization rules when the model is send in responses.
+This means the information on Model properties define input validation rules enforced when the model is expected in requests, and defines serialization rules when the model is send in responses.
 
 Finally, model properties can also provide OpenAPI documentation information, like descriptions and usage examples.
 
@@ -543,33 +526,6 @@ At any point during the app execution, other parts of the app might use [Reflect
 
 <br />
 <br />
-
----------------------------------------------------------------------------
-# Reference <a name="RefIndex"></a>
-
-* [Auth Module](#AuthModule) 🚪
-* [Policies Module](#PoliciesModule) 🏛️
-  * [CaslAbilityFactory](#CaslAbilityFactory)
-  * [PoliciesGuard](#PoliciesGuard) <sup>guard</sup>
-  * [@CheckPolicies()](#CheckPoliciesDecorator) <sup>decorator</sup>
-  * [@UserAbilityParam()](#UserAbilityParamDecorator) <sup>parameter decorator</sup>
-* [User Module](#UserModule) 👤
-  * [EmailVerifiedGuard](#EmailVerifiedGuard) <sup>guard</sup>
-  * [EmailOrIdPipe](#EmailOrIdPipe) <sup>pipe</sup>
-* [Mailer Module](#MailerModule) 📮
-* [Config Module](#ConfigModule) ⚙️
-* [StandardResponse Module](#StandardResponseModule) 📦
-  * [@StandardResponse()](#StandardResponseDecorator) <sup>decorator</sup>
-    * [StandardResponseOptions](#StandardResponseOptions)
-    * [@StandardParam()](#StandardParamDecorator) <sup>parameter decorator</sup>
-  * [@RawResponse()](#RawResponseDecorator) <sup>decorator</sup>
-  * [Advanced Configuration](#StandardResponseConfiguration)
-* [Testing Factories](#TestModule) 🧪
-  * [TestingServerFactory](#TestingServerFactory)
-  * [UserStubFactory](#UserStubFactory)
-
-</br>
-
 
 # Auth Module <a name="AuthModule"></a> 🚪
 <p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
@@ -993,6 +949,28 @@ For consistency, I tried to keep the code as much as posible close to NestJS' co
 - [nestjsx/crud](https://github.com/nestjsx/crud);
 
 <br /> -->
+
+
+<!-- --------------------------------------------------------------------------- -->
+<!-- # Motivation
+
+NestJS achieves a great balance between performance, development speed and developer experience. By using TS/JS, it can tap on a vast ecosystem of libraries and tools
+
+This project:
+- enforces automatic linting and code formatting;
+- is fully tested and encourages test-driven development;
+- provides a "single source of truth" architecture for data Models that grant security in operations while avoiding code duplication;
+
+<br />
+
+## Model Classes as a "single source of truth" for data entities
+
+In Typescript, data Models and their property types are usually defined as an `Interface` that is implemented by a schema or entity class 
+
+- A schema, used by mongoose to provide type safety (and code completion, easier refactoring, etc...)
+  - The schema contains all properties from the model, and represents the data exactly as it is saved in the DB
+- Data validation on input
+  - Contain only the fields that are acceptable for a given operation -->
 
 <br />
 <br />
