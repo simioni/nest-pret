@@ -8,7 +8,7 @@
 <!-- <a href="https://app.circleci.com/pipelines/github/simioni/nest-pret" target="_blank"><img alt="CircleCI" src="https://img.shields.io/circleci/build/github/simioni/nest-pret/main?logo=circleci"></a> -->
 
 
-### Generates code that is tested, documented, and production-ready with zero-downtime continuous deployment.
+### Generates code that is tested, documented, and production-ready with zero downtime continuous deployment.
 </br>
 
 The generated app solves much of the functionality required from a modern web app:
@@ -127,6 +127,8 @@ To see how the app behaves in production, you can run the deployment `stack` on 
 ```
 npm run deploy
 ```
+
+### 🔥 Done!
 
 The deployment pipeline will:
 
