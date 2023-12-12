@@ -1,7 +1,19 @@
+# only /bin should be commited to npm
+
 # env config
 .env
 
-# only /bin and /node_modules should be commited to npm
+# source
+**/*.ts
+*.ts
+
+# definitions
+!**/*.d.ts
+!*.d.ts
+
+# compiled output
+/dist
+/node_modules
 
 # all source
 /src
@@ -9,9 +21,6 @@
 /scripts
 /schematics
 /cli
-
-# compiled output
-/dist
 
 # Logs
 logs

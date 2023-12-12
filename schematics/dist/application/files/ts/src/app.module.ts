@@ -21,6 +21,7 @@ import { RolesSerializerInterceptor } from './user/interceptors/roles-serializer
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ApiConfig } from './config/interfaces/api-config.interface';
 import { AuthController } from './auth/auth.controller';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { AuthController } from './auth/auth.controller';
     AuthModule,
     UserModule,
     MailerModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [
