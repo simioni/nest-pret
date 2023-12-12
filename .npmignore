@@ -3,6 +3,14 @@
 # env config
 .env
 
+# source
+**/*.ts
+*.ts
+
+# definitions
+!**/*.d.ts
+!*.d.ts
+
 # compiled output
 /dist
 /node_modules
@@ -13,14 +21,6 @@
 /scripts
 /schematics
 /cli
-
-# source
-**/*.ts
-*.ts
-
-# definitions
-!**/*.d.ts
-!*.d.ts
 
 # Logs
 logs
