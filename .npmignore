@@ -5,6 +5,7 @@
 
 # compiled output
 /dist
+/node_modules
 
 # all source
 /src
@@ -16,7 +17,6 @@
 # source
 **/*.ts
 *.ts
-/test
 
 # definitions
 !**/*.d.ts
