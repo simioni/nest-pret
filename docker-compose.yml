@@ -46,6 +46,23 @@ services:
       - nest-pret-dev-internal-network
     depends_on:
       - mongo
+    healthcheck:
+      # the command 'docker compose up' waits for this healthcheck before showing the welcome message during development
+      # see: https://docs.docker.com/engine/reference/commandline/compose_up/
+      # since we don't want to wait for too long before showing the message, we want to use a low internal number here
+      # we're using 10s here, but this is very wastefull outside of initial boot
+      # ideally we would check every 2 or 3 seconds during startup, and them only every 60 seconds after that
+      # the property required to do this is start_interval, but...
+      # TODO start_interval requires docker engine >= 25, which has not yet been released https://github.com/docker/compose/issues/10830
+      # it depends on moby/moby 1.25, the milestone progress can be tracked here: https://github.com/moby/moby/milestone/119
+      # documentation for it is here: https://docs.docker.com/engine/reference/builder/#healthcheck
+      test: wget --no-verbose --tries=1 --spider http://localhost:3000/health/replica || exit 1
+      interval: 10s # TODO for now we'll go with a 10s internal
+      # interval: 60s # But it should be 60 after docker engine 25
+      # start_interval: 2s # TODO this requires docker engine 25
+      start_period: 30s
+      retries: 5
+      timeout: 5s
 
 volumes:
   nest-pret-dev-mongo-data:
