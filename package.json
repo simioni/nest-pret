@@ -1,6 +1,6 @@
 {
   "name": "nest-pret",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "A generator to bootstrap fully-featured NestJS apps. Includes user registration, email verification, password recovery, claims-based access control, standardized and paginated responses, OpenAPI auto-documentation and more.",
   "keywords": [
     "typescript",
