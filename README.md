@@ -220,6 +220,8 @@ The Code:
 # App Graph <a name="AppGraph"></a>
 <p align="right"><a href="#RefIndex"><small>Back to index &nbsp;⤴</small></a></p>
 
+These are the modules included in the generated app and how they interact with each other.
+
 ```mermaid
 %%{ init: { 'flowchart': { 'curve': 'monotoneX' }, 'theme':'dark' } }%%
 flowchart LR
