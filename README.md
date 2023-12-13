@@ -86,7 +86,7 @@ Remember to edit the ```.env``` file and add your mailer service information to 
 |<code>npm&nbsp;run&nbsp;dev:stop</code>|Stops all containers created by running the `dev` command.|
 |<code>npm&nbsp;run&nbsp;test</code>|Run tests locally.|
 |<code>npm&nbsp;run&nbsp;e2e</code>|Starts docker *as* `production` and run the `e2e` tests inside of it.|
-|<code>npm&nbsp;run&nbsp;deploy</code>|Once you're ready to publish an update, this stars the continuous deployment pipeline. See [running in production](#RunningInProduction). |
+|<code>npm&nbsp;run&nbsp;deploy</code>|Once you're ready to publish to production, this stars the continuous deployment pipeline. See [running in production](#runningInProduction). |
 
 <br />
 
@@ -110,7 +110,7 @@ To see how the app behaves in production, you can run the deployment `stack` on 
 <br />
 <br />
 
-# 🐳 Running in production <a name="RunningInProduction"></a>
+# 🐳 Running in production <a name="runningInProduction"></a>
 
 ### Prepare the servers:
 1. Start one or more servers or VPSs on your cloud provider of choice and install Docker on them;
