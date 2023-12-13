@@ -86,7 +86,7 @@ Remember to edit the ```.env``` file and add your mailer service information to 
 |<code>npm&nbsp;run&nbsp;dev:stop</code>|Stops all containers created by running the `dev` command.|
 |<code>npm&nbsp;run&nbsp;test</code>|Run tests locally.|
 |<code>npm&nbsp;run&nbsp;e2e</code>|Starts docker *as* `production` and run the `e2e` tests inside of it.|
-|<code>npm&nbsp;run&nbsp;deploy</code>|Once you're ready to publish an update, this stars the continuous-deployment pipeline. This will test, build, bump the version, commit & tag, containerize and push the new image to the registry, and start the rolling-update of new containers into the production swarm. |
+|<code>npm&nbsp;run&nbsp;deploy</code>|Once you're ready to publish an update, this stars the continuous deployment pipeline. See [running in production](#RunningInProduction). |
 
 <br />
 
@@ -110,23 +110,25 @@ To see how the app behaves in production, you can run the deployment `stack` on 
 <br />
 <br />
 
-# 🐳 Running in production
+# 🐳 Running in production <a name="RunningInProduction"></a>
 
 ### Prepare the servers:
 1. Start one or more servers or VPSs on your cloud provider of choice and install Docker on them;
-2. Start docker in swarm mode; If running multiple servers, add them to the swarm;
+2. Start docker in [swarm mode](https://docs.docker.com/engine/swarm/swarm-mode/); If running multiple servers, add them to the swarm;
 
 <br />
 
 ### On your local machine:
 
-1. Make sure to edit the `.env` file to add the correct production information for your domain, mailer service, VPS, and a private container registry where the application container will be published to.
+1. Make sure to edit the `.env` file to add the correct production information for your domain, mailer service, SSH key location, and a private container registry where the application container will be published to.
 2. Make sure your git working directory is clean. Merge all changes that you want to be included in this release or stash them.
 3. Start the deployment pipeline by running:
 
 ```
 npm run deploy
 ```
+
+<br />
 
 ### 🔥 Done!
 
@@ -135,11 +137,20 @@ The deployment pipeline will:
 - Run all tests and e2e tests;
 - Build the app;
 - Bump the npm version and create a tagged git commit;
-- Build the docker image and push it to the registry;
+- Build the container image and push it to the registry;
 - SSH into the docker swarm manager node;
 - Update the deployed stack with the new services;
 
 Once the new stack is applied, the swarm will start a zero downtime rolling update of changed containers one at a time.
+
+<br />
+
+> Deployments will default to building a new *patch* release. You can specify another semversion, for example for a *minor* release, run:
+>
+> `npm run deploy -- -v minor`
+>
+> To see all options available to the *deploy.sh* script, run:
+> `npm run deploy -- --help`.
 
 <br />
 
