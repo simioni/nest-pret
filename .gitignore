@@ -2,8 +2,10 @@
 .env
 
 # compiled output
+/bin
 /dist
 /node_modules
+/schematics/dist
 
 # Logs
 logs

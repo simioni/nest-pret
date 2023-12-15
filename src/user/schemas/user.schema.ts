@@ -58,13 +58,13 @@ export class User {
   familyName?: string;
 
   @Prop()
-  @ApiProperty({ example: '093478857' })
+  @ApiProperty({ example: 93478857 })
   @IsInt()
   @Min(100000, { message: 'phone must have at least 6 digits' })
   phone?: string;
 
   @Prop()
-  @ApiProperty({ type: 'string', example: '07-23-1992' }) // birthDate is exposed as string in the API
+  @ApiProperty({ type: 'string', example: '07/23/1992' }) // birthDate is exposed as string in the API
   @Transform(({ value, type, options }) => {
     if (type === TransformationType.PLAIN_TO_CLASS)
       return isISO8601(value) ? new Date(value) : value; // but transformed during plainToClass, into a proper Date() but only if the string is a valid ISO 8601 date string
