@@ -62,6 +62,7 @@ export class NewAction extends AbstractAction {
     if (!isDryRunEnabled) {
       if (!shouldSkipGit) {
         await initializeGitRepository(projectDirectory);
+        await renameGitIgnore(projectDirectory);
         // await createGitIgnoreFile(projectDirectory);
       }
     }
@@ -206,6 +207,25 @@ const createGitIgnoreFile = (dir: string, content?: string) => {
     return;
   }
   return fs.promises.writeFile(filePath, fileContent);
+};
+
+/**
+ * Renames the `.gitignore.example` file from the root of the newly created project to
+ * just `.gitignore`.
+ * This is needed to get around npm completely removing the .gitignore file from
+ * published packages.
+ *
+ * @param dir Relative path to the project.
+ *
+ * @return Resolves when succeeds, or rejects with any error from `fn.rename`.
+ */
+const renameGitIgnore = (dir: string) => {
+  const filePath = join(process.cwd(), dir, '.gitignore.example');
+  const newPath = join(process.cwd(), dir, '.gitignore');
+  if (!fileExists(filePath)) {
+    return;
+  }
+  return fs.promises.rename(filePath, newPath);
 };
 
 /**

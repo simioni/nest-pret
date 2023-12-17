@@ -54,4 +54,24 @@ async function copyPackageJson() {
   await fs.promises.writeFile(destinationPath, newFile, { encoding: 'utf8' });
 }
 
+/**
+ * Copies the .gitignore file and renames it into .gitignore.example.
+ * This file is renamed back by by the CLI tool after the the code is generated.
+ * This workaround is needed due to a controversial design decision by npm to
+ * completely remove .gitignore files from published packages.
+ *
+ * To learn more about the issue:
+ * See: https://github.com/npm/npm/issues/7252
+ * and https://github.com/npm/npm/issues/1862
+ */
+async function copyGitIgnore() {
+  const originalPath = path.join(__dirname, '../../.gitignore');
+  const destinationPath = path.join(
+    __dirname,
+    '../dist/application/files/ts/.gitignore.example',
+  );
+  await fs.promises.copyFile(originalPath, destinationPath);
+}
+
 copyPackageJson();
+copyGitIgnore();
