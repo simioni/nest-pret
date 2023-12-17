@@ -74,11 +74,8 @@ async function copyGitIgnore() {
 }
 
 /**
- * Copies the .env.example file from the source app into the schematics used
- * to scaffold the generated apps.
- *
- * This will replace some fields with template strings to be populated with the
- * cli options.
+ * Copies the .env.example file and replace some fields with template strings
+ * to be populated with the cli options.
  */
 async function copyDotEnv() {
   const originalPath = path.join(__dirname, '../../.env.example');
@@ -98,10 +95,43 @@ async function copyDotEnv() {
     mailerEmailRegex,
     'MAILER_FROM_EMAIL=contact@<%= name %>.yourdomain',
   );
-
   await fs.promises.writeFile(destinationPath, file, { encoding: 'utf8' });
+}
+
+/**
+ * Copies docker-compose files and replace some fields with template strings
+ * to be populated with the cli options.
+ */
+async function copyDockerCompose() {
+  const pathDev = path.join(__dirname, '../../docker-compose.yml');
+  const pathTest = path.join(__dirname, '../../docker-compose.test.yml');
+  const destinationPathDev = path.join(
+    __dirname,
+    '../dist/application/files/ts/docker-compose.yml',
+  );
+  const destinationPathTest = path.join(
+    __dirname,
+    '../dist/application/files/ts/docker-compose.test.yml',
+  );
+  let fileDev = await fs.promises.readFile(pathDev, {
+    encoding: 'utf8',
+  });
+  let fileTest = await fs.promises.readFile(pathTest, {
+    encoding: 'utf8',
+  });
+  const nameRegex = new RegExp('^name:.*', 'gm');
+  fileDev = fileDev.replace(nameRegex, "name: '<%= name %>-dev'");
+  fileTest = fileTest.replace(nameRegex, "name: '<%= name %>-dev'");
+
+  await fs.promises.writeFile(destinationPathDev, fileDev, {
+    encoding: 'utf8',
+  });
+  await fs.promises.writeFile(destinationPathTest, fileTest, {
+    encoding: 'utf8',
+  });
 }
 
 copyPackageJson();
 copyGitIgnore();
 copyDotEnv();
+copyDockerCompose();
