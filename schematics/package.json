@@ -1,6 +1,6 @@
 {
   "name": "nest-pret-schematics",
-  "version": "1.3.7",
+  "version": "1.3.8",
   "description": "Schematics for scaffolding a Nest Pret App.",
   "author": "Ricardo Simioni",
   "license": "MIT",
