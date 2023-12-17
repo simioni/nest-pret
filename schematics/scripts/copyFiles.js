@@ -73,5 +73,35 @@ async function copyGitIgnore() {
   await fs.promises.copyFile(originalPath, destinationPath);
 }
 
+/**
+ * Copies the .env.example file from the source app into the schematics used
+ * to scaffold the generated apps.
+ *
+ * This will replace some fields with template strings to be populated with the
+ * cli options.
+ */
+async function copyDotEnv() {
+  const originalPath = path.join(__dirname, '../../.env.example');
+  const destinationPath = path.join(
+    __dirname,
+    '../dist/application/files/ts/.env.example',
+  );
+  let file = await fs.promises.readFile(originalPath, {
+    encoding: 'utf8',
+  });
+  const databaseNameRegex = new RegExp('^DATABASE_NAME=.*', 'gm');
+  const mailerNameRegex = new RegExp('^MAILER_FROM_NAME=.*', 'gm');
+  const mailerEmailRegex = new RegExp('^MAILER_FROM_EMAIL=.*', 'gm');
+  file = file.replace(databaseNameRegex, 'DATABASE_NAME=<%= name %>');
+  file = file.replace(mailerNameRegex, 'MAILER_FROM_NAME=<%= name %>');
+  file = file.replace(
+    mailerEmailRegex,
+    'MAILER_FROM_EMAIL=contact@<%= name %>.yourdomain',
+  );
+
+  await fs.promises.writeFile(destinationPath, file, { encoding: 'utf8' });
+}
+
 copyPackageJson();
 copyGitIgnore();
+copyDotEnv();
