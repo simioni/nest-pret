@@ -99,7 +99,7 @@ describe('App (e2e)', () => {
       expect(body.data.user.name).toEqual(user.name);
       expect(body.data.user.familyName).toEqual('Mayer');
       expect(body.data.user.email).toEqual(user.email);
-      expect(body.data.user.phone).toEqual('1234567');
+      expect(body.data.user.phone).toEqual(1234567);
       // use an admin account to verify that the birthDate was created (since that field is only visible to admins)
       const createdUser: User = await pactum
         .spec()

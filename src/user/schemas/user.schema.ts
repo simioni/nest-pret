@@ -61,7 +61,7 @@ export class User {
   @ApiProperty({ example: 93478857 })
   @IsInt()
   @Min(100000, { message: 'phone must have at least 6 digits' })
-  phone?: string;
+  phone?: number;
 
   @Prop()
   @ApiProperty({ type: 'string', example: '07/23/1992' }) // birthDate is exposed as string in the API

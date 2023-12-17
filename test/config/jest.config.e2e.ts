@@ -4,6 +4,7 @@ const config: Config = {
   rootDir: '../../',
   moduleFileExtensions: ['js', 'json', 'ts'],
   moduleDirectories: ['<rootDir>', 'node_modules'],
+  modulePathIgnorePatterns: ['<rootDir>/schematics/'],
   // modulePaths: ['./'],
   testRegex: '.e2e-spec.ts$',
   transform: {
