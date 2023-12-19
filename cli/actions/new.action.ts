@@ -123,11 +123,9 @@ const generateApplicationFiles = async (args: Input[], options: Input[]) => {
   const collectionName = options.find(
     (option) => option.name === 'collection' && option.value != null,
   )!.value;
-  console.log('collectionName: ', collectionName);
   const collection: AbstractCollection = CollectionFactory.create(
     (collectionName as Collection) || Collection.NESTPRET,
   );
-  console.log('collection: ', collection);
   const schematicOptions: SchematicOption[] = mapSchematicOptions(
     args.concat(options),
   );

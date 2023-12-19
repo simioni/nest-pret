@@ -48,8 +48,6 @@ async function copyPackageJson() {
   delete json.devDependencies['@types/inquirer'];
   delete json.devDependencies.copyfiles;
 
-  // console.log(json);
-
   const newFile = JSON.stringify(json, null, 2);
   await fs.promises.writeFile(destinationPath, newFile, { encoding: 'utf8' });
 }

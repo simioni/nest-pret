@@ -8,11 +8,9 @@ import { NestCollection } from './nest.collection';
 
 export class CollectionFactory {
   public static create(collection: Collection | string): AbstractCollection {
-    console.log('inside CollectionFactory.create:');
     const schematicRunner = RunnerFactory.create(
       Runner.SCHEMATIC,
     ) as SchematicRunner;
-    console.log('schematicRunner:', schematicRunner);
 
     if (collection === Collection.NESTJS) {
       return new NestCollection(schematicRunner);
